@@ -1,0 +1,330 @@
+# CAT monitor | software | Surveillance système | Voir ce que fait l'ordinateur : processeur, mémoire, disques, réseau. | Un moniteur affiche la charge de la machine et les programmes qui consomment le plus. | Moniteur système
+crit interface | Interface | text
+crit detail | Niveau de détail | enum
+crit gpu | Suivi du GPU | bool
+crit language | Langage | text
+#h detail | Quantité d'informations affichées.
+#h gpu | Affichage de l'usage de la carte graphique.
+
+@ btop | btop | Apache-2.0 | stable | 1 | oui |
+s Moniteur en terminal très complet : processeur, mémoire, disques, réseau, processus.
+c interface=Terminal (TUI) ; detail=élevé ; gpu=true ; language=C++
++ Très lisible ; Souris et thèmes
+- Un peu plus lourd que htop
+i Installer (Alpine) :: apk add btop
+d Dépôt | https://github.com/aristocratos/btop
+
+@ htop | htop | GPL-2.0+ | stable | 1 | oui |
+s Visualiseur de processus classique et léger.
+c interface=Terminal (TUI) ; detail=moyen ; gpu=false ; language=C
++ Très léger ; Disponible partout
+- Moins de détails que btop
+i Installer (Alpine) :: apk add htop
+d Site officiel | https://htop.dev/
+
+@ glances | Glances | LGPL-3.0 | stable | 2 | oui |
+s Moniteur en Python avec interface terminal, web et API.
+c interface=Terminal, web, API ; detail=élevé ; gpu=false ; language=Python
++ Accessible à distance par le web ; API pour les scripts
+- Plus lourd (Python)
+n Python
+i Installer (Alpine) :: apk add glances
+d Dépôt | https://github.com/nicolargo/glances
+
+@ bottom | bottom | MIT | stable | 2 | oui |
+s Moniteur en terminal avec graphiques, écrit en Rust.
+c interface=Terminal (TUI) ; detail=élevé ; gpu=false ; language=Rust
++ Graphiques clairs ; Très configurable
+- Moins connu
+i Installer (Alpine) :: apk add bottom
+d Dépôt | https://github.com/ClementTsang/bottom
+
+@ resources | Resources | GPL-3.0+ | stable | 1 | oui |
+s Moniteur graphique moderne (GNOME) : applications, processus, GPU.
+c interface=Graphique (GTK4) ; detail=élevé ; gpu=true ; language=Rust
++ Simple ; Suivi du GPU
+- Pour un bureau graphique
+n GTK4 et libadwaita
+i Installer (Alpine) :: apk add resources
+d Dépôt | https://github.com/nokyan/resources
+
+@ nvtop | nvtop | GPL-3.0 | stable | 2 | partiel |
+s Moniteur de cartes graphiques en terminal (NVIDIA, AMD, Intel).
+c interface=Terminal (TUI) ; detail=moyen (GPU) ; gpu=true ; language=C
++ Utile pour les jeux et le calcul
+- Seulement dans le dépôt testing d'Alpine
+n Dépôt testing d'Alpine
+i Installer (Alpine, testing) :: apk add nvtop
+d Dépôt | https://github.com/Syllo/nvtop
+
+# CAT disk-tools | software | Disques et stockage | Partitionner, analyser et surveiller les disques. | Ces outils créent des partitions, trouvent ce qui prend de la place ou surveillent la santé d'un disque. | Partition de disque
+crit function | Rôle | text
+crit interface | Interface | text
+crit beginners | Adapté aux débutants | enum
+crit formats | Systèmes de fichiers gérés | text
+#h function | Ce que fait principalement l'outil.
+#h beginners | Niveau de risque pour quelqu'un qui débute.
+
+@ gparted | GParted | GPL-2.0+ | stable | 2 | oui |
+s Éditeur de partitions graphique : créer, redimensionner, déplacer.
+c function=Partitionnement ; interface=Graphique ; beginners=avec prudence ; formats=ext4, Btrfs, XFS, NTFS, FAT
++ Visuel ; Éprouvé
+- Une erreur peut détruire des données
+n Bibliothèques GTK ; Outils des systèmes de fichiers (e2fsprogs, dosfstools, ntfs-3g)
+i Installer (Alpine) :: apk add gparted
+p Sauvegarder avant toute modification de partition.
+d Site officiel | https://gparted.org/
+
+@ gnome-disks | GNOME Disks | GPL-2.0+ | stable | 1 | oui |
+s Gestion des disques : montage, partitions, tests SMART, images disque.
+c function=Partitions, SMART, images disque ; interface=Graphique ; beginners=oui ; formats=ext4, Btrfs, XFS, NTFS, exFAT
++ Simple ; Test de santé SMART
+- Moins de fonctions que GParted
+n GTK
+i Installer (Alpine) :: apk add gnome-disk-utility
+d Site officiel | https://wiki.gnome.org/Apps/Disks
+
+@ smartmontools | smartmontools | GPL-2.0+ | stable | 2 | oui |
+s Lit l'état de santé des disques (SMART) pour prévoir une panne.
+c function=Santé des disques ; interface=Terminal ; beginners=moyen ; formats=sans objet
++ Indispensable pour surveiller un disque ; Léger
+- Résultats à interpréter
+i Installer (Alpine) :: apk add smartmontools
+i Tester un disque :: smartctl -a /dev/sda
+d Site officiel | https://www.smartmontools.org/
+
+@ ncdu | ncdu | MIT | stable | 1 | oui |
+s Analyse l'espace disque dans le terminal pour trouver ce qui prend de la place.
+c function=Analyse d'espace ; interface=Terminal (TUI) ; beginners=oui ; formats=tous
++ Très rapide ; Simple
+- Terminal uniquement
+i Installer (Alpine) :: apk add ncdu
+d Site officiel | https://dev.yorhel.nl/ncdu
+
+@ baobab | Baobab (Utilitaire d'analyse) | GPL-2.0+ | stable | 1 | oui |
+s Analyse graphique de l'espace disque, par cercles ou arborescence.
+c function=Analyse d'espace ; interface=Graphique ; beginners=oui ; formats=tous
++ Visuel ; Simple
+- Bureau graphique requis
+n GTK
+i Installer (Alpine) :: apk add baobab
+d Site officiel | https://wiki.gnome.org/Apps/DiskUsageAnalyzer
+
+@ filelight | Filelight | GPL-2.0+ | stable | 1 | oui |
+s Analyse graphique de l'espace disque en cercles concentriques, version KDE.
+c function=Analyse d'espace ; interface=Graphique ; beginners=oui ; formats=tous
++ Visuel ; Simple
+- Bibliothèques KDE
+n Bibliothèques Qt et KDE
+i Installer (Alpine) :: apk add filelight
+d Site officiel | https://apps.kde.org/filelight/
+
+# CAT archive | software | Archives | Compresser et extraire des fichiers. | Une archive regroupe plusieurs fichiers dans un seul, souvent compressé. | Archive informatique
+crit formats | Formats | text
+crit compression | Compression | enum
+crit interface | Interface | text
+crit encryption | Chiffrement | bool
+#h compression | Capacité à réduire la taille des fichiers.
+
+@ 7zip | 7-Zip | LGPL-2.1 et règle unRAR | stable | 2 | oui |
+s Archiveur à fort taux de compression, avec une version Linux officielle en terminal.
+c formats=7z, ZIP, TAR, GZ, XZ, lecture RAR ; compression=forte ; interface=Terminal ; encryption=true
++ Compression forte ; Chiffrement AES
+- Pas d'interface graphique officielle
+i Installer (Alpine) :: apk add 7zip
+i Extraire :: 7z x archive.7z
+d Site officiel | https://www.7-zip.org/
+
+@ ark | Ark | GPL-2.0+ | stable | 1 | oui |
+s Gestionnaire d'archives de KDE.
+c formats=ZIP, TAR, 7z, RAR (selon les outils installés) ; compression=bonne ; interface=Graphique ; encryption=true
++ Simple ; Intégré à Dolphin
+- Bibliothèques KDE
+n Bibliothèques Qt et KDE ; 7zip ou unrar en option
+i Installer (Alpine) :: apk add ark
+d Site officiel | https://apps.kde.org/ark/
+
+@ file-roller | File Roller | GPL-2.0+ | stable | 1 | oui |
+s Gestionnaire d'archives de GNOME.
+c formats=ZIP, TAR, 7z, RAR (selon les outils installés) ; compression=bonne ; interface=Graphique ; encryption=true
++ Simple ; Intégré à Fichiers
+- Pour un bureau GTK
+n GTK ; 7zip ou unrar en option
+i Installer (Alpine) :: apk add file-roller
+d Site officiel | https://wiki.gnome.org/Apps/FileRoller
+
+# CAT snapshots | software | Instantanés système | Revenir à un état précédent du système après une panne. | Un instantané est une photo du système à un instant donné. Il permet de revenir en arrière après une mauvaise mise à jour. | Instantané de système de fichiers
+crit backend | Support | text
+crit automatic | Automatique | bool
+crit boot_rollback | Retour depuis le menu de démarrage | bool
+crit interface | Interface | text
+#h backend | Technique utilisée : Btrfs, LVM ou copie de fichiers.
+#h automatic | Création régulière sans intervention.
+
+@ timeshift | Timeshift | GPL-2.0+ | stable | 2 | partiel |
+s Instantanés du système, pour revenir à un état précédent après une panne.
+c backend=rsync ou Btrfs ; automatic=true ; boot_rollback=false ; interface=Graphique
++ Simple ; Planification
+- Ne sauvegarde pas les documents par défaut ; Seulement dans le dépôt testing d'Alpine
+n Dépôt testing d'Alpine ; rsync ou Btrfs ; Un service de planification (cron)
+i Installer (Alpine, testing) :: apk add timeshift
+d Dépôt | https://github.com/linuxmint/timeshift
+
+@ snapper | Snapper | LGPL-2.1 | stable | 3 | partiel |
+s Instantanés Btrfs avec comparaison de versions et retour en arrière.
+c backend=Btrfs (ou LVM) ; automatic=true ; boot_rollback=true ; interface=Terminal (interface graphique en option)
++ Très rapide sur Btrfs ; Retour depuis GRUB avec grub-btrfs
+- Demande Btrfs ; Seulement dans le dépôt testing d'Alpine
+n Dépôt testing d'Alpine ; Système de fichiers Btrfs ; grub-btrfs pour le menu de démarrage
+i Installer (Alpine, testing) :: apk add snapper
+d Site officiel | http://snapper.io/
+
+# CAT shell | software | Shell | Choisir l'interpréteur de commandes. | Le shell est le programme qui lit les commandes tapées dans le terminal. Il est aussi utilisé pour écrire des scripts. | Interpréteur de commandes
+crit posix | Compatibilité POSIX | enum
+crit completion | Complétion | enum
+crit scripting | Scripts | text
+crit learning_curve | Courbe d'apprentissage | enum
+
+@ bash | Bash | GPL-3.0+ | stable | 2 | oui |
+s Shell par défaut de la plupart des distributions, universel.
+c posix=large ; completion=bonne ; scripting=Référence pour les scripts ; learning_curve=moyenne
++ Présent partout ; Énormément de documentation
+- Réglages par défaut austères
+i Installer (Alpine) :: apk add bash
+d Manuel | https://www.gnu.org/software/bash/manual/
+
+@ zsh | Zsh | Licence de type MIT | stable | 3 | oui |
+s Shell très personnalisable, avec thèmes et plugins.
+c posix=large ; completion=excellente ; scripting=Proche de bash ; learning_curve=moyenne
++ Complétion avancée ; Plugins (Oh My Zsh)
+- Beaucoup de réglages possibles
+i Installer (Alpine) :: apk add zsh
+d Site officiel | https://www.zsh.org/
+
+@ fish | fish | GPL-2.0 | stable | 1 | oui |
+s Shell convivial : suggestions et couleurs dès l'installation.
+c posix=non ; completion=excellente ; scripting=Syntaxe propre à fish ; learning_curve=faible
++ Agréable sans configuration ; Suggestions automatiques
+- Les scripts bash ne tournent pas tels quels
+i Installer (Alpine) :: apk add fish
+p Garder bash pour les scripts système et utiliser fish seulement en interactif.
+d Site officiel | https://fishshell.com/
+
+@ nushell | Nushell | MIT | stable | 4 | oui |
+s Shell qui traite les données en tableaux (JSON, CSV), écrit en Rust.
+c posix=non ; completion=bonne ; scripting=Langage structuré propre ; learning_curve=élevée
++ Données structurées ; Moderne
+- Très différent des autres shells
+i Installer (Alpine) :: apk add nushell
+d Site officiel | https://www.nushell.sh/
+
+# CAT cli-tools | software | Outils en ligne de commande modernes | Remplacer des commandes classiques par des versions plus rapides et plus agréables. | Ces outils améliorent des commandes historiques (grep, find, ls, cat) avec plus de vitesse et de confort. | Interface en ligne de commande
+crit replaces | Remplace | text
+crit speed | Rapidité | enum
+crit language | Langage | text
+crit highlights | Points forts | text
+#h replaces | Commande classique que l'outil améliore.
+#h highlights | Ce qui le rend plus agréable à utiliser.
+
+@ ripgrep | ripgrep | MIT ou Unlicense | stable | 1 | oui |
+s Recherche de texte dans les fichiers, très rapide, qui respecte .gitignore.
+c replaces=grep ; speed=très rapide ; language=Rust ; highlights=Respecte .gitignore, couleurs
++ Très rapide ; Valeurs par défaut utiles
+i Installer (Alpine) :: apk add ripgrep
+d Dépôt | https://github.com/BurntSushi/ripgrep
+
+@ fd | fd | MIT ou Apache-2.0 | stable | 1 | oui |
+s Recherche de fichiers simple et rapide.
+c replaces=find ; speed=très rapide ; language=Rust ; highlights=Syntaxe simple, couleurs
++ Syntaxe simple ; Rapide
+i Installer (Alpine) :: apk add fd
+d Dépôt | https://github.com/sharkdp/fd
+
+@ fzf | fzf | MIT | stable | 2 | oui |
+s Recherche floue interactive dans n'importe quelle liste : historique, fichiers, processus.
+c replaces=Ctrl+R et sélection manuelle ; speed=rapide ; language=Go ; highlights=Recherche floue instantanée
++ Très polyvalent ; S'intègre au shell
+i Installer (Alpine) :: apk add fzf
+d Dépôt | https://github.com/junegunn/fzf
+
+@ bat | bat | MIT ou Apache-2.0 | stable | 1 | oui |
+s Affiche un fichier avec coloration et numéros de ligne.
+c replaces=cat ; speed=rapide ; language=Rust ; highlights=Coloration syntaxique, intégration Git
++ Lisible ; Simple
+i Installer (Alpine) :: apk add bat
+d Dépôt | https://github.com/sharkdp/bat
+
+@ eza | eza | EUPL-1.2 | stable | 1 | oui |
+s Liste les fichiers avec couleurs, icônes et arborescence.
+c replaces=ls ; speed=rapide ; language=Rust ; highlights=Couleurs, état Git, arborescence
++ Lisible ; Arborescence intégrée
+i Installer (Alpine) :: apk add eza
+d Dépôt | https://github.com/eza-community/eza
+
+@ zoxide | zoxide | MIT | stable | 1 | oui |
+s Commande cd intelligente qui retient les dossiers que tu utilises.
+c replaces=cd ; speed=très rapide ; language=Rust ; highlights=Apprend tes dossiers fréquents
++ Gain de temps ; Compatible avec tous les shells
+i Installer (Alpine) :: apk add zoxide
+d Dépôt | https://github.com/ajeetdsouza/zoxide
+
+@ starship | Starship | ISC | stable | 1 | oui |
+s Invite de commande rapide et personnalisable qui affiche les informations utiles (Git, langage).
+c replaces=Invite par défaut du shell ; speed=rapide ; language=Rust ; highlights=Informations contextuelles
++ Fonctionne avec tous les shells ; Configuration simple
+n Une police Nerd Font pour les icônes
+i Installer (Alpine) :: apk add starship
+d Site officiel | https://starship.rs/
+
+# CAT screenshot | software | Captures d'écran et presse-papiers | Capturer l'écran et gérer le copier-coller. | Ces outils prennent des captures d'écran ou gèrent l'historique du presse-papiers, surtout sous Wayland. | Capture d'écran
+crit wayland | Support Wayland | enum
+crit annotate | Annotation | bool
+crit interface | Interface | text
+crit scripting | Scripts | enum
+
+@ grim | grim + slurp | MIT | stable | 3 | oui |
+s Capture en ligne de commande pour les compositeurs Wayland, avec slurp pour choisir la zone.
+c wayland=natif (wlroots) ; annotate=false ; interface=Terminal ; scripting=totale
++ Léger ; Idéal avec Sway, Hyprland et MangoWC
+- Pas d'annotation ; Réservé aux compositeurs wlroots
+n slurp ; wl-clipboard pour copier la capture
+i Installer (Alpine) :: apk add grim slurp
+i Capturer une zone :: grim -g "$(slurp)" capture.png
+d Dépôt | https://github.com/emersion/grim
+
+@ flameshot | Flameshot | GPL-3.0 | stable | 1 | oui |
+s Capture avec annotation (flèches, flou, texte) intégrée.
+c wayland=partiel (selon le compositeur) ; annotate=true ; interface=Graphique ; scripting=bonne
++ Annotation intégrée ; Simple
+- Sous Wayland, dépend du compositeur
+n Bibliothèques Qt ; Portail xdg-desktop-portal sous Wayland
+i Installer (Alpine) :: apk add flameshot
+d Site officiel | https://flameshot.org/
+
+@ spectacle | Spectacle | GPL-2.0+ | stable | 1 | oui |
+s Outil de capture de KDE.
+c wayland=natif ; annotate=true ; interface=Graphique ; scripting=bonne
++ Bien intégré à Plasma ; Annotation
+- Bibliothèques KDE
+n Bibliothèques Qt et KDE
+i Installer (Alpine) :: apk add spectacle
+d Site officiel | https://apps.kde.org/spectacle/
+
+@ wl-clipboard | wl-clipboard | GPL-3.0 | stable | 2 | oui |
+s Copier-coller en ligne de commande sous Wayland (wl-copy, wl-paste).
+c wayland=natif ; annotate=false ; interface=Terminal ; scripting=totale
++ Indispensable pour scripter sous Wayland ; Léger
+- Terminal uniquement
+i Installer (Alpine) :: apk add wl-clipboard
+d Dépôt | https://github.com/bugaevc/wl-clipboard
+
+@ cliphist | cliphist | GPL-3.0 | stable | 3 | partiel |
+s Historique du presse-papiers pour Wayland, à combiner avec un menu comme fuzzel ou wofi.
+c wayland=natif ; annotate=false ; interface=Terminal ; scripting=totale
++ Historique texte et images ; Léger
+- Seulement dans le dépôt testing d'Alpine ; Demande un menu pour choisir
+n Dépôt testing d'Alpine ; wl-clipboard
+r wl-clipboard
+i Installer (Alpine, testing) :: apk add cliphist
+d Dépôt | https://github.com/sentriz/cliphist
+

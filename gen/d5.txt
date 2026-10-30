@@ -1,0 +1,174 @@
+# USE package-manager
+@ xbps | XBPS (Void Linux) | BSD-2-Clause | stable | 2 | oui |
+s Gestionnaire de paquets de Void Linux, rapide et simple, avec un système de construction depuis les sources (xbps-src).
+c package_format=.xbps ; speed=rapide ; repo_size=moyenne ; rollback=partiel ; learning_curve=faible
++ Très rapide ; Simple ; Compilation possible avec xbps-src
+- Dépôts plus petits qu'Arch ou Debian
+l Gestion de paquets binaires et construction depuis les sources.
+i Installer un paquet (Void) :: xbps-install -S vim
+i Mettre à jour (Void) :: xbps-install -Su
+d Documentation Void | https://docs.voidlinux.org/xbps/index.html
+
+@ emerge | Portage (emerge, Gentoo) | GPL-2.0 | stable | 4 | non |
+s Système de paquets de Gentoo : les logiciels sont compilés depuis les sources, avec des options (USE flags) au choix.
+c package_format=ebuild (compilation depuis les sources) ; speed=lente (compilation) ; repo_size=grande ; rollback=non (reconstruire) ; learning_curve=élevée
++ Contrôle total des options ; Optimisé pour ta machine
+- Compilation très longue ; Courbe d'apprentissage élevée
+l Options de compilation (USE flags) et dépendances.
+n Du temps de compilation ; Un compilateur et assez de mémoire
+i Installer un paquet (Gentoo) :: emerge --ask app-editors/vim
+d Wiki Gentoo | https://wiki.gentoo.org/wiki/Portage
+
+@ zypper | zypper (openSUSE) | GPL-2.0+ | stable | 2 | non |
+s Gestionnaire de paquets d'openSUSE, avec résolution de dépendances fiable et instantanés Btrfs.
+c package_format=.rpm ; speed=moyenne ; repo_size=grande ; rollback=natif (avec Btrfs et Snapper) ; learning_curve=moyenne
++ Retour en arrière avec Snapper ; Résolution de dépendances solide
+- Moins répandu que apt ou dnf
+l Dépôts, instantanés Btrfs et mises à jour de distribution.
+i Installer un paquet (openSUSE) :: zypper install vim
+i Mettre à jour (Tumbleweed) :: zypper dup
+d Documentation | https://en.opensuse.org/SDB:Zypper_usage
+
+@ tce | tce-load (Tiny Core) | GPL-2.0 | stable | 3 | non |
+s Gestionnaire d'extensions de Tiny Core : les applications se chargent en mémoire à la demande.
+c package_format=.tcz (extension chargée en mémoire) ; speed=rapide ; repo_size=petite ; rollback=natif (état propre à chaque redémarrage) ; learning_curve=moyenne
++ Très léger ; Retour à zéro à chaque démarrage
+- Peu de logiciels ; Persistance à configurer
+l Système chargé en mémoire et extensions.
+i Installer une extension (Tiny Core) :: tce-load -wi mc
+d Wiki | https://wiki.tinycorelinux.net/
+
+@ slackpkg | pkgtools et slackpkg (Slackware) | GPL-2.0 | stable | 3 | non |
+s Outils de paquets de Slackware : simples, sans résolution automatique des dépendances.
+c package_format=.txz ; speed=moyenne ; repo_size=petite ; rollback=non ; learning_curve=moyenne
++ Très simple et transparent ; Peu de surprises
+- Pas de résolution automatique des dépendances ; Peu de paquets officiels
+l Dépendances gérées à la main.
+i Installer un paquet (Slackware) :: slackpkg install vim
+d Documentation | https://docs.slackware.com/
+
+# USE init
+@ sysvinit | SysVinit | GPL-2.0+ | stable | 3 | oui |
+s Init historique : des scripts shell lancés en séquence selon le niveau d'exécution.
+c service_format=Scripts shell dans /etc/init.d ; parallel_boot=false ; supervision=aucune ; footprint_mb=null ; extras=Niveaux d'exécution (runlevels)
++ Très simple à comprendre ; Éprouvé depuis des décennies
+- Pas de supervision ; Démarrage séquentiel
+l Niveaux d'exécution et scripts de démarrage.
+i Installer (Alpine) :: apk add sysvinit
+d Dépôt | https://github.com/slicer69/sysvinit
+
+
+# USE base-distro
+@ ubuntu | Ubuntu | Libre (licences variées) | stable | 1 | oui |
+s Dérivée de Debian, très répandue, avec des versions LTS tous les deux ans et un support commercial possible.
+c libc_default=glibc ; pm_default=apt (et snap) ; init_default=systemd ; cycle=LTS tous les 2 ans, versions intermédiaires tous les 6 mois ; repo_size=très grande
++ Énorme communauté ; Très bon support du matériel ; Versions LTS
+- Snap imposé pour certains logiciels ; Dépend de Canonical
+l Cycle LTS et paquets .deb.
+p Les paquets snap peuvent remplacer des paquets apt : vérifier avant d'installer.
+d Site officiel | https://ubuntu.com/
+
+@ void | Void Linux | Libre (licences variées) | stable | 3 | oui |
+s Distribution indépendante en rolling release, avec runit et le choix entre glibc et musl.
+c libc_default=glibc ou musl (au choix) ; pm_default=xbps ; init_default=runit ; cycle=En continu (rolling) ; repo_size=moyenne
++ Simple et rapide ; Sans systemd ; Choix de la libc
+- Dépôts plus petits ; Documentation moins fournie
+l Un système indépendant, de l'init au gestionnaire de paquets.
+p Choisir l'image musl ou glibc dès l'installation : on ne change pas ensuite.
+d Site officiel | https://voidlinux.org/
+
+@ gentoo | Gentoo Linux | Libre (licences variées) | stable | 5 | oui |
+s Distribution où l'on compile les logiciels depuis les sources, avec un contrôle total des options.
+c libc_default=glibc ou musl (au choix) ; pm_default=Portage (emerge) ; init_default=OpenRC (ou systemd) ; cycle=En continu (rolling) ; repo_size=grande
++ Contrôle total ; Optimisé pour ta machine ; Très bien documentée
+- Compilation très longue ; Entretien régulier nécessaire
+l Compilation, options USE et dépendances.
+p Prévoir beaucoup de temps de compilation à chaque grosse mise à jour.
+d Wiki Gentoo | https://wiki.gentoo.org/
+
+@ nixos | NixOS | Libre (licences variées) | stable | 5 | oui |
+s Système déclaratif : toute la configuration est décrite dans des fichiers, avec retour en arrière natif.
+c libc_default=glibc ; pm_default=Nix ; init_default=systemd ; cycle=Version stable tous les 6 mois et unstable en continu ; repo_size=très grande
++ Reproductible ; Retour en arrière natif ; Une seule configuration pour tout
+- Langage Nix à apprendre ; Les binaires précompilés classiques ne marchent pas sans adaptation
+l Configuration déclarative et reproductibilité.
+p Un programme téléchargé hors du dépôt Nix peut ne pas démarrer (chemins non standards).
+d Site officiel | https://nixos.org/
+
+@ opensuse | openSUSE | Libre (licences variées) | stable | 2 | oui |
+s Distribution avec Leap (stable) et Tumbleweed (rolling), outil YaST et instantanés Btrfs par défaut.
+c libc_default=glibc ; pm_default=zypper ; init_default=systemd ; cycle=Tumbleweed en continu, Leap en versions stables ; repo_size=grande
++ Instantanés Btrfs avec retour en arrière ; Outils d'administration complets
+- Moins répandue ; Dépôts tiers à connaître
+l Instantanés Btrfs et mises à jour de distribution.
+p Utiliser zypper dup (et non upgrade) sur Tumbleweed.
+d Site officiel | https://www.opensuse.org/
+
+@ devuan | Devuan | Libre (licences variées) | stable | 3 | oui |
+s Fork de Debian sans systemd : sysvinit, OpenRC ou runit au choix à l'installation.
+c libc_default=glibc ; pm_default=apt ; init_default=sysvinit (OpenRC ou runit en option) ; cycle=Suit les versions stables de Debian (Devuan 6 est basée sur Debian 13) ; repo_size=très grande
++ Dépôt Debian ; Liberté du choix de l'init
+- Communauté plus petite ; Installation plus longue
+l Fonctionnement d'un système Debian sans systemd.
+p Certains logiciels de bureau attendent systemd ou logind : vérifier avant de choisir.
+d Site officiel | https://www.devuan.org/
+
+@ lfs | Linux From Scratch | Libre (livre et composants) | stable | 5 | oui |
+s Un livre pour construire un système Linux entier à la main, composant par composant. Le meilleur moyen d'apprendre.
+c libc_default=glibc (compilée par toi) ; pm_default=Aucun (compilation à la main) ; init_default=SysVinit ou systemd (deux éditions du livre) ; cycle=Le livre sort deux fois par an ; repo_size=aucun
++ Comprendre chaque pièce ; Contrôle total
+- Très long ; Pas de gestionnaire de paquets ; Mises à jour à la main
+l Toute la chaîne : compilateur, libc, noyau, init.
+p Prévoir plusieurs jours, et suivre le livre sans sauter d'étape.
+d Livre | https://www.linuxfromscratch.org/
+
+@ raspios | Raspberry Pi OS | Libre (licences variées) | stable | 1 | oui |
+s Système officiel des Raspberry Pi, basé sur Debian, pour processeurs ARM.
+c libc_default=glibc ; pm_default=apt ; init_default=systemd ; cycle=Suit les versions stables de Debian ; repo_size=très grande
++ Optimisé pour les Raspberry Pi ; Très bien documenté
+- Pensé pour les cartes Raspberry Pi ; Peu adapté aux PC classiques
+l Un système Debian adapté à l'ARM.
+d Site officiel | https://www.raspberrypi.com/software/
+
+@ openwrt | OpenWrt | GPL-2.0 | stable | 4 | oui |
+s Système pour routeurs et appareils réseau, très léger, avec un dépôt de paquets et une interface web (LuCI).
+c libc_default=musl ; pm_default=apk (opkg avant la version 25.12) ; init_default=procd ; cycle=Versions stables environ tous les ans ; repo_size=petite
++ Très léger ; Interface web LuCI ; Plus de 2 200 appareils pris en charge
+- Réservé aux appareils réseau et embarqués ; Peu de mémoire flash
+l Systèmes embarqués, routage et pare-feu.
+p Sauvegarder la configuration avant de changer de version.
+d Site officiel | https://openwrt.org/
+
+@ tinycore | Tiny Core Linux | GPL-2.0 | stable | 3 | oui |
+s Système minuscule (11 à 23 Mo) qui tourne en mémoire vive, avec des extensions chargées à la demande.
+c libc_default=glibc ; pm_default=tce (extensions .tcz) ; init_default=BusyBox init ; cycle=Versions irrégulières (16.0 en mars 2025) ; repo_size=petite
++ Extrêmement léger ; Démarre en mémoire
+- Peu de logiciels ; Persistance à configurer soi-même
+l Un système qui tourne entièrement en mémoire.
+p Sans configuration de persistance, tout est perdu à l'extinction.
+d Site officiel | http://tinycorelinux.net/
+
+@ slackware | Slackware | Libre (licences variées) | stable | 3 | oui |
+s La plus ancienne distribution encore active : simple, sans surcouche, avec des scripts de démarrage à l'ancienne.
+c libc_default=glibc ; pm_default=pkgtools (slackpkg) ; init_default=Scripts BSD (rc) ; cycle=Versions irrégulières, branche current en continu ; repo_size=petite
++ Simple et stable ; Peu de changements
+- Pas de résolution automatique des dépendances ; Peu de paquets officiels
+l Un système Unix classique, sans automatisme.
+p Lire les dépendances dans la documentation avant d'installer un paquet.
+d Site officiel | http://www.slackware.com/
+
+@ rocky | Rocky Linux | Libre (licences variées) | stable | 2 | oui |
+s Clone de RHEL, gratuit, pensé pour les serveurs et le long terme.
+c libc_default=glibc ; pm_default=dnf ; init_default=systemd ; cycle=Versions majeures tous les 3 ans environ, support très long ; repo_size=moyenne
++ Stabilité sur plusieurs années ; Compatible RHEL
+- Logiciels plus anciens ; Peu adaptée au bureau et aux jeux
+l Environnement serveur d'entreprise.
+d Site officiel | https://rockylinux.org/
+
+@ almalinux | AlmaLinux | Libre (licences variées) | stable | 2 | oui |
+s Distribution compatible avec RHEL, gratuite, pensée pour les serveurs et le long terme.
+c libc_default=glibc ; pm_default=dnf ; init_default=systemd ; cycle=Versions majeures tous les 3 ans environ, support très long ; repo_size=moyenne
++ Stabilité sur plusieurs années ; Compatible RHEL
+- Logiciels plus anciens ; Peu adaptée au bureau et aux jeux
+l Environnement serveur d'entreprise.
+d Site officiel | https://almalinux.org/

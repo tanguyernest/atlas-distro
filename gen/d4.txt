@@ -1,0 +1,636 @@
+# USE file-manager
+@ dolphin | Dolphin | GPL-2.0+ | stable | 1 | oui |
+s Gestionnaire de fichiers de KDE, très complet.
+c interface=Graphique ; footprint_mb=null ; previews=true ; mount_support=complet ; keybindings=personnalisables
++ Très complet ; Panneaux et onglets ; Aperçus
+- Tire les bibliothèques KDE
+n Bibliothèques Qt et KDE
+i Installer (Alpine) :: apk add dolphin
+d Site officiel | https://apps.kde.org/dolphin/
+
+@ thunar | Thunar | GPL-2.0+ | stable | 1 | oui |
+s Gestionnaire de fichiers de Xfce, rapide et léger.
+c interface=Graphique ; footprint_mb=null ; previews=true ; mount_support=complet (via GVfs) ; keybindings=standard
++ Léger ; Simple ; Actions personnalisées
+- Moins de fonctions que Dolphin
+n GTK ; GVfs pour le montage des volumes
+i Installer (Alpine) :: apk add thunar
+d Site officiel | https://docs.xfce.org/xfce/thunar/start
+
+@ nautilus | Fichiers (Nautilus) | GPL-3.0+ | stable | 1 | oui |
+s Gestionnaire de fichiers de GNOME, simple et épuré.
+c interface=Graphique ; footprint_mb=null ; previews=true ; mount_support=complet ; keybindings=standard
++ Très simple ; Bien intégré à GNOME
+- Peu de réglages
+n GTK4 et libadwaita
+i Installer (Alpine) :: apk add nautilus
+d Site officiel | https://apps.gnome.org/Nautilus/
+
+@ pcmanfm | PCManFM | GPL-2.0+ | stable | 1 | oui |
+s Gestionnaire de fichiers très léger.
+c interface=Graphique ; footprint_mb=null ; previews=true ; mount_support=basique ; keybindings=standard
++ Très léger ; Rapide
+- Fonctions limitées
+n GTK
+i Installer (Alpine) :: apk add pcmanfm
+d Site officiel | https://wiki.lxde.org/en/PCManFM
+
+@ yazi | yazi | MIT | stable | 3 | oui |
+s Gestionnaire de fichiers en terminal, rapide et asynchrone, avec aperçus.
+c interface=Terminal (TUI) ; footprint_mb=null ; previews=true ; mount_support=basique ; keybindings=personnalisables (TOML)
++ Très rapide ; Aperçus d'images et de vidéos ; Écrit en Rust
+- Demande de configurer ses aperçus
+n Un terminal qui gère les images (kitty, foot...) pour les aperçus
+i Installer (Alpine) :: apk add yazi
+d Site officiel | https://yazi-rs.github.io/
+
+@ ranger | ranger | GPL-3.0 | stable | 3 | oui |
+s Gestionnaire de fichiers en terminal, avec raccourcis de type Vim.
+c interface=Terminal (TUI) ; footprint_mb=null ; previews=true ; mount_support=basique ; keybindings=de type Vim
++ Vi-like ; Très configurable
+- Plus lent que yazi (Python)
+n Python
+i Installer (Alpine) :: apk add ranger
+d Dépôt | https://github.com/ranger/ranger
+
+# USE terminal
+@ kitty | kitty | GPL-3.0 | stable | 2 | oui |
+s Terminal rapide accéléré par le GPU, avec onglets, fenêtres et affichage d'images.
+c gpu_rendering=true ; features=Onglets, fenêtres, images, ligatures ; config_style=Fichier texte (kitty.conf) ; footprint_mb=null ; language=C, Python et Go
++ Très complet ; Affichage d'images ; Scriptable
+- Réglages nombreux
+n Pilote graphique OpenGL
+i Installer (Alpine) :: apk add kitty
+d Site officiel | https://sw.kovidgoyal.net/kitty/
+
+@ alacritty | Alacritty | Apache-2.0 | stable | 2 | oui |
+s Terminal minimaliste accéléré par le GPU, sans onglets.
+c gpu_rendering=true ; features=Minimal, pas d'onglets ; config_style=Fichier TOML ; footprint_mb=null ; language=Rust
++ Très rapide ; Configuration simple
+- Pas d'onglets (à combiner avec tmux)
+n Pilote graphique OpenGL
+i Installer (Alpine) :: apk add alacritty
+d Site officiel | https://alacritty.org/
+
+@ foot | foot | MIT | stable | 2 | oui |
+s Terminal léger et rapide, natif Wayland.
+c gpu_rendering=false ; features=Léger, Wayland natif, serveur de terminaux ; config_style=Fichier texte (foot.ini) ; footprint_mb=null ; language=C
++ Très léger ; Rapide sans GPU ; Idéal avec Sway et MangoWC
+- Seulement Wayland
+i Installer (Alpine) :: apk add foot
+d Dépôt | https://codeberg.org/dnkl/foot
+
+@ wezterm | WezTerm | MIT | stable | 3 | oui |
+s Terminal accéléré par le GPU, avec multiplexeur intégré et configuration en Lua.
+c gpu_rendering=true ; features=Onglets, multiplexeur, configuration Lua ; config_style=Lua ; footprint_mb=null ; language=Rust
++ Multiplexeur intégré ; Très scriptable
+- Plus lourd
+n Pilote graphique OpenGL ou Vulkan
+i Installer (Alpine) :: apk add wezterm
+d Site officiel | https://wezterm.org/
+
+@ ghostty | Ghostty | MIT | stable | 2 | partiel |
+s Terminal rapide et riche en fonctions, avec interface native (GTK4 sous Linux).
+c gpu_rendering=true ; features=Onglets, volets, images, thèmes ; config_style=Fichier texte ; footprint_mb=null ; language=Zig
++ Interface native ; Rapide ; Beaucoup de fonctions
+- Seulement dans le dépôt testing d'Alpine ; Développement hors de GitHub depuis avril 2026
+n Dépôt testing d'Alpine ; GTK4 ; Pilote graphique OpenGL
+i Installer (Alpine, testing) :: apk add ghostty
+d Site officiel | https://ghostty.org/
+
+# CAT vm | software | Machines virtuelles | Faire tourner un autre système dans une fenêtre. | Une machine virtuelle simule un ordinateur complet : tu peux tester une autre distribution ou Windows sans toucher à ton système. | Machine virtuelle
+crit hypervisor | Moteur | text
+crit gui | Interface graphique | bool
+crit gpu_passthrough | Accès direct à la carte graphique | text
+crit kernel_modules | Modules du noyau | text
+crit ease | Facilité | enum
+#h hypervisor | Technique qui fait tourner la machine virtuelle.
+#h gpu_passthrough | Réserver la carte graphique à la machine virtuelle, utile pour jouer dedans.
+#h kernel_modules | Pièces du noyau Linux à charger pour la virtualisation.
+
+@ qemu | QEMU/KVM | GPL-2.0 | stable | 4 | oui |
+s Émulateur et hyperviseur libre : machines virtuelles rapides grâce à KVM.
+c hypervisor=KVM (noyau Linux) ; gui=false ; gpu_passthrough=Possible (VFIO) ; kernel_modules=kvm, kvm_intel ou kvm_amd ; ease=difficile
++ Très performant ; Très souple ; Libre
+- Beaucoup d'options en ligne de commande
+l Virtualisation matérielle et périphériques virtuels.
+n Virtualisation activée dans le BIOS ou l'UEFI ; Droits d'accès au groupe kvm
+i Installer (Alpine) :: apk add qemu-system-x86_64 qemu-img
+d Site officiel | https://www.qemu.org/
+
+@ virt-manager | virt-manager | LGPL-2.0+ | stable | 2 | oui |
+s Interface graphique pour créer et gérer des machines virtuelles QEMU/KVM.
+c hypervisor=QEMU/KVM via libvirt ; gui=true ; gpu_passthrough=Possible (VFIO) ; kernel_modules=kvm ; ease=moyenne
++ Interface complète ; Gère beaucoup de machines
+- Dépend de libvirt et de QEMU
+r qemu
+n libvirt (service libvirtd démarré) ; Droits du groupe libvirt ; GTK
+i Installer (Alpine) :: apk add virt-manager libvirt
+d Site officiel | https://virt-manager.org/
+
+@ gnome-boxes | GNOME Boxes | GPL-3.0+ | stable | 1 | oui |
+s Machines virtuelles très simples, en quelques clics, sur QEMU/KVM.
+c hypervisor=QEMU/KVM ; gui=true ; gpu_passthrough=Non ; kernel_modules=kvm ; ease=facile
++ Très simple ; Téléchargement des images intégré
+- Peu de réglages
+n GTK4 ; QEMU et libvirt
+i Installer (Alpine) :: apk add gnome-boxes
+d Site officiel | https://apps.gnome.org/Boxes/
+
+@ virtualbox | VirtualBox | GPL-3.0 (+ extension propriétaire) | stable | 2 | non |
+s Hyperviseur graphique multiplateforme d'Oracle, simple pour débuter.
+c hypervisor=VirtualBox ; gui=true ; gpu_passthrough=Non ; kernel_modules=vboxdrv (à compiler) ; ease=facile
++ Simple ; Multiplateforme
+- Pas dans les dépôts d'Alpine ; Modules noyau à compiler ; Extension pack propriétaire
+n Modules noyau (DKMS) et en-têtes du noyau
+p Sur Alpine, préférer QEMU/KVM avec virt-manager.
+d Site officiel | https://www.virtualbox.org/
+
+# CAT distro-box | software | Environnements isolés (Distrobox) | Faire tourner une autre distribution dans un conteneur intégré. | Ces outils lancent une autre distribution dans un conteneur, partagé avec ton bureau. Utile pour installer des logiciels non disponibles sur ta distro. | Conteneur Linux
+crit base | Moteur | text
+crit gui_apps | Applications graphiques | bool
+crit home | Dossier personnel | text
+crit rootless | Sans droits administrateur | bool
+#h base | Outil de conteneurs utilisé en dessous.
+#h home | Partage du dossier personnel avec le système principal.
+
+@ distrobox | Distrobox | GPL-3.0 | stable | 2 | oui |
+s Lance une autre distribution Linux dans un conteneur, intégrée à ton bureau.
+c base=Podman ou Docker ; gui_apps=true ; home=Partagé avec l'hôte ; rootless=true
++ Installer des logiciels glibc sur une distro musl ; Applications graphiques intégrées
+- Dépend de Podman ou Docker
+l Conteneurs d'intégration au système hôte.
+r podman
+n Podman ou Docker
+i Installer (Alpine) :: apk add distrobox
+i Créer un conteneur :: distrobox create --name debian --image debian:stable ;; distrobox enter debian
+d Site officiel | https://distrobox.it/
+
+@ toolbx | Toolbx | Apache-2.0 | stable | 2 | difficile |
+s Conteneur d'outils de développement de Fedora, intégré à ton système.
+c base=Podman ; gui_apps=true ; home=Partagé avec l'hôte ; rootless=true
++ Simple ; Bien intégré à Fedora
+- Pas dans les dépôts d'Alpine ; Pensé pour Fedora
+n Podman
+d Site officiel | https://containertoolbx.org/
+
+# CAT sys-containers | software | Conteneurs système | Faire tourner des systèmes complets légers, comme de petites machines. | Un conteneur système contient un système Linux entier, avec ses services, pour un coût mémoire très faible. | Conteneur système
+crit model | Modèle | text
+crit vm_support | Machines virtuelles | bool
+crit api | Interface de gestion | text
+crit complexity | Complexité | enum
+
+@ incus | Incus | Apache-2.0 | stable | 4 | oui |
+s Gestionnaire de conteneurs système et de machines virtuelles, issu de LXD.
+c model=Conteneurs système (LXC) et VM ; vm_support=true ; api=Ligne de commande et API REST ; complexity=moyenne
++ Conteneurs et VM au même endroit ; Moderne
+- Demande du réseau et du stockage à configurer
+n cgroups ; Plages subuid et subgid ; Pont réseau
+i Installer (Alpine) :: apk add incus
+d Site officiel | https://linuxcontainers.org/incus/
+
+@ lxc | LXC | LGPL-2.1+ | stable | 4 | oui |
+s Conteneurs système légers, la base d'Incus et de LXD.
+c model=Conteneurs système ; vm_support=false ; api=Ligne de commande (lxc-*) ; complexity=élevée
++ Très léger ; Fondation du domaine
+- Configuration manuelle
+n cgroups v2 ; Réseau à configurer
+i Installer (Alpine) :: apk add lxc
+d Site officiel | https://linuxcontainers.org/lxc/
+
+# CAT ssh | software | Accès distant en ligne de commande | Se connecter à un autre ordinateur ou à un serveur en terminal. | SSH ouvre une connexion chiffrée vers une autre machine, pour la piloter ou transférer des fichiers. | Secure Shell
+crit transport | Transport | text
+crit roaming | Reconnexion automatique | bool
+crit auth | Authentification | text
+crit extras | Fonctions en plus | text
+#h roaming | La connexion survit aux coupures et aux changements de réseau.
+#h auth | Façon de prouver son identité.
+
+@ openssh | OpenSSH | BSD | stable | 2 | oui |
+s Connexion sécurisée à une autre machine en terminal, avec transferts de fichiers et tunnels.
+c transport=TCP (port 22) ; roaming=false ; auth=Mot de passe ou clés ; extras=scp, sftp, tunnels, agent de clés
++ Standard universel ; Clés sécurisées ; Tunnels
+- La connexion tombe si le réseau coupe
+l Authentification par clés et tunnels.
+n Un serveur SSH sur la machine distante
+i Installer (Alpine) :: apk add openssh
+i Créer une clé :: ssh-keygen -t ed25519
+p Désactiver la connexion par mot de passe sur un serveur exposé à internet.
+d Manuel | https://www.openssh.com/manual.html
+
+@ mosh | Mosh | GPL-3.0 | stable | 2 | oui |
+s Shell distant qui survit aux coupures réseau et aux changements d'adresse.
+c transport=UDP (60000 à 61000) après connexion SSH ; roaming=true ; auth=Via SSH ; extras=Affichage local immédiat
++ Résiste aux coupures ; Réactif sur connexion lente
+- Pas de transfert de fichiers ; Ports UDP à ouvrir
+n Mosh installé des deux côtés ; Ports UDP 60000 à 61000 ouverts
+i Installer (Alpine) :: apk add mosh
+d Site officiel | https://mosh.org/
+
+@ dropbear | Dropbear | MIT | stable | 3 | oui |
+s Serveur et client SSH très légers, pour systèmes embarqués.
+c transport=TCP (port 22) ; roaming=false ; auth=Mot de passe ou clés ; extras=Très petit
++ Très léger ; Idéal pour les systèmes minimaux
+- Moins de fonctions qu'OpenSSH
+i Installer (Alpine) :: apk add dropbear
+d Site officiel | https://matt.ucc.asn.au/dropbear/dropbear.html
+
+# CAT remote-desktop | software | Bureau à distance | Contrôler un autre ordinateur avec son écran. | Ces outils affichent l'écran d'une autre machine et permettent de la piloter, ou de jouer à distance. | Bureau à distance
+crit protocol | Protocole | text
+crit server_needed | Serveur à installer | bool
+crit wayland | Support Wayland | enum
+crit gaming_ok | Adapté au jeu | bool
+crit self_host | Auto-hébergeable | bool
+#h server_needed | Un programme doit être installé sur la machine à contrôler.
+#h gaming_ok | Assez fluide pour jouer.
+#h self_host | Possibilité d'utiliser son propre serveur.
+
+@ rustdesk | RustDesk | AGPL-3.0 | stable | 2 | flatpak |
+s Prise en main à distance, alternative libre à TeamViewer, avec serveur auto-hébergeable.
+c protocol=Propre (serveur de rendez-vous) ; server_needed=false ; wayland=partiel ; gaming_ok=false ; self_host=true
++ Simple ; Libre ; Serveur personnel possible
+- Absent des dépôts Alpine ; Wayland partiel
+n Flatpak ; Un serveur de rendez-vous (public ou auto-hébergé)
+i Installer (Flatpak) :: flatpak install flathub com.rustdesk.RustDesk
+d Site officiel | https://rustdesk.com/
+
+@ remmina | Remmina | GPL-2.0+ | stable | 2 | oui |
+s Client de bureau à distance : RDP, VNC, SSH.
+c protocol=RDP, VNC, SSH, SPICE ; server_needed=true ; wayland=bon (client) ; gaming_ok=false ; self_host=true
++ Plusieurs protocoles ; Profils enregistrés
+- Un serveur doit tourner sur l'autre machine
+n GTK ; freerdp pour RDP
+i Installer (Alpine) :: apk add remmina
+d Site officiel | https://remmina.org/
+
+@ tigervnc | TigerVNC | GPL-2.0+ | stable | 3 | oui |
+s Serveur et client VNC performants.
+c protocol=VNC ; server_needed=true ; wayland=partiel (client) ; gaming_ok=false ; self_host=true
++ Rapide ; Standard
+- VNC n'est pas chiffré par défaut (le passer dans un tunnel SSH)
+n Un tunnel SSH pour le chiffrement
+i Installer (Alpine) :: apk add tigervnc
+p Ne jamais exposer VNC directement sur internet.
+d Site officiel | https://tigervnc.org/
+
+@ moonlight | Moonlight (client) | GPL-3.0 | stable | 2 | oui |
+s Joue à distance à des jeux depuis un autre PC, avec Sunshine ou GeForce Experience.
+c protocol=Flux vidéo de type GameStream ; server_needed=true ; wayland=bon ; gaming_ok=true ; self_host=true
++ Très fluide ; Faible latence
+- Demande un PC de jeu avec encodage matériel
+n Un serveur Sunshine sur le PC de jeu ; Décodage vidéo matériel recommandé
+i Installer (Alpine) :: apk add moonlight-qt
+d Site officiel | https://moonlight-stream.org/
+
+@ sunshine | Sunshine (serveur) | GPL-3.0 | stable | 3 | flatpak |
+s Serveur de streaming de jeux, compatible avec Moonlight.
+c protocol=Flux vidéo de type GameStream ; server_needed=true ; wayland=partiel ; gaming_ok=true ; self_host=true
++ Libre ; Compatible Moonlight
+- Absent des dépôts Alpine ; Demande des réglages réseau et vidéo
+n Flatpak ; Encodage vidéo matériel ; Ports réseau ouverts (plage 47984 à 48010)
+i Installer (Flatpak) :: flatpak install flathub dev.lizardbyte.app.Sunshine
+d Site officiel | https://app.lizardbyte.dev/Sunshine/
+
+# CAT net-analysis | software | Analyse réseau | Comprendre et diagnostiquer le trafic réseau. | Ces outils capturent des paquets ou scannent un réseau, pour comprendre un problème ou vérifier une sécurité. | Analyse de trafic réseau
+crit purpose | Usage | text
+crit interface | Interface | text
+crit privileges | Droits nécessaires | text
+crit learning_curve | Courbe d'apprentissage | enum
+#h purpose | Problème que l'outil permet de résoudre.
+#h privileges | Droits système requis pour fonctionner.
+
+@ wireshark | Wireshark | GPL-2.0+ | stable | 3 | oui |
+s Analyse graphique des paquets réseau, la référence pour comprendre un trafic.
+c purpose=Capture et analyse de paquets ; interface=Graphique ; privileges=Droits de capture (groupe wireshark) ; learning_curve=élevée
++ Très complet ; Filtres puissants
+- Courbe d'apprentissage élevée
+n Bibliothèques Qt ; Droits de capture pour un utilisateur normal
+i Installer (Alpine) :: apk add wireshark
+d Site officiel | https://www.wireshark.org/
+
+@ nmap | Nmap | Licence Nmap Public Source | stable | 3 | oui |
+s Scanne un réseau : machines, ports ouverts, services.
+c purpose=Découverte et audit ; interface=Terminal ; privileges=Root pour certains scans ; learning_curve=moyenne
++ Référence de l'audit réseau ; Scripts nombreux
+- Ne scanner que des réseaux autorisés
+i Installer (Alpine) :: apk add nmap
+p Scanner un réseau sans autorisation peut être illégal.
+d Site officiel | https://nmap.org/
+
+@ tcpdump | tcpdump | BSD-3-Clause | stable | 4 | oui |
+s Capture de paquets en ligne de commande, légère.
+c purpose=Capture ; interface=Terminal ; privileges=Root ; learning_curve=élevée
++ Léger ; Disponible partout
+- Austère
+i Installer (Alpine) :: apk add tcpdump
+d Site officiel | https://www.tcpdump.org/
+
+@ mtr | mtr | GPL-2.0 | stable | 2 | oui |
+s Combine ping et traceroute pour localiser les pertes sur un trajet réseau.
+c purpose=Diagnostic de route ; interface=Terminal ; privileges=Droits sur les sockets bruts ; learning_curve=faible
++ Très utile pour diagnostiquer une connexion ; Simple
+- Résultats à interpréter
+i Installer (Alpine) :: apk add mtr
+d Site officiel | https://www.bitwizard.nl/mtr/
+
+@ bandwhich | bandwhich | MIT | stable | 2 | oui |
+s Affiche quel programme utilise la bande passante.
+c purpose=Trafic par processus ; interface=Terminal (TUI) ; privileges=Root ; learning_curve=faible
++ Simple ; Très parlant
+- Demande les droits root
+i Installer (Alpine) :: apk add bandwhich
+d Dépôt | https://github.com/imsnif/bandwhich
+
+# CAT downloader | software | Téléchargements | Télécharger des fichiers et des vidéos. | Ces outils téléchargent des fichiers, des torrents ou des vidéos, et reprennent après une coupure. | Gestionnaire de téléchargement
+crit protocols | Protocoles | text
+crit interface | Interface | text
+crit resume | Reprise des téléchargements | bool
+crit remote_control | Contrôle à distance | bool
+#h resume | Reprise d'un téléchargement interrompu au point où il s'était arrêté.
+#h remote_control | Pilotage depuis un autre appareil.
+
+@ aria2 | aria2 | GPL-2.0+ | stable | 3 | oui |
+s Gestionnaire de téléchargements en ligne de commande, multi-connexions.
+c protocols=HTTP, FTP, BitTorrent, Metalink ; interface=Terminal ; resume=true ; remote_control=true
++ Très rapide ; Pilotable à distance
+- Terminal uniquement
+i Installer (Alpine) :: apk add aria2
+d Site officiel | https://aria2.github.io/
+
+@ qbittorrent | qBittorrent | GPL-2.0+ | stable | 1 | oui |
+s Client BitTorrent complet avec interface graphique et interface web.
+c protocols=BitTorrent ; interface=Graphique (Qt) et web ; resume=true ; remote_control=true
++ Complet ; Libre ; Interface web
+- Bibliothèques Qt
+n Bibliothèques Qt
+i Installer (Alpine) :: apk add qbittorrent
+p Télécharger uniquement des contenus dont tu as le droit.
+d Site officiel | https://www.qbittorrent.org/
+
+@ transmission | Transmission | GPL-2.0 ou GPL-3.0 | stable | 1 | oui |
+s Client BitTorrent léger, en version graphique ou serveur.
+c protocols=BitTorrent ; interface=Graphique, web ou terminal ; resume=true ; remote_control=true
++ Léger ; Version serveur
+- Moins de fonctions que qBittorrent
+i Installer (Alpine) :: apk add transmission
+d Site officiel | https://transmissionbt.com/
+
+@ yt-dlp | yt-dlp | Unlicense | stable | 2 | oui |
+s Télécharge des vidéos et de l'audio depuis des centaines de sites.
+c protocols=HTTP, flux HLS et DASH ; interface=Terminal ; resume=true ; remote_control=false
++ Très complet ; Mis à jour régulièrement
+- Terminal uniquement ; À maintenir à jour
+n FFmpeg ; Python
+i Installer (Alpine) :: apk add yt-dlp
+p Respecter les conditions d'utilisation des sites et les droits d'auteur.
+d Dépôt | https://github.com/yt-dlp/yt-dlp
+
+# CAT music-player | software | Lecteur de musique | Écouter sa collection ou des services en ligne. | Ces lecteurs jouent ta musique locale ou se connectent à des services en ligne. | Lecteur de musique
+crit library | Bibliothèque locale | text
+crit streaming | Services en ligne | text
+crit interface | Interface | text
+crit controls | Contrôle à distance | text
+#h library | Façon de ranger et rechercher sa collection de musique.
+#h streaming | Services de musique en ligne pris en charge.
+#h controls | Touches multimédia et pilotage depuis un autre appareil.
+
+@ strawberry | Strawberry | GPL-3.0+ | stable | 1 | oui |
+s Lecteur de musique pour grandes collections locales, avec étiquettes et égaliseur.
+c library=Très grosse (base de données) ; streaming=Subsonic, Tidal, Qobuz ; interface=Graphique (Qt) ; controls=MPRIS
++ Excellent pour les grosses collections ; Étiquettes et paroles
+- Bibliothèques Qt
+n Bibliothèques Qt ; GStreamer
+i Installer (Alpine) :: apk add strawberry
+d Site officiel | https://www.strawberrymusicplayer.org/
+
+@ mpd | MPD + ncmpcpp | GPL-2.0+ | stable | 4 | oui |
+s Serveur de musique léger, piloté par un client en terminal comme ncmpcpp.
+c library=Dossier de musique indexé ; streaming=Radios web, plugins ; interface=Terminal (clients graphiques possibles) ; controls=Clients réseau, MPRIS
++ Très léger ; Pilotable à distance
+- Configuration manuelle
+n Un client (ncmpcpp ou mpc) ; Un dossier de musique
+i Installer (Alpine) :: apk add mpd ncmpcpp
+d Site officiel | https://www.musicpd.org/
+
+@ lollypop | Lollypop | GPL-3.0+ | stable | 1 | oui |
+s Lecteur de musique moderne pour GNOME.
+c library=Grosse ; streaming=Radios, podcasts, Last.fm ; interface=Graphique (GTK) ; controls=MPRIS
++ Moderne ; Pochettes soignées
+- Pour un bureau GTK
+n GTK
+i Installer (Alpine) :: apk add lollypop
+d Site officiel | https://wiki.gnome.org/Apps/Lollypop
+
+@ amberol | Amberol | GPL-3.0+ | stable | 1 | oui |
+s Lecteur de musique minimaliste, sans bibliothèque.
+c library=Aucune (listes à la volée) ; streaming=Non ; interface=Graphique (GTK4) ; controls=MPRIS
++ Très simple ; Joli
+- Pas de bibliothèque
+n GTK4
+i Installer (Alpine) :: apk add amberol
+d Dépôt | https://gitlab.gnome.org/World/amberol
+
+@ cmus | cmus | GPL-2.0+ | stable | 3 | oui |
+s Lecteur de musique en terminal, léger et rapide.
+c library=Dossiers de musique ; streaming=Non ; interface=Terminal ; controls=Raccourcis clavier
++ Très léger ; Rapide
+- Terminal uniquement
+i Installer (Alpine) :: apk add cmus
+d Site officiel | https://cmus.github.io/
+
+@ ncspot | ncspot | BSD-2-Clause | stable | 3 | oui |
+s Client Spotify en terminal (compte Premium requis).
+c library=Aucune (service en ligne) ; streaming=Spotify Premium ; interface=Terminal ; controls=MPRIS
++ Léger ; Piloté au clavier
+- Compte Spotify Premium obligatoire
+n Un compte Spotify Premium
+i Installer (Alpine) :: apk add ncspot
+d Dépôt | https://github.com/hrkfdn/ncspot
+
+@ spotify | Spotify (client officiel) | Propriétaire | stable | 1 | flatpak |
+s Client du service Spotify, gratuit avec publicités ou payant.
+c library=Aucune (service en ligne) ; streaming=Spotify ; interface=Graphique ; controls=Spotify Connect, MPRIS
++ Très grand catalogue ; Simple
+- Propriétaire ; Paquets prévus pour glibc, absent d'Alpine
+n Flatpak ; Un compte Spotify
+i Installer (Flatpak) :: flatpak install flathub com.spotify.Client
+d Site officiel | https://www.spotify.com/download/linux/
+
+# CAT retro-emulation | software | Émulation et jeux rétro | Jouer à d'anciens jeux sur ordinateur. | Un émulateur reproduit une ancienne console pour jouer à ses jeux. Utilise uniquement tes propres jeux et sauvegardes. | Émulateur
+crit systems | Systèmes émulés | text
+crit gpu_needs | Besoin en carte graphique | enum
+crit frontend | Interface de lancement | bool
+crit bios_needed | Fichiers de démarrage (BIOS) | text
+crit ease | Facilité | enum
+#h systems | Consoles reproduites par l'émulateur.
+#h gpu_needs | Puissance graphique nécessaire pour un jeu fluide.
+#h frontend | Menu pour lancer les jeux depuis une bibliothèque.
+#h bios_needed | Fichiers système de la console parfois nécessaires, à fournir toi-même.
+
+@ retroarch | RetroArch | GPL-3.0 | stable | 3 | oui |
+s Interface unique qui lance des dizaines d'émulateurs (cores), du rétro à la PlayStation.
+c systems=NES à PS1, Saturn et plus ; gpu_needs=faible à moyen ; frontend=true ; bios_needed=Pour certains systèmes ; ease=moyenne
++ Un seul programme pour de nombreuses consoles ; Filtres graphiques
+- Menus déroutants
+n Les cores à installer selon les consoles
+i Installer (Alpine) :: apk add retroarch
+p N'utiliser que des jeux et des BIOS que tu possèdes légalement.
+d Site officiel | https://www.retroarch.com/
+
+@ dolphin-emu | Dolphin | GPL-2.0+ | stable | 2 | oui |
+s Émulateur GameCube et Wii.
+c systems=GameCube, Wii ; gpu_needs=moyen à élevé ; frontend=true ; bios_needed=Non (optionnel) ; ease=facile
++ Très performant ; Résolution améliorée
+- Demande une carte graphique correcte
+n Bibliothèques Qt ; Pilote Vulkan ou OpenGL
+i Installer (Alpine) :: apk add dolphin-emu
+d Site officiel | https://dolphin-emu.org/
+
+@ pcsx2 | PCSX2 | GPL-3.0+ | stable | 2 | partiel |
+s Émulateur PlayStation 2.
+c systems=PlayStation 2 ; gpu_needs=élevé ; frontend=true ; bios_needed=BIOS PS2 à fournir ; ease=moyenne
++ Très compatible ; Résolution améliorée
+- Seulement dans le dépôt testing d'Alpine ; Demande un bon processeur
+n Dépôt testing d'Alpine ; Pilote Vulkan ; BIOS de ta console
+i Installer (Alpine, testing) :: apk add pcsx2
+d Site officiel | https://pcsx2.net/
+
+@ ppsspp | PPSSPP | GPL-2.0+ | stable | 1 | oui |
+s Émulateur PSP.
+c systems=PlayStation Portable ; gpu_needs=faible à moyen ; frontend=true ; bios_needed=Non ; ease=facile
++ Léger ; Très compatible
+- Peu de réglages avancés
+n Pilote OpenGL ou Vulkan
+i Installer (Alpine) :: apk add ppsspp
+d Site officiel | https://www.ppsspp.org/
+
+@ mgba | mGBA | MPL-2.0 | stable | 1 | oui |
+s Émulateur Game Boy, Game Boy Color et Game Boy Advance précis et léger.
+c systems=Game Boy, GBC, GBA ; gpu_needs=faible ; frontend=true ; bios_needed=Optionnel ; ease=facile
++ Très précis ; Très léger
+- Un seul domaine de consoles
+n Bibliothèques Qt
+i Installer (Alpine) :: apk add mgba
+d Site officiel | https://mgba.io/
+
+@ cemu | Cemu | MPL-2.0 | stable | 3 | partiel |
+s Émulateur Wii U.
+c systems=Wii U ; gpu_needs=élevé ; frontend=true ; bios_needed=Clés et fichiers de ta console ; ease=difficile
++ Très bonnes performances ; Libre
+- Seulement dans le dépôt testing d'Alpine ; Configuration plus longue
+n Dépôt testing d'Alpine ; Pilote Vulkan ; Clés de ta console
+i Installer (Alpine, testing) :: apk add cemu
+d Site officiel | https://cemu.info/
+
+# CAT game-tools | software | Outils de jeu | Améliorer et surveiller les performances en jeu. | Ces outils optimisent la machine pendant les jeux, affichent les images par seconde ou gèrent les versions de Proton. | Optimisation de jeux vidéo
+crit purpose | Rôle | text
+crit overlay | Affichage à l'écran | bool
+crit wayland | Support Wayland | enum
+crit setup | Mise en place | enum
+#h purpose | Ce que fait principalement l'outil.
+#h overlay | Affichage de chiffres par-dessus le jeu.
+
+@ gamemode | GameMode | BSD-3-Clause | stable | 2 | oui |
+s Active temporairement des réglages de performance pendant un jeu.
+c purpose=Performances (processeur, priorité) ; overlay=false ; wayland=indifférent ; setup=moyenne
++ Simple à activer ; Réglages automatiques
+- Gain variable selon la machine
+n Droits du groupe gamemode ; Option de lancement dans Steam
+i Installer (Alpine) :: apk add gamemode
+i Dans Steam :: gamemoderun %command%
+d Dépôt | https://github.com/FeralInteractive/gamemode
+
+@ mangohud | MangoHud | MIT | stable | 2 | oui |
+s Affiche FPS, températures et charge pendant les jeux (surcouche Vulkan et OpenGL).
+c purpose=Surveillance en jeu ; overlay=true ; wayland=oui (Vulkan) ; setup=facile
++ Très lisible ; Configurable
+- Incompatible avec certains jeux anticheat
+i Installer (Alpine) :: apk add mangohud
+i Dans Steam :: mangohud %command%
+d Dépôt | https://github.com/flightlessmango/MangoHud
+
+@ gamescope | gamescope | BSD-2-Clause | stable | 3 | oui |
+s Micro-compositeur de Valve : résolution, mise à l'échelle FSR, limite d'images par seconde.
+c purpose=Affichage et mise à l'échelle ; overlay=false ; wayland=session propre ; setup=moyenne
++ Mise à l'échelle FSR ; Contrôle de la résolution
+- Réglages à comprendre
+n Pilote Vulkan
+i Installer (Alpine) :: apk add gamescope
+i Dans Steam :: gamescope -W 1920 -H 1080 -- %command%
+d Dépôt | https://github.com/ValveSoftware/gamescope
+
+@ protonup-qt | ProtonUp-Qt | GPL-3.0 | stable | 1 | flatpak |
+s Installe et met à jour Proton-GE et Wine-GE pour Steam et Lutris.
+c purpose=Gestion des versions de Proton ; overlay=false ; wayland=sans objet ; setup=facile
++ Simple ; Corrige certains jeux
+- Absent des dépôts Alpine
+n Flatpak ; Steam ou Lutris
+i Installer (Flatpak) :: flatpak install flathub net.davidotek.pupgui2
+d Dépôt | https://github.com/DavidoTek/ProtonUp-Qt
+
+# CAT media-center | software | Médiathèque et streaming vidéo | Regarder films, séries et TV depuis sa propre collection. | Un centre multimédia organise ta collection de films et de séries et les lit sur ta télé ou ton ordinateur. | Centre multimédia
+crit sources | Sources | text
+crit server_needed | Serveur nécessaire | bool
+crit remote | Télécommande | text
+crit ease | Facilité | enum
+#h sources | D'où viennent les médias : dossiers locaux, réseau, serveur.
+
+@ kodi | Kodi | GPL-2.0+ | stable | 2 | oui |
+s Centre multimédia complet pour salon : films, séries, musique, TV.
+c sources=Dossiers, réseau (SMB, NFS), add-ons ; server_needed=false ; remote=Application mobile, télécommande, MPRIS ; ease=moyenne
++ Très complet ; Pensé pour la télévision
+- Interface chargée
+n Pilote graphique ; Accélération vidéo matérielle conseillée
+i Installer (Alpine) :: apk add kodi
+d Site officiel | https://kodi.tv/
+
+@ jellyfin-player | Jellyfin Media Player | GPL-2.0 | stable | 1 | flatpak |
+s Client de bureau pour un serveur Jellyfin, ta propre médiathèque.
+c sources=Serveur Jellyfin ; server_needed=true ; remote=Clavier, manette ; ease=facile
++ Simple ; Se connecte à ton serveur
+- Il faut un serveur Jellyfin ; Absent des dépôts Alpine
+n Flatpak ; Un serveur Jellyfin
+i Installer (Flatpak) :: flatpak install flathub com.github.iwalton3.jellyfin-media-player
+d Site officiel | https://jellyfin.org/
+
+# CAT rss-podcasts | software | Flux RSS et podcasts | Suivre des sites, des blogs et des podcasts. | Ces outils récupèrent automatiquement les nouveaux articles et épisodes des sites que tu suis. | Flux RSS
+crit types | Types de contenu | text
+crit interface | Interface | text
+crit sync | Synchronisation | text
+crit offline | Fonctionne hors ligne | bool
+#h types | Types de contenu pris en charge : articles, podcasts, vidéos.
+
+@ newsboat | Newsboat | MIT | stable | 3 | oui |
+s Lecteur de flux RSS en terminal.
+c types=Articles (RSS, Atom) ; interface=Terminal ; sync=Nextcloud News, TT-RSS (option) ; offline=true
++ Très léger ; Piloté au clavier
+- Terminal uniquement
+i Installer (Alpine) :: apk add newsboat
+d Site officiel | https://newsboat.org/
+
+@ liferea | Liferea | GPL-2.0+ | stable | 1 | oui |
+s Lecteur de flux RSS graphique avec dossiers et recherche.
+c types=Articles, podcasts ; interface=Graphique (GTK) ; sync=TT-RSS, Nextcloud (option) ; offline=true
++ Complet ; Recherche
+- Pour un bureau GTK
+n GTK
+i Installer (Alpine) :: apk add liferea
+d Site officiel | https://lzone.de/liferea/
+
+@ gpodder | gPodder | GPL-3.0+ | stable | 2 | oui |
+s Gestionnaire de podcasts : abonnements, téléchargements et synchronisation.
+c types=Podcasts ; interface=Graphique (GTK) ; sync=gpodder.net (option) ; offline=true
++ Dédié aux podcasts ; Téléchargements automatiques
+- Interface datée
+n GTK ; Python
+i Installer (Alpine) :: apk add gpodder
+d Site officiel | https://gpodder.github.io/
+
+@ akregator | Akregator | GPL-2.0+ | stable | 1 | oui |
+s Lecteur de flux RSS de KDE.
+c types=Articles (RSS, Atom) ; interface=Graphique ; sync=Aucune native ; offline=true
++ Intégré à KDE ; Simple
+- Bibliothèques KDE
+n Bibliothèques Qt et KDE
+i Installer (Alpine) :: apk add akregator
+d Site officiel | https://apps.kde.org/akregator/

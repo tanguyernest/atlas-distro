@@ -1,0 +1,565 @@
+# USE coreutils
+@ gnu-coreutils | GNU Coreutils | GPL-3.0+ | stable | 1 | oui |
+s Les commandes de base de presque toutes les distributions (ls, cp, mv, cat...), complètes et très compatibles.
+c size_mb=null ; completeness=complète ; language=C ; posix=large ; scripting_ease=élevé
++ Toutes les options habituelles ; Référence pour les scripts ; Disponible partout
+- Plus volumineux que BusyBox
+l Les commandes Unix de tous les jours.
+i Installer (Alpine) :: apk add coreutils
+d Site officiel | https://www.gnu.org/software/coreutils/
+
+@ busybox | BusyBox | GPL-2.0 | stable | 2 | oui |
+s Un seul petit programme qui fournit des centaines de commandes. Standard d'Alpine, des routeurs et des systèmes embarqués.
+c size_mb=1 ; completeness=minimale ; language=C ; posix=partielle ; scripting_ease=moyen
++ Minuscule ; Tout en un ; Idéal pour l'embarqué
+- Moins d'options que GNU ; Certains scripts bash ne fonctionnent pas
+n Un shell compatible (ash est inclus)
+i Installer (Alpine) :: apk add busybox
+d Site officiel | https://busybox.net/
+
+@ uutils | uutils coreutils | MIT | stable | 2 | oui |
+s Réécriture en Rust des commandes GNU, visant une compatibilité totale avec elles.
+c size_mb=null ; completeness=bonne (en progression) ; language=Rust ; posix=large ; scripting_ease=élevé
++ Moderne et sûr (Rust) ; Compatible avec les commandes GNU
+- Encore quelques différences de comportement
+n Les tests de compatibilité avec GNU sont à suivre
+i Installer (Alpine) :: apk add uutils
+d Dépôt | https://github.com/uutils/coreutils
+
+@ toybox | Toybox | 0BSD | stable | 2 | partiel |
+s Ensemble de commandes minimal et simple, utilisé par Android.
+c size_mb=null ; completeness=minimale ; language=C ; posix=partielle ; scripting_ease=moyen
++ Très petit ; Licence très libre
+- Moins complet que BusyBox
+n Dépôt testing d'Alpine
+i Installer (Alpine, testing) :: apk add toybox
+d Site officiel | https://landley.net/toybox/
+
+# USE filesystem
+@ ext4 | ext4 | GPL-2.0 | stable | 1 | oui |
+s Système de fichiers par défaut de nombreuses distributions, simple et très éprouvé.
+c snapshots=false ; checksums=false ; encryption=partiel (fscrypt) ; in_kernel=true ; maturity_notes=Très éprouvé : le choix sûr par défaut
++ Très fiable ; Rapide ; Outils de réparation matures
+- Pas d'instantanés ; Pas de vérification de toutes les données
+n e2fsprogs
+i Installer (Alpine) :: apk add e2fsprogs
+d Wiki | https://ext4.wiki.kernel.org/
+
+@ btrfs | Btrfs | GPL-2.0 | stable | 3 | oui |
+s Système de fichiers moderne avec instantanés, sommes de contrôle et compression.
+c snapshots=true ; checksums=true ; encryption=non (via LUKS) ; in_kernel=true ; maturity_notes=Stable pour l'usage courant, RAID 5 et 6 déconseillés
++ Instantanés ; Compression ; Vérification des données
+- Réglages à connaître ; RAID 5 et 6 déconseillés
+l Sous-volumes et instantanés.
+n btrfs-progs
+i Installer (Alpine) :: apk add btrfs-progs
+d Documentation | https://btrfs.readthedocs.io/
+
+@ xfs | XFS | GPL-2.0 | stable | 2 | oui |
+s Système de fichiers très performant sur de gros fichiers et de gros volumes, courant sur les serveurs.
+c snapshots=false ; checksums=false ; encryption=non ; in_kernel=true ; maturity_notes=Très éprouvé sur serveur : ne peut pas être réduit
++ Excellent sur gros fichiers ; Très stable
+- Ne peut pas être réduit ; Pas d'instantanés
+n xfsprogs
+i Installer (Alpine) :: apk add xfsprogs
+d Site officiel | https://xfs.wiki.kernel.org/
+
+@ zfs | OpenZFS | CDDL | stable | 4 | oui |
+s Système de fichiers et gestionnaire de volumes très robuste, avec instantanés, chiffrement et sommes de contrôle.
+c snapshots=true ; checksums=true ; encryption=oui ; in_kernel=false ; maturity_notes=Très robuste : module externe à installer et gourmand en mémoire
++ Très fiable ; Instantanés ; Chiffrement natif
+- Module externe (licence incompatible avec le noyau) ; Gourmand en mémoire
+l Pools, jeux de données et instantanés.
+n Module noyau OpenZFS correspondant à ta version du noyau ; Assez de RAM
+i Installer (Alpine) :: apk add zfs
+d Site officiel | https://openzfs.org/
+
+@ f2fs | F2FS | GPL-2.0 | stable | 2 | oui |
+s Système de fichiers conçu pour la mémoire flash : SSD, cartes SD et eMMC.
+c snapshots=false ; checksums=false ; encryption=partiel (fscrypt) ; in_kernel=true ; maturity_notes=Mature pour le stockage flash
++ Adapté au flash ; Réduit l'usure
+- Moins d'outils de réparation ; Peu de fonctions avancées
+n f2fs-tools
+i Installer (Alpine) :: apk add f2fs-tools
+d Documentation | https://docs.kernel.org/filesystems/f2fs.html
+
+@ bcachefs | bcachefs | GPL-2.0 | experimental | 4 | oui |
+s Système de fichiers moderne avec instantanés, sommes de contrôle et chiffrement. Retiré du noyau officiel à partir de la version 6.18.
+c snapshots=true ; checksums=true ; encryption=oui ; in_kernel=false ; maturity_notes=Récent : développé hors du noyau officiel (module DKMS)
++ Fonctions modernes ; Chiffrement natif
+- Retiré du noyau officiel (6.18) ; Module DKMS à maintenir
+n Module noyau (DKMS) ; bcachefs-tools ; Initramfs qui charge le module
+i Installer (Alpine) :: apk add bcachefs-tools
+p Vérifier que le module se compile pour ton noyau avant chaque mise à jour.
+d Site officiel | https://bcachefs.org/
+
+# USE iso-builder
+@ mkimage | mkimage (Alpine) | MIT | stable | 3 | oui |
+s Scripts d'Alpine (dépôt aports) pour construire une image ISO avec des paquets et une configuration choisis.
+c base_distro=Alpine ; customization=bon ; reproducible=false ; build_time=courte ; doc_quality=correcte
++ Rapide ; Simple à comprendre ; Idéal pour une distro basée sur Alpine
+- Réservé à Alpine ; Documentation dispersée
+l Profils d'image et paquets de base.
+n alpine-sdk et une clé de signature abuild ; Le dépôt aports
+i Préparer (Alpine) :: apk add alpine-sdk squashfs-tools xorriso ;; git clone https://gitlab.alpinelinux.org/alpine/aports.git
+d Wiki Alpine | https://wiki.alpinelinux.org/wiki/How_to_make_a_custom_ISO_image_with_mkimage
+
+@ archiso | archiso | GPL-3.0 | stable | 3 | non |
+s Outil d'Arch pour construire une ISO live à partir de profils faciles à modifier.
+c base_distro=Arch ; customization=total ; reproducible=true ; build_time=moyenne ; doc_quality=excellente
++ Profils clairs ; Builds reproductibles ; Excellente documentation
+- À utiliser depuis un système Arch ou un conteneur Arch
+n Un système Arch (ou conteneur) pour le construire
+i Installer (Arch) :: pacman -S archiso
+d ArchWiki | https://wiki.archlinux.org/title/Archiso
+
+@ live-build | live-build | GPL-3.0 | stable | 3 | non |
+s Outil de Debian pour construire des images live personnalisées avec des listes de paquets.
+c base_distro=Debian ; customization=très bon ; reproducible=null ; build_time=moyenne ; doc_quality=bonne
++ Très souple ; Base Debian
+- À utiliser depuis un système Debian ; Configuration par dossiers
+n Un système Debian pour le construire
+i Installer (Debian) :: apt install live-build
+d Manuel | https://live-team.pages.debian.net/live-manual/
+
+@ kiwi | KIWI NG | GPL-3.0 | stable | 4 | non |
+s Constructeur d'images multi-distributions (SUSE, Fedora, Debian) décrites en XML.
+c base_distro=Plusieurs (SUSE, Fedora, Debian...) ; customization=très bon ; reproducible=null ; build_time=moyenne ; doc_quality=bonne
++ Plusieurs distributions ; Nombreux formats d'image
+- Description XML austère
+n Python ; Les outils de la distribution cible
+d Documentation | https://osinside.github.io/kiwi/
+
+@ mkosi | mkosi | LGPL-2.1+ | stable | 3 | oui |
+s Constructeur d'images du projet systemd, pour plusieurs distributions, avec un seul fichier de configuration.
+c base_distro=Plusieurs (Fedora, Debian, Ubuntu, Arch, openSUSE, Alpine...) ; customization=bon ; reproducible=true ; build_time=moyenne ; doc_quality=bonne
++ Un seul outil pour plusieurs bases ; Pensé pour les images modernes
+- Demande systemd et des outils de la distribution cible
+n Python ; Les outils de la distribution cible
+i Installer (Alpine) :: apk add mkosi
+d Dépôt | https://github.com/systemd/mkosi
+
+@ buildroot | Buildroot | GPL-2.0+ | stable | 4 | non |
+s Construit un système Linux minimal sur mesure à partir des sources, surtout pour l'embarqué.
+c base_distro=Aucune (système minimal sur mesure) ; customization=total ; reproducible=true ; build_time=longue ; doc_quality=excellente
++ Résultat très petit ; Excellente documentation ; Reproductible
+- Compilation longue ; Pas de gestionnaire de paquets sur le système final
+l Compilation croisée et système minimal.
+n Un compilateur et plusieurs Go d'espace disque
+d Manuel | https://buildroot.org/docs.html
+
+@ yocto | Yocto Project / OpenEmbedded | MIT | stable | 5 | non |
+s Cadre de construction de distributions embarquées sur mesure, utilisé par l'industrie.
+c base_distro=Aucune (distribution construite sur mesure) ; customization=total ; reproducible=true ; build_time=longue ; doc_quality=bonne
++ Très complet et industriel ; Mises à jour de couches
+- Très complexe ; Compilation très longue
+n Plusieurs dizaines de Go d'espace disque
+d Documentation | https://docs.yoctoproject.org/
+
+# USE system-image
+@ sys-classic | Système classique (modifiable) | Sans objet | stable | 1 | oui |
+s Le système est installé sur le disque et se modifie librement avec le gestionnaire de paquets.
+c mutable=true ; atomic_update=false ; rollback=false ; ram_usage=faible ; complexity=faible
++ Simple ; Très flexible
+- Une mise à jour interrompue peut laisser le système cassé ; Pas de retour en arrière facile
+l Installation et entretien d'un système classique.
+d Documentation | https://en.wikipedia.org/wiki/Package_manager
+
+@ sys-squashfs | SquashFS + overlay (système live) | GPL-2.0 | stable | 3 | oui |
+s Le système est une image en lecture seule ; les changements vont dans une couche en mémoire ou sur disque.
+c mutable=true ; atomic_update=true ; rollback=true ; ram_usage=moyen ; complexity=moyenne
++ Mise à jour par remplacement de l'image ; Retour à l'état propre au redémarrage
+- Les changements sont perdus sans persistance ; Demande de la mémoire
+n squashfs-tools ; Une couche de modifications (overlay)
+i Installer (Alpine) :: apk add squashfs-tools
+d Documentation | https://docs.kernel.org/filesystems/squashfs.html
+
+@ ostree | OSTree (rpm-ostree) | LGPL-2.0+ | stable | 3 | oui |
+s Mises à jour du système par images versionnées, avec retour en arrière. Utilisé par Fedora Silverblue et d'autres bureaux « atomiques ».
+c mutable=false ; atomic_update=true ; rollback=true ; ram_usage=faible ; complexity=moyenne
++ Mises à jour atomiques ; Retour en arrière ; Éprouvé (Fedora Silverblue, Fedora CoreOS)
+- Installation de paquets différente (empilement) ; Écosystème centré sur Fedora
+l Images versionnées du système.
+i Installer (Alpine) :: apk add ostree
+d Dépôt | https://github.com/ostreedev/ostree
+
+@ bootc | bootc | Apache-2.0 | stable | 4 | non |
+s Démarre le système depuis une image de conteneur, avec mises à jour atomiques. Base du mode image de RHEL et de Fedora.
+c mutable=false ; atomic_update=true ; rollback=true ; ram_usage=faible ; complexity=moyenne
++ Le système se construit comme une image de conteneur ; Mises à jour atomiques ; Accepté au sein de la CNCF
+- Demande de maîtriser les conteneurs ; Surtout Fedora et RHEL
+n Un registre d'images et un outil de conteneurs
+d Dépôt | https://github.com/containers/bootc
+
+@ abroot | ABRoot (Vanilla OS) | GPL-3.0 | stable | 4 | non |
+s Deux partitions système (A et B) : la mise à jour s'applique sur celle qui n'est pas utilisée, puis on bascule.
+c mutable=false ; atomic_update=true ; rollback=true ; ram_usage=faible ; complexity=moyenne
++ Retour immédiat à l'ancienne partition ; Mises à jour sans risque
+- Demande deux partitions système ; Spécifique à Vanilla OS
+n Deux partitions système de même taille
+d Site officiel | https://vanillaos.org/
+
+# USE update-model
+@ rolling | Rolling release (en continu) | Sans objet | stable | 2 | oui |
+s Pas de numéro de version : le système se met à jour en continu vers les derniers logiciels.
+c model=rolling ; support_length=Pas de versions : toujours la dernière ; breakage_risk=moyen à élevé ; security_patch_speed=rapide ; mirror_needs=Miroir ou cache utile, gros volume de mises à jour
++ Toujours à jour ; Pas de mise à niveau de version
+- Une mise à jour peut casser quelque chose ; Demande de la vigilance
+l Gérer une distribution en continu.
+p Lire les annonces avant chaque grosse mise à jour et garder un instantané.
+d Documentation | https://en.wikipedia.org/wiki/Rolling_release
+
+@ sixmonth | Versions tous les 6 mois | Sans objet | stable | 2 | oui |
+s Une nouvelle version environ tous les six mois, avec des logiciels récents (Fedora, Ubuntu intermédiaire).
+c model=stable fixe ; support_length=9 à 13 mois par version ; breakage_risk=faible à moyen (à chaque montée de version) ; security_patch_speed=rapide ; mirror_needs=Miroir utile
++ Logiciels récents ; Étapes claires
+- Mise à niveau tous les 6 mois ; Courte durée de support
+d Documentation | https://en.wikipedia.org/wiki/Software_release_life_cycle
+
+@ stable | Version stable à long cycle (Debian) | Sans objet | stable | 1 | oui |
+s Une version figée sur plusieurs années, qui ne reçoit que des corrections et des correctifs de sécurité.
+c model=stable fixe ; support_length=3 ans puis 2 ans de support long (Debian) ; breakage_risk=faible ; security_patch_speed=rapide pour la sécurité, versions figées ; mirror_needs=Miroir local utile (cache de paquets)
++ Très prévisible ; Peu de casse
+- Logiciels plus anciens
+d Documentation | https://wiki.debian.org/DebianReleases
+
+@ lts | Support très long (RHEL, Ubuntu LTS) | Sans objet | stable | 2 | oui |
+s Versions à très long support, pensées pour les serveurs et les entreprises.
+c model=stable fixe ; support_length=5 à 10 ans selon la distribution ; breakage_risk=faible ; security_patch_speed=rapide (rétroportage) ; mirror_needs=Miroir local recommandé
++ Stabilité sur de longues années ; Correctifs de sécurité rétroportés
+- Logiciels anciens ; Montée de version majeure lourde
+d Documentation | https://ubuntu.com/about/release-cycle
+
+# USE desktop-shell
+@ waybar | Waybar | MIT | stable | 2 | oui |
+s Barre d'état très personnalisable pour les compositeurs Wayland (Sway, Hyprland, MangoWC).
+c component=Barre d'état ; scripting=bonne (modules externes) ; theming=CSS ; footprint_mb=null ; wayland_native=true
++ Très répandue ; Style en CSS ; Beaucoup de modules
+- Configuration en JSON à apprendre
+n Une police d'icônes (Font Awesome ou Nerd Font)
+i Installer (Alpine) :: apk add waybar
+d Dépôt | https://github.com/Alexays/Waybar
+
+@ yambar | yambar | MIT | stable | 3 | oui |
+s Barre d'état légère pour Wayland et X11, configurée en YAML.
+c component=Barre d'état ; scripting=moyenne ; theming=Fichier YAML ; footprint_mb=null ; wayland_native=true
++ Légère ; Configuration claire
+- Moins de modules que Waybar
+i Installer (Alpine) :: apk add yambar
+d Dépôt | https://codeberg.org/dnkl/yambar
+
+@ polybar | Polybar | MIT | stable | 2 | oui |
+s Barre d'état pour X11, facile à personnaliser.
+c component=Barre d'état ; scripting=bonne ; theming=Fichier ini ; footprint_mb=null ; wayland_native=false
++ Très configurable ; Beaucoup de documentation
+- Seulement X11
+n Session X11
+i Installer (Alpine) :: apk add polybar
+d Dépôt | https://github.com/polybar/polybar
+
+@ eww | ElKowars Wacky Widgets (eww) | MIT | stable | 4 | partiel |
+s Boîte à outils pour créer ses propres widgets, barres et tableaux de bord, en code.
+c component=Widgets et barres sur mesure ; scripting=totale (Yuck et scripts) ; theming=CSS ou SCSS ; footprint_mb=null ; wayland_native=true
++ Liberté totale ; Beaux résultats
+- Courbe d'apprentissage ; Seulement dans le dépôt testing d'Alpine
+n Dépôt testing d'Alpine ; GTK
+i Installer (Alpine, testing) :: apk add eww
+d Documentation | https://elkowar.github.io/eww/
+
+@ fuzzel | fuzzel | MIT | stable | 1 | oui |
+s Lanceur d'applications léger et rapide pour Wayland.
+c component=Lanceur d'applications ; scripting=mode dmenu ; theming=Fichier ini ; footprint_mb=null ; wayland_native=true
++ Très rapide ; Simple
+- Moins de modes que rofi
+i Installer (Alpine) :: apk add fuzzel
+d Dépôt | https://codeberg.org/dnkl/fuzzel
+
+@ wofi | Wofi | GPL-3.0 | stable | 2 | oui |
+s Lanceur et menu pour Wayland, stylé en CSS.
+c component=Lanceur d'applications ; scripting=mode dmenu ; theming=CSS ; footprint_mb=null ; wayland_native=true
++ Style en CSS ; Mode dmenu
+- Développement peu actif
+i Installer (Alpine) :: apk add wofi
+d Site officiel | https://hg.sr.ht/~scoopta/wofi
+
+@ rofi | rofi | MIT | stable | 3 | oui |
+s Lanceur, sélecteur de fenêtres et menu très configurable.
+c component=Lanceur et menus ; scripting=totale (modes) ; theming=Thèmes rasi ; footprint_mb=null ; wayland_native=true
++ Très puissant ; Nombreux thèmes ; Modes personnalisés
+- Support Wayland natif récent
+i Installer (Alpine) :: apk add rofi
+d Dépôt | https://github.com/davatorium/rofi
+
+@ tofi | tofi | MIT | stable | 2 | oui |
+s Lanceur minimal très rapide pour Wayland.
+c component=Lanceur d'applications ; scripting=mode dmenu ; theming=Fichier de configuration ; footprint_mb=null ; wayland_native=true
++ Le plus rapide ; Minimal
+- Peu de fonctions
+i Installer (Alpine) :: apk add tofi
+d Dépôt | https://github.com/philj56/tofi
+
+@ mako | mako | MIT | stable | 2 | oui |
+s Démon de notifications léger pour Wayland.
+c component=Notifications ; scripting=limitée (actions) ; theming=Fichier ini ; footprint_mb=null ; wayland_native=true
++ Léger ; Simple
+- Peu de fonctions
+i Installer (Alpine) :: apk add mako
+d Dépôt | https://github.com/emersion/mako
+
+@ dunst | dunst | BSD-3-Clause | stable | 2 | oui |
+s Démon de notifications léger et configurable, pour X11 et Wayland.
+c component=Notifications ; scripting=bonne (scripts) ; theming=Fichier ini ; footprint_mb=null ; wayland_native=true
++ Très configurable ; Règles par application
+- Plus de réglages
+i Installer (Alpine) :: apk add dunst
+d Site officiel | https://dunst-project.org/
+
+@ swaync | SwayNotificationCenter | GPL-3.0 | stable | 3 | oui |
+s Centre de notifications avec panneau de contrôle pour Sway et d'autres compositeurs Wayland.
+c component=Centre de notifications ; scripting=moyenne ; theming=CSS ; footprint_mb=null ; wayland_native=true
++ Panneau de notifications ; Style en CSS
+- Plus lourd que mako
+n GTK
+i Installer (Alpine) :: apk add swaync
+d Dépôt | https://github.com/ErikReider/SwayNotificationCenter
+
+# USE network
+@ networkmanager | NetworkManager | GPL-2.0+ | stable | 2 | oui |
+s Gestionnaire de réseau complet : Wi-Fi, câble, VPN, avec applets graphiques.
+c wifi=complet ; vpn_support=large (modules) ; footprint_mb=null ; interface=Graphique, nmtui, nmcli ; server_use=true
++ Complet ; Beaucoup de VPN pris en charge ; Applets pour tous les bureaux
+- Plus lourd ; Beaucoup de dépendances
+i Installer (Alpine) :: apk add networkmanager
+d Site officiel | https://networkmanager.dev/
+
+@ iwd | iwd | LGPL-2.1+ | stable | 3 | oui |
+s Démon Wi-Fi moderne et léger d'Intel, qui remplace wpa_supplicant.
+c wifi=bon (Wi-Fi seulement) ; vpn_support=aucun ; footprint_mb=null ; interface=Terminal (iwctl) ; server_use=false
++ Léger ; Rapide à se connecter
+- Seulement le Wi-Fi ; Moins de fonctions d'entreprise
+n Un autre outil pour la configuration réseau (DHCP)
+i Installer (Alpine) :: apk add iwd
+d Documentation | https://iwd.wiki.kernel.org/
+
+@ systemd-networkd | systemd-networkd | LGPL-2.1+ | stable | 3 | non |
+s Gestion du réseau intégrée à systemd, configurée par fichiers.
+c wifi=basique (avec iwd ou wpa_supplicant) ; vpn_support=partiel (WireGuard natif) ; footprint_mb=null ; interface=Fichiers de configuration ; server_use=true
++ Intégré à systemd ; Déclaratif
+- Demande systemd
+n systemd
+d Documentation | https://www.freedesktop.org/software/systemd/man/latest/systemd.network.html
+
+@ connman | ConnMan | GPL-2.0 | stable | 3 | oui |
+s Gestionnaire de réseau léger, pensé pour l'embarqué.
+c wifi=bon ; vpn_support=partiel ; footprint_mb=null ; interface=Terminal (connmanctl) et clients graphiques ; server_use=false
++ Léger ; Adapté à l'embarqué
+- Moins courant ; Moins de documentation
+i Installer (Alpine) :: apk add connman
+d Site officiel | https://git.kernel.org/pub/scm/network/connman/connman.git
+
+@ wpa_supplicant | wpa_supplicant | BSD-3-Clause | stable | 3 | oui |
+s Programme qui gère l'authentification Wi-Fi (WPA, WPA3, entreprise).
+c wifi=complet ; vpn_support=aucun ; footprint_mb=null ; interface=Fichier de configuration et wpa_cli ; server_use=true
++ Complet ; Standard historique
+- Configuration à la main ; Aucun DHCP intégré
+n Un client DHCP
+i Installer (Alpine) :: apk add wpa_supplicant
+d Site officiel | https://w1.fi/wpa_supplicant/
+
+@ ifupdown-ng | ifupdown-ng | ISC | stable | 2 | oui |
+s Configuration réseau par un fichier simple (/etc/network/interfaces), outil d'Alpine.
+c wifi=via wpa_supplicant ; vpn_support=WireGuard et autres (exécuteurs) ; footprint_mb=null ; interface=Fichier de configuration ; server_use=true
++ Très simple ; Léger
+- Pas d'interface graphique ; Wi-Fi à configurer à la main
+i Installer (Alpine) :: apk add ifupdown-ng
+d Dépôt | https://github.com/ifupdown-ng/ifupdown-ng
+
+# USE access-control
+@ selinux | SELinux | GPL-2.0+ | stable | 5 | partiel |
+s Contrôle d'accès obligatoire par étiquettes sur tous les fichiers et processus, très fin.
+c model=étiquettes ; granularity=très fine ; setup_effort=élevé ; profiles_available=très nombreux (Fedora, RHEL) ; alpine_support=partiel
++ Très puissant ; Politiques prêtes (Fedora, RHEL) ; Standard des entreprises
+- Très difficile à maîtriser ; Politique Alpine seulement dans testing
+l Étiquettes, domaines et politiques.
+n Dépôt testing d'Alpine pour la politique ; Un noyau avec SELinux activé
+d Site officiel | https://github.com/SELinuxProject
+
+@ apparmor | AppArmor | GPL-2.0 | stable | 3 | oui |
+s Contrôle d'accès obligatoire par chemins de fichiers, plus simple que SELinux.
+c model=chemins ; granularity=fine ; setup_effort=moyen ; profiles_available=bon nombre ; alpine_support=bon
++ Plus simple que SELinux ; Profils prêts ; Disponible sur Alpine
+- Moins fin que SELinux
+n Un noyau avec AppArmor activé
+i Installer (Alpine) :: apk add apparmor
+d Documentation | https://apparmor.net/
+
+@ tomoyo | TOMOYO | GPL-2.0 | stable | 4 | non |
+s Contrôle d'accès par noms de chemins, avec apprentissage automatique des comportements.
+c model=chemins ; granularity=fine ; setup_effort=moyen ; profiles_available=peu ; alpine_support=non
++ Mode d'apprentissage ; Politique lisible
+- Peu répandu ; Peu de profils
+d Site officiel | https://tomoyo.osdn.jp/
+
+@ landlock | Landlock | GPL-2.0 | stable | 4 | partiel |
+s Module du noyau qui permet à chaque programme de se limiter lui-même, sans droits administrateur.
+c model=autre (restriction volontaire par programme) ; granularity=moyenne ; setup_effort=faible pour le développeur ; profiles_available=peu (à intégrer dans les programmes) ; alpine_support=partiel
++ Sans droits administrateur ; Intégré au noyau
+- Chaque programme doit l'utiliser ; Peu de profils tout faits
+n Un noyau avec Landlock activé
+d Documentation | https://landlock.io/
+
+# USE disk-encryption
+@ luks | LUKS (dm-crypt, cryptsetup) | GPL-2.0+ | stable | 3 | oui |
+s Chiffrement de partition ou de disque entier, standard de Linux.
+c scope=Partition ou disque entier ; performance_cost=faible (AES matériel) ; key_management=Mot de passe, fichier-clé, TPM2, FIDO2 ; header_backup=true ; boot_integration=moyenne
++ Standard ; Très éprouvé ; Plusieurs façons de déverrouiller
+- Initramfs à configurer ; En-tête à sauvegarder
+l Initramfs, déverrouillage au démarrage et en-tête LUKS.
+n cryptsetup ; Un initramfs qui déverrouille le disque
+i Installer (Alpine) :: apk add cryptsetup
+i Sauvegarder l'en-tête :: cryptsetup luksHeaderBackup /dev/sdX --header-backup-file entete.img
+p Sans sauvegarde de l'en-tête, un secteur abîmé rend tout le disque illisible.
+d Site officiel | https://gitlab.com/cryptsetup/cryptsetup
+
+@ fscrypt | fscrypt (ext4, F2FS) | GPL-2.0 | stable | 3 | oui |
+s Chiffrement par dossier intégré à ext4 et F2FS, sans couche supplémentaire.
+c scope=Dossiers (ext4, F2FS) ; performance_cost=faible ; key_management=Mot de passe, clé de protection ; header_backup=false ; boot_integration=simple
++ Pas de couche en plus ; Chiffre seulement ce qu'il faut
+- Noms de fichiers visibles dans certains cas ; Outil moins connu
+n Système de fichiers ext4 ou F2FS avec chiffrement activé
+i Installer (Alpine) :: apk add fscrypt
+d Dépôt | https://github.com/google/fscrypt
+
+@ gocryptfs | gocryptfs | MIT | stable | 2 | oui |
+s Dossier chiffré fichier par fichier, monté par FUSE. Pratique pour un cloud.
+c scope=Dossier (FUSE) ; performance_cost=moyen (FUSE) ; key_management=Mot de passe ; header_backup=true ; boot_integration=sans objet (monté après connexion)
++ Fichiers chiffrés individuellement ; Adapté à la synchronisation cloud
+- Plus lent que LUKS ; Dépend de FUSE
+n FUSE ; Sauvegarde du fichier gocryptfs.conf
+i Installer (Alpine) :: apk add gocryptfs
+d Site officiel | https://nuetzlich.net/gocryptfs/
+
+@ ecryptfs | eCryptfs | GPL-2.0+ | legacy | 3 | oui |
+s Ancien chiffrement de dossier personnel, aujourd'hui déconseillé au profit de LUKS ou fscrypt.
+c scope=Dossier personnel ; performance_cost=moyen ; key_management=Mot de passe ; header_backup=false ; boot_integration=simple
++ Simple à activer
+- Peu maintenu : déconseillé ; Limites de longueur de noms
+n ecryptfs-utils
+i Installer (Alpine) :: apk add ecryptfs-utils
+p À éviter pour une nouvelle installation.
+d Dépôt | https://github.com/eCryptfs/ecryptfs
+
+# USE firewall
+@ nftables | nftables | GPL-2.0 | stable | 3 | oui |
+s Pare-feu moderne du noyau Linux, qui remplace iptables.
+c backend=Netfilter (noyau) ; rule_syntax=Langage nft ; stateful=true ; gui_available=false ; learning_curve=moyenne
++ Syntaxe claire ; Un seul outil pour IPv4 et IPv6 ; Standard moderne
+- Pas d'interface graphique ; Syntaxe à apprendre
+l Tables, chaînes et règles.
+i Installer (Alpine) :: apk add nftables
+d Wiki | https://wiki.nftables.org/
+
+@ iptables | iptables | GPL-2.0 | legacy | 3 | oui |
+s Pare-feu historique de Linux, encore très répandu mais remplacé par nftables.
+c backend=Netfilter (noyau) ; rule_syntax=Commandes iptables ; stateful=true ; gui_available=false ; learning_curve=moyenne
++ Énormément de documentation ; Compatible avec de vieux outils
+- Remplacé par nftables ; Séparé pour IPv4 et IPv6
+i Installer (Alpine) :: apk add iptables
+d Site officiel | https://www.netfilter.org/projects/iptables/
+
+@ ufw | UFW | GPL-3.0 | stable | 1 | oui |
+s Pare-feu simplifié : quelques commandes pour autoriser ou refuser des ports.
+c backend=iptables ou nftables ; rule_syntax=Commandes simples (allow, deny) ; stateful=true ; gui_available=true ; learning_curve=faible
++ Très simple ; Interface graphique possible (Gufw)
+- Moins fin que nftables
+n Python
+i Installer (Alpine) :: apk add ufw
+i Activer :: ufw default deny incoming ;; ufw allow ssh ;; ufw enable
+d Wiki | https://wiki.ubuntu.com/UncomplicatedFirewall
+
+@ firewalld | firewalld | GPL-2.0+ | stable | 3 | oui |
+s Pare-feu par zones et services, avec modification à chaud (Fedora, RHEL).
+c backend=nftables ; rule_syntax=Zones et services ; stateful=true ; gui_available=true ; learning_curve=moyenne
++ Zones adaptées aux portables ; Modifications sans coupure
+- Demande D-Bus ; Plus lourd
+n D-Bus ; Python
+i Installer (Alpine) :: apk add firewalld
+d Site officiel | https://firewalld.org/
+
+@ awall | Alpine Wall (awall) | MIT | stable | 3 | oui |
+s Pare-feu d'Alpine : décrit des zones et des politiques en JSON, traduites en règles.
+c backend=iptables ou nftables ; rule_syntax=Fichiers JSON (zones, politiques) ; stateful=true ; gui_available=false ; learning_curve=moyenne
++ Description lisible ; Intégré à Alpine
+- Spécifique à Alpine ; Peu connu
+i Installer (Alpine) :: apk add awall
+d Wiki Alpine | https://wiki.alpinelinux.org/wiki/Alpine_Wall
+
+# USE kernel-hardening
+@ sysctl-hardening | Réglages sysctl durcis | Sans objet | stable | 2 | oui |
+s Réglages du noyau en fonctionnement (sysctl) qui cachent les adresses et limitent les informations exposées.
+c method=Fichier /etc/sysctl.d (kptr_restrict, dmesg_restrict...) ; protection_level=moyen ; breakage_risk=faible ; maintenance=légère ; performance_cost=faible
++ Facile à appliquer ; Réversible ; Peu de risque
+- Protection limitée seule
+l Réglages du noyau à chaud.
+i Exemple :: echo "kernel.kptr_restrict=2" >> /etc/sysctl.d/50-durcissement.conf ;; echo "kernel.dmesg_restrict=1" >> /etc/sysctl.d/50-durcissement.conf
+d Recommandations | https://kspp.github.io/
+
+@ kspp-config | Options de compilation KSPP | GPL-2.0 | stable | 4 | oui |
+s Options de noyau recommandées par le Kernel Self Protection Project, à activer à la compilation.
+c method=Options de compilation du noyau ; protection_level=fort ; breakage_risk=moyen ; maintenance=lourde ; performance_cost=faible à moyen
++ Protection profonde ; Liste de contrôle claire ; Outil de vérification disponible
+- À refaire à chaque version du noyau ; Peut casser des pilotes
+n kernel-hardening-checker pour vérifier ; Compiler son propre noyau
+i Vérifier (Alpine) :: apk add kernel-hardening-checker ;; kernel-hardening-checker -c /proc/config.gz
+d Projet KSPP | https://kspp.github.io/
+
+@ lockdown | Kernel lockdown et Secure Boot | GPL-2.0 | stable | 4 | oui |
+s Mode lockdown du noyau avec signature des modules, pour que même un administrateur compromis ne puisse pas modifier le noyau.
+c method=Mode lockdown, signature des modules ; protection_level=fort contre un administrateur compromis ; breakage_risk=moyen (modules non signés refusés) ; maintenance=moyenne (signer les modules DKMS) ; performance_cost=faible
++ Protège le noyau contre root ; S'appuie sur Secure Boot
+- Les modules DKMS doivent être signés ; Demande une chaîne de démarrage signée
+n Secure Boot activé ; Clés de signature pour les modules
+d Documentation | https://man7.org/linux/man-pages/man7/kernel_lockdown.7.html
+
+@ bootparams | Paramètres de démarrage durcis | Sans objet | stable | 2 | oui |
+s Options passées au noyau au démarrage qui effacent la mémoire et réduisent les attaques (init_on_alloc, slab_nomerge).
+c method=Options de la ligne de commande du noyau ; protection_level=moyen ; breakage_risk=faible ; maintenance=légère ; performance_cost=faible à moyen
++ Une simple ligne à ajouter ; Efficace contre plusieurs attaques mémoire
+- Coût en performances selon les options
+l Options de démarrage du noyau.
+i Exemple :: # ajouter à la ligne du noyau : init_on_alloc=1 init_on_free=1 slab_nomerge
+d Options | https://docs.kernel.org/admin-guide/kernel-parameters.html
+
+# USE sandbox
+@ bubblewrap | bubblewrap | LGPL-2.0+ | stable | 4 | oui |
+s Outil léger pour lancer un programme dans un environnement restreint, utilisé par Flatpak.
+c mechanism=Namespaces utilisateur ; isolation_strength=bonne ; ease_of_use=difficile ; app_packaging=false ; musl_support=oui
++ Minimal ; Sans droits administrateur ; Base de Flatpak
+- Ligne de commande austère
+i Installer (Alpine) :: apk add bubblewrap
+d Dépôt | https://github.com/containers/bubblewrap
+
+@ firejail | Firejail | GPL-2.0+ | stable | 3 | difficile |
+s Isole des applications avec des profils prêts (navigateur, lecteurs...).
+c mechanism=Namespaces, seccomp et profils ; isolation_strength=moyenne ; ease_of_use=moyenne ; app_packaging=false ; musl_support=difficile
++ Nombreux profils prêts ; Simple à lancer
+- Programme avec droits élevés (surface d'attaque) ; Absent des dépôts Alpine
+n Un noyau avec les namespaces
+d Site officiel | https://firejail.wordpress.com/
+
+@ flatpak | Flatpak | LGPL-2.1+ | stable | 2 | oui |
+s Applications empaquetées avec leurs bibliothèques et isolées par permissions.
+c mechanism=bubblewrap et portails ; isolation_strength=bonne (selon les permissions) ; ease_of_use=simple ; app_packaging=true ; musl_support=oui
++ Catalogue d'applications prêtes ; Isolation par défaut ; Fonctionne sur toutes les distros
+- Occupe de la place (runtimes) ; Permissions parfois larges
+n xdg-desktop-portal ; bubblewrap
+i Installer (Alpine) :: apk add flatpak
+d Site officiel | https://flatpak.org/
+
+@ nsjail | nsjail | Apache-2.0 | stable | 4 | oui |
+s Bac à sable léger avec namespaces, cgroups et filtre d'appels système (seccomp).
+c mechanism=Namespaces, cgroups, seccomp-bpf ; isolation_strength=forte ; ease_of_use=difficile ; app_packaging=false ; musl_support=oui
++ Isolation forte ; Limites de ressources
+- Configuration technique
+i Installer (Alpine) :: apk add nsjail
+d Dépôt | https://github.com/google/nsjail

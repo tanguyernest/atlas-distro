@@ -1,0 +1,556 @@
+# CAT file-transfer | software | Transfert de fichiers entre appareils | Envoyer des fichiers entre téléphone, ordinateur et tablette. | Ces outils envoient des fichiers entre tes appareils. Certains restent sur le réseau local, d'autres passent par internet. | Partage de fichiers
+crit platforms | Plateformes | text
+crit transport | Réseau utilisé | text
+crit encryption | Chiffrement | text
+crit setup | Mise en place | enum
+crit phone | Application mobile | bool
+#h platforms | Systèmes sur lesquels l'outil fonctionne.
+#h transport | Chemin des données : réseau local ou internet.
+#h phone | Existence d'une application pour téléphone.
+
+@ localsend | LocalSend | Apache-2.0 | stable | 1 | flatpak |
+s Partage de fichiers et de messages sur le réseau local, sans compte ni internet. Alternative libre à AirDrop.
+c platforms=Linux, Windows, macOS, Android, iOS ; transport=Réseau local ; encryption=Chiffré entre appareils (HTTPS) ; setup=faible ; phone=true
++ Très simple ; Marche sans internet ; Libre
+- Les appareils doivent être sur le même réseau ; Absent des dépôts Alpine
+l Découverte d'appareils sur un réseau local.
+n Flatpak ou AppImage ; Port 53317 ouvert dans le pare-feu
+i Installer (Flatpak) :: flatpak install flathub org.localsend.localsend_app
+p Un pare-feu actif bloque la découverte des appareils.
+d Site officiel | https://localsend.org/
+
+@ kdeconnect | KDE Connect | GPL-2.0+ | stable | 2 | oui |
+s Relie téléphone et ordinateur : fichiers, presse-papiers, notifications, contrôle à distance.
+c platforms=Linux, Android, Windows ; transport=Réseau local ; encryption=TLS entre appareils appairés ; setup=moyenne ; phone=true
++ Beaucoup de fonctions au-delà des fichiers ; Notifications du téléphone sur l'ordinateur
+- Tire les bibliothèques Qt et KDE ; Appairage obligatoire
+l Appairage sécurisé et services entre appareils.
+n Bibliothèques Qt et KDE ; Ports 1714 à 1764 ouverts dans le pare-feu
+i Installer (Alpine) :: apk add kdeconnect
+p Sans les ports ouverts, le téléphone ne trouve pas l'ordinateur.
+d Site officiel | https://kdeconnect.kde.org/
+
+@ warpinator | Warpinator | GPL-3.0 | stable | 1 | partiel |
+s Transfert de fichiers entre ordinateurs du réseau local, issu de Linux Mint.
+c platforms=Linux, Windows ; transport=Réseau local ; encryption=Chiffré (certificat) ; setup=faible ; phone=false
++ Simple ; Sans compte
+- Pas d'application mobile officielle ; Seulement dans le dépôt testing d'Alpine
+l Transfert direct entre machines d'un réseau.
+n Dépôt testing d'Alpine ; GTK et Python ; Ports 42000 et 42001 ouverts
+i Installer (Alpine, testing) :: apk add warpinator
+d Dépôt | https://github.com/linuxmint/warpinator
+
+@ croc | croc | MIT | stable | 2 | oui |
+s Envoi de fichiers en ligne de commande avec un code à saisir, même entre réseaux différents.
+c platforms=Linux, Windows, macOS ; transport=Internet (relais) ou réseau local ; encryption=De bout en bout (PAKE) ; setup=aucune ; phone=false
++ Très simple ; Marche entre réseaux différents
+- Ligne de commande ; Relais public par défaut (auto-hébergeable)
+l Échange de clés par mot de passe partagé.
+i Installer (Alpine) :: apk add croc
+i Envoyer un fichier :: croc send fichier.zip
+p Le code affiché ne doit être donné qu'à la personne concernée.
+d Dépôt | https://github.com/schollz/croc
+
+# CAT file-sync | software | Synchronisation de dossiers | Garder les mêmes dossiers à jour sur plusieurs appareils. | Ces outils copient automatiquement les changements d'un dossier vers d'autres appareils ou un serveur. | Synchronisation de fichiers
+crit model | Modèle | text
+crit selfhost | Auto-hébergeable | bool
+crit platforms | Plateformes | text
+crit conflicts | Gestion des conflits | text
+crit gui | Interface | text
+#h model | Façon dont les appareils se parlent : directement ou via un serveur.
+#h selfhost | Possibilité de l'installer sur ton propre serveur.
+#h conflicts | Que se passe-t-il quand un fichier est modifié des deux côtés.
+#h gui | Façon de piloter l'outil.
+
+@ syncthing | Syncthing | MPL-2.0 | stable | 3 | oui |
+s Synchronise des dossiers directement entre appareils, sans serveur central.
+c model=Pair à pair ; selfhost=true ; platforms=Linux, Windows, macOS, Android, BSD ; conflicts=Copies de conflit conservées ; gui=Interface web locale
++ Sans cloud ; Chiffré entre appareils ; Libre
+- Les appareils doivent être allumés en même temps ; Pas d'application iOS officielle
+l Synchronisation pair à pair et identifiants d'appareils.
+n Port 22000 ouvert ; Un démarrage automatique du service
+i Installer (Alpine) :: apk add syncthing
+i Lancer :: syncthing
+p L'interface web écoute seulement en local : ne pas l'ouvrir sur internet.
+d Site officiel | https://syncthing.net/
+
+@ nextcloud-client | Nextcloud Desktop | GPL-2.0+ | stable | 2 | oui |
+s Client de synchronisation pour un serveur Nextcloud, le tien ou celui d'un hébergeur.
+c model=Client-serveur ; selfhost=true ; platforms=Linux, Windows, macOS, Android, iOS ; conflicts=Fichiers de conflit créés ; gui=Icône dans la barre système
++ Agenda et contacts via le serveur ; Bien intégré aux gestionnaires de fichiers
+- Il faut un serveur Nextcloud
+l Fonctionnement d'un cloud personnel.
+n Un serveur Nextcloud ; Bibliothèques Qt
+i Installer (Alpine) :: apk add nextcloud-client
+d Site officiel | https://nextcloud.com/install/#install-clients
+
+@ unison | Unison | GPL-3.0 | stable | 3 | oui |
+s Synchronisation bidirectionnelle de dossiers entre deux machines, en terminal ou interface simple.
+c model=Deux machines (via SSH) ; selfhost=true ; platforms=Linux, Windows, macOS ; conflicts=Demande à chaque conflit ; gui=Terminal ou GTK
++ Fiable ; Bidirectionnel
+- Les deux machines doivent avoir la même version ; Interface austère
+l Synchronisation à deux sens et détection de conflits.
+n Accès SSH à l'autre machine
+i Installer (Alpine) :: apk add unison
+d Dépôt | https://github.com/bcpierce00/unison
+
+@ rclone | rclone | MIT | stable | 3 | oui |
+s Synchronise ou copie des fichiers vers plus de 70 services de stockage en ligne.
+c model=Client vers stockage distant ; selfhost=true ; platforms=Linux, Windows, macOS, BSD ; conflicts=Selon la commande (copy, sync, bisync) ; gui=Terminal (interface web en option)
++ Énorme choix de services ; Chiffrement possible
+- Une mauvaise commande sync peut supprimer des fichiers
+l Fonctionnement des API de stockage en ligne.
+n Un compte de stockage distant
+i Installer (Alpine) :: apk add rclone
+i Simuler d'abord :: rclone sync ~/Docs distant:Docs --dry-run
+p rclone sync supprime à destination ce qui n'existe plus à la source : toujours tester avec --dry-run.
+d Site officiel | https://rclone.org/
+
+# CAT backup | software | Sauvegarde | Garder une copie de tes données pour les retrouver après une panne. | La sauvegarde copie tes données ailleurs. Une bonne sauvegarde est chiffrée, versionnée et testée. | Sauvegarde informatique
+crit dedup | Déduplication | bool
+crit encryption | Chiffrement | bool
+crit targets | Destinations | text
+crit interface | Interface | text
+crit incremental | Sauvegardes incrémentales | bool
+#h dedup | Les données identiques ne sont stockées qu'une fois : gain de place important.
+#h targets | Où les sauvegardes peuvent être envoyées.
+#h incremental | Après la première copie, seules les modifications sont enregistrées.
+
+@ restic | restic | BSD-2-Clause | stable | 3 | oui |
+s Sauvegarde chiffrée et dédupliquée, simple à automatiser, vers disque, SFTP ou cloud.
+c dedup=true ; encryption=true ; targets=Disque, SFTP, S3, rclone ; interface=Terminal ; incremental=true
++ Chiffré par défaut ; Un seul programme ; Nombreux stockages
+- Pas d'interface officielle
+l Dépôts de sauvegarde et instantanés.
+n Un dépôt de sauvegarde (disque ou serveur)
+i Installer (Alpine) :: apk add restic
+i Premier dépôt :: restic init -r /mnt/sauvegarde ;; restic -r /mnt/sauvegarde backup ~/Documents
+p Perdre le mot de passe du dépôt revient à perdre les sauvegardes.
+d Site officiel | https://restic.net/
+
+@ borgbackup | BorgBackup | BSD-3-Clause | stable | 3 | oui |
+s Sauvegarde dédupliquée et chiffrée, très économe en espace disque.
+c dedup=true ; encryption=true ; targets=Disque, serveur SSH ; interface=Terminal ; incremental=true
++ Très économe en espace ; Éprouvé
+- Pas de stockage cloud direct (possible avec rclone)
+l Archives dédupliquées et clés de dépôt.
+n Python 3 ; Un serveur SSH avec Borg pour la sauvegarde distante
+i Installer (Alpine) :: apk add borgbackup
+p Sauvegarder la clé du dépôt séparément si elle n'est pas dans le dépôt.
+d Site officiel | https://www.borgbackup.org/
+
+@ pika-backup | Pika Backup | GPL-3.0 | stable | 1 | partiel |
+s Interface simple pour Borg, intégrée à GNOME.
+c dedup=true ; encryption=true ; targets=Disque, réseau (Borg) ; interface=Graphique ; incremental=true
++ Très simple ; Planification intégrée
+- Seulement dans le dépôt testing d'Alpine ; Utilise Borg en dessous
+l Utiliser Borg sans ligne de commande.
+n Dépôt testing d'Alpine ; BorgBackup ; GTK4 et libadwaita
+r borgbackup
+i Installer (Alpine, testing) :: apk add pika-backup
+d Site officiel | https://apps.gnome.org/PikaBackup/
+
+@ kopia | Kopia | Apache-2.0 | stable | 3 | partiel |
+s Sauvegarde rapide et chiffrée, avec interface graphique et ligne de commande.
+c dedup=true ; encryption=true ; targets=Disque, SFTP, S3, Google, Azure ; interface=Terminal et graphique ; incremental=true
++ Rapide ; Interface graphique disponible
+- Seulement dans le dépôt testing d'Alpine
+l Sauvegarde moderne avec instantanés.
+n Dépôt testing d'Alpine ; Un dépôt de sauvegarde
+i Installer (Alpine, testing) :: apk add kopia
+d Site officiel | https://kopia.io/
+
+@ duplicity | Duplicity | GPL-2.0+ | stable | 3 | oui |
+s Sauvegarde chiffrée et incrémentale avec GnuPG, vers disque ou cloud.
+c dedup=false ; encryption=true ; targets=Disque, SFTP, S3, cloud ; interface=Terminal ; incremental=true
++ Éprouvé ; Chiffrement GnuPG
+- Il faut refaire des sauvegardes complètes régulières
+l Chaînes de sauvegardes incrémentales.
+n GnuPG ; Python
+i Installer (Alpine) :: apk add duplicity
+d Site officiel | https://duplicity.us/
+
+# CAT passwords | software | Mots de passe | Stocker et générer des mots de passe uniques et solides. | Un gestionnaire de mots de passe garde tous tes accès dans un coffre chiffré. Tu n'as qu'un seul mot de passe à retenir. | Gestionnaire de mots de passe
+crit storage | Stockage | text
+crit sync | Synchronisation | text
+crit totp | Codes à usage unique (TOTP) | bool
+crit browser_ext | Extension navigateur | bool
+crit open_source | Libre | bool
+#h storage | Où est conservé le coffre de mots de passe.
+#h sync | Façon de retrouver le coffre sur plusieurs appareils.
+#h totp | Génère les codes à 6 chiffres de la double authentification.
+#h browser_ext | Remplissage automatique dans le navigateur.
+
+@ keepassxc | KeePassXC | GPL-2.0 ou GPL-3.0 | stable | 2 | oui |
+s Gestionnaire de mots de passe local dans un fichier chiffré, avec codes TOTP et extension navigateur.
+c storage=Fichier local .kdbx ; sync=Manuelle (Syncthing, cloud...) ; totp=true ; browser_ext=true ; open_source=true
++ Pas de compte ; Le fichier t'appartient ; Codes TOTP intégrés
+- La synchronisation est à organiser soi-même
+l Format de coffre ouvert et clés de déverrouillage.
+n Bibliothèques Qt
+i Installer (Alpine) :: apk add keepassxc
+p Sauvegarder le fichier .kdbx : sans lui, plus d'accès.
+d Site officiel | https://keepassxc.org/
+
+@ bitwarden | Bitwarden (bureau) | GPL-3.0 | stable | 1 | flatpak |
+s Gestionnaire avec synchronisation sur serveur, dans le cloud ou auto-hébergé.
+c storage=Serveur chiffré ; sync=Automatique ; totp=true ; browser_ext=true ; open_source=true
++ Synchronisation automatique ; Partage en famille ou équipe
+- Certaines fonctions (comme le TOTP) sont payantes ; Application Electron
+l Coffre synchronisé et chiffré de bout en bout.
+n Flatpak ; Un compte Bitwarden ou un serveur auto-hébergé
+i Installer (Flatpak) :: flatpak install flathub com.bitwarden.desktop
+d Site officiel | https://bitwarden.com/download/
+
+@ pass | pass | GPL-2.0+ | stable | 3 | oui |
+s Gestionnaire minimaliste : un mot de passe est un fichier chiffré avec GnuPG, versionnable avec Git.
+c storage=Fichiers GPG dans un dossier ; sync=Git ; totp=false ; browser_ext=true ; open_source=true
++ Très simple et transparent ; Versionnable avec Git
+- Ligne de commande ; Courbe d'apprentissage GnuPG
+l GnuPG et gestion de clés.
+n GnuPG ; Git
+i Installer (Alpine) :: apk add pass
+p Sauvegarder la clé GPG : sans elle les mots de passe sont perdus.
+d Site officiel | https://www.passwordstore.org/
+
+# CAT vpn | software | VPN | Chiffrer ta connexion et accéder à un réseau privé. | Un VPN envoie ton trafic dans un tunnel chiffré vers un serveur, pour protéger ta connexion ou rejoindre un réseau privé. | Réseau privé virtuel
+crit protocol | Protocole | text
+crit own_server | Serveur personnel possible | bool
+crit provider | Abonnement nécessaire | bool
+crit gui | Interface graphique | bool
+crit setup | Mise en place | enum
+#h protocol | Technique de chiffrement et de tunnel utilisée.
+#h own_server | Possibilité d'installer ton propre serveur.
+#h provider | Faut-il payer un fournisseur de VPN.
+#h setup | Travail nécessaire avant de pouvoir se connecter.
+
+@ wireguard | WireGuard | GPL-2.0 | stable | 3 | oui |
+s Protocole VPN moderne, rapide et simple, intégré au noyau Linux.
+c protocol=WireGuard ; own_server=true ; provider=false ; gui=false ; setup=moyenne
++ Très rapide et léger ; Code court donc plus facile à auditer
+- Pas d'interface par défaut ; Clés à gérer à la main
+l Chiffrement par clés publiques et tunnels.
+n Un serveur WireGuard ou un abonnement compatible
+i Installer (Alpine) :: apk add wireguard-tools
+i Connecter :: wg-quick up wg0
+p Ne jamais partager la clé privée ni la mettre dans un dépôt Git.
+d Site officiel | https://www.wireguard.com/
+
+@ openvpn | OpenVPN | GPL-2.0 | stable | 3 | oui |
+s VPN très répandu, très configurable, compatible avec presque tous les services.
+c protocol=OpenVPN (TLS) ; own_server=true ; provider=false ; gui=false ; setup=moyenne
++ Compatible partout ; Très configurable
+- Plus lent et plus lourd que WireGuard ; Configuration plus longue
+l Certificats et configuration d'un VPN classique.
+n Un fichier de configuration (.ovpn)
+i Installer (Alpine) :: apk add openvpn
+d Site officiel | https://openvpn.net/community-resources/
+
+@ tailscale | Tailscale | BSD-3-Clause | stable | 2 | oui |
+s Réseau privé entre tes appareils, basé sur WireGuard, sans configurer de serveur.
+c protocol=WireGuard (coordination par un service) ; own_server=true ; provider=true ; gui=true ; setup=faible
++ Très simple ; Accès à tes machines de n'importe où
+- Dépend d'un service de coordination (ou de Headscale auto-hébergé) ; Compte nécessaire
+l Réseaux maillés et traversée de pare-feu.
+n Un compte Tailscale ou un serveur Headscale
+i Installer (Alpine) :: apk add tailscale
+d Documentation | https://tailscale.com/kb
+
+@ mullvad | Mullvad VPN (application) | GPL-3.0 | stable | 1 | difficile |
+s Application d'un fournisseur VPN axé sur la vie privée, sans adresse e-mail à fournir.
+c protocol=WireGuard ; own_server=false ; provider=true ; gui=true ; setup=faible
++ Compte anonyme par numéro ; Application simple
+- Abonnement payant ; Paquets prévus pour glibc, pas dans Alpine
+l Fonctionnement d'un VPN commercial axé vie privée.
+n Un abonnement Mullvad ; Alternative : fichiers WireGuard avec wireguard-tools
+i Alternative sur Alpine :: apk add wireguard-tools
+p Sur une distro musl, passer par les fichiers de configuration WireGuard plutôt que l'application.
+d Téléchargement | https://mullvad.net/en/download/vpn/linux
+
+# CAT file-encryption | software | Chiffrement de fichiers | Protéger des fichiers ou des dossiers avec un mot de passe ou une clé. | Le chiffrement rend un fichier illisible sans la clé. Utile avant d'envoyer un document ou de le stocker dans un cloud. | Chiffrement
+crit scope | Portée | text
+crit gui | Interface graphique | bool
+crit cross_platform | Multiplateforme | bool
+crit key_type | Clés | text
+#h cross_platform | Utilisable sur Linux, Windows et macOS.
+#h key_type | Façon de verrouiller : mot de passe ou paire de clés.
+
+@ cryptomator | Cryptomator | GPL-3.0 | stable | 2 | flatpak |
+s Chiffre des dossiers avant leur envoi dans un cloud, avec des coffres qui se déverrouillent comme des disques.
+c scope=Coffre (dossier chiffré) ; gui=true ; cross_platform=true ; key_type=Mot de passe
++ Pensé pour les clouds ; Simple
+- Application Java lourde ; Absent des dépôts Alpine
+l Chiffrement fichier par fichier côté client.
+n Flatpak ; FUSE
+i Installer (Flatpak) :: flatpak install flathub org.cryptomator.Cryptomator
+d Site officiel | https://cryptomator.org/
+
+@ veracrypt | VeraCrypt | Apache-2.0 et licence TrueCrypt | stable | 3 | difficile |
+s Volumes chiffrés (fichier ou partition), héritier de TrueCrypt.
+c scope=Fichier conteneur, partition, disque ; gui=true ; cross_platform=true ; key_type=Mot de passe, fichier-clé
++ Très éprouvé ; Volumes cachés
+- Pas dans les dépôts d'Alpine ; Licence mixte
+l Volumes chiffrés et déni plausible.
+n FUSE ; Droits administrateur
+p Une perte du mot de passe est irréversible.
+d Site officiel | https://veracrypt.io/
+
+@ age | age | BSD-3-Clause | stable | 2 | oui |
+s Outil minimaliste de chiffrement de fichiers, simple et moderne.
+c scope=Fichier ; gui=false ; cross_platform=true ; key_type=Clé publique ou mot de passe
++ Très simple ; Pas de configuration
+- Pas d'interface graphique
+l Chiffrement moderne avec clés courtes.
+i Installer (Alpine) :: apk add age
+i Chiffrer :: age -p -o secret.age secret.txt
+d Site officiel | https://age-encryption.org/
+
+@ gnupg | GnuPG | GPL-3.0+ | stable | 4 | oui |
+s Chiffrement et signature de fichiers et d'e-mails (OpenPGP), la référence historique.
+c scope=Fichiers, e-mails, signatures ; gui=false ; cross_platform=true ; key_type=Paire de clés OpenPGP
++ Standard universel ; Signature et chiffrement
+- Complexe ; Interface austère
+l Cryptographie à clé publique et confiance entre clés.
+i Installer (Alpine) :: apk add gnupg
+p Sauvegarder la clé privée et le certificat de révocation.
+d Documentation | https://gnupg.org/documentation/
+
+# CAT security-audit | software | Audit et analyse | Vérifier l'état de sécurité de ton système et de tes fichiers. | Ces outils cherchent des virus ou des réglages faibles. Ils ne remplacent pas de bonnes habitudes. | Antivirus
+crit type | Type d'outil | text
+crit realtime | Analyse en temps réel | text
+crit interface | Interface | text
+crit reports | Rapports | text
+#h type | Ce que l'outil recherche : virus, réglages faibles, etc.
+#h realtime | Surveillance continue des fichiers pendant l'utilisation.
+#h reports | Format des résultats produits.
+
+@ clamav | ClamAV | GPL-2.0 | stable | 2 | oui |
+s Antivirus libre en ligne de commande, utile pour scanner des fichiers partagés avec Windows.
+c type=Antivirus (signatures) ; realtime=Possible (clamonacc) ; interface=Terminal (ClamTk en option) ; reports=Journal texte
++ Libre ; Léger ; Idéal pour les serveurs de fichiers
+- Détecte surtout des virus Windows ; Pas de protection par défaut en temps réel
+l Détection par signatures.
+n Base de signatures à mettre à jour (freshclam)
+i Installer (Alpine) :: apk add clamav
+i Mettre à jour la base :: freshclam
+d Site officiel | https://www.clamav.net/
+
+@ lynis | Lynis | GPL-3.0 | stable | 3 | partiel |
+s Audit de sécurité du système : liste les réglages à durcir.
+c type=Audit de configuration ; realtime=Non ; interface=Terminal ; reports=Rapport avec score et conseils
++ Conseils concrets ; Utile pour apprendre le durcissement
+- Seulement dans le dépôt testing d'Alpine ; Les conseils demandent du jugement
+l Bonnes pratiques de durcissement.
+n Dépôt testing d'Alpine
+i Installer (Alpine, testing) :: apk add lynis
+i Lancer :: lynis audit system
+d Site officiel | https://cisofy.com/lynis/
+
+# CAT notes | software | Notes et connaissances | Prendre des notes et relier ses idées. | Ces outils servent à écrire, classer et retrouver ses notes, parfois avec des liens entre elles. | Prise de notes
+crit format | Format des notes | text
+crit links | Liens entre notes | bool
+crit sync | Synchronisation | text
+crit open_source | Libre | bool
+crit editor_type | Éditeur | text
+#h format | Format de fichier : Markdown est lisible partout.
+#h links | Possibilité de relier une note à une autre.
+#h editor_type | Façon d'écrire : texte simple, plan ou wiki.
+
+@ joplin | Joplin | AGPL-3.0 | stable | 2 | flatpak |
+s Notes en Markdown avec synchronisation chiffrée vers Nextcloud, WebDAV ou S3.
+c format=Markdown ; links=true ; sync=Nextcloud, WebDAV, S3, Dropbox ; open_source=true ; editor_type=Markdown avec aperçu
++ Synchronisation chiffrée ; Clients mobiles
+- Absent des dépôts Alpine
+l Synchronisation de notes sans cloud imposé.
+n Flatpak ; Un service de synchronisation au choix
+i Installer (Flatpak) :: flatpak install flathub net.cozic.joplin_desktop
+d Site officiel | https://joplinapp.org/
+
+@ logseq | Logseq | AGPL-3.0 | stable | 3 | flatpak |
+s Prise de notes en plan (outliner) avec liens bidirectionnels, sur fichiers locaux.
+c format=Markdown ou Org-mode ; links=true ; sync=Git ou service tiers ; open_source=true ; editor_type=Plan en blocs
++ Liens bidirectionnels ; Fichiers locaux
+- Application Electron ; Prise en main particulière
+l Pensée en graphe et notes quotidiennes.
+n Flatpak
+i Installer (Flatpak) :: flatpak install flathub com.logseq.Logseq
+d Site officiel | https://logseq.com/
+
+@ obsidian | Obsidian | Propriétaire (gratuit) | stable | 2 | flatpak |
+s Notes Markdown locales avec liens, graphe et très nombreux plugins.
+c format=Markdown ; links=true ; sync=Service payant ou outil tiers ; open_source=false ; editor_type=Markdown
++ Énormément de plugins ; Fichiers locaux
+- Propriétaire ; Synchronisation officielle payante
+l Écrire dans un coffre de notes en Markdown.
+n Flatpak
+i Installer (Flatpak) :: flatpak install flathub md.obsidian.Obsidian
+d Site officiel | https://obsidian.md/
+
+@ zim | Zim | GPL-2.0+ | stable | 2 | oui |
+s Wiki personnel local, léger, avec pages hiérarchiques et liens.
+c format=Texte wiki ; links=true ; sync=Manuelle (dossier) ; open_source=true ; editor_type=Wiki visuel
++ Léger ; Sans compte
+- Interface datée ; Pas de client mobile
+l Organisation en wiki personnel.
+n Python et GTK
+i Installer (Alpine) :: apk add zim
+d Site officiel | https://zim-wiki.org/
+
+@ zettlr | Zettlr | GPL-3.0 | stable | 2 | flatpak |
+s Éditeur Markdown pour écrire et citer, adapté à la méthode Zettelkasten.
+c format=Markdown ; links=true ; sync=Manuelle ; open_source=true ; editor_type=Markdown avec citations
++ Citations et bibliographie ; Libre
+- Application Electron
+l Écriture académique avec Zotero et BibTeX.
+n Flatpak
+i Installer (Flatpak) :: flatpak install flathub com.zettlr.Zettlr
+d Site officiel | https://www.zettlr.com/
+
+# CAT email | software | Courriel et agenda | Lire et écrire des e-mails, gérer son agenda et ses contacts. | Un client de messagerie rassemble tes comptes e-mail, ton agenda et tes contacts dans une seule application. | Client de messagerie
+crit protocols | Protocoles | text
+crit calendar | Agenda et contacts | bool
+crit interface | Interface | text
+crit pgp | Chiffrement PGP | text
+#h protocols | Langages utilisés pour parler au serveur de messagerie (IMAP, SMTP...).
+#h pgp | Possibilité de chiffrer et signer les messages avec OpenPGP.
+
+@ thunderbird | Thunderbird | MPL-2.0 | stable | 1 | oui |
+s Client e-mail complet avec agenda, contacts et flux RSS.
+c protocols=IMAP, POP3, SMTP, Exchange (partiel) ; calendar=true ; interface=Graphique ; pgp=OpenPGP intégré
++ Complet ; OpenPGP intégré ; Très répandu
+- Assez lourd
+l Comptes multiples et filtres de messages.
+i Installer (Alpine) :: apk add thunderbird
+d Site officiel | https://www.thunderbird.net/
+
+@ evolution | Evolution | LGPL-2.0+ | stable | 2 | oui |
+s Client e-mail, agenda et contacts de GNOME, compatible Exchange.
+c protocols=IMAP, POP3, SMTP, Exchange (EWS) ; calendar=true ; interface=Graphique ; pgp=GnuPG
++ Bonne compatibilité Exchange ; Agenda intégré
+- Lourd à installer hors GNOME
+n Bibliothèques GNOME
+i Installer (Alpine) :: apk add evolution
+d Site officiel | https://wiki.gnome.org/Apps/Evolution
+
+@ kmail | KMail (Kontact) | GPL-2.0+ | stable | 2 | oui |
+s Client e-mail de KDE, avec Kontact pour l'agenda et les contacts.
+c protocols=IMAP, POP3, SMTP ; calendar=true ; interface=Graphique ; pgp=GnuPG
++ Très complet ; Intégré à KDE
+- Tire beaucoup de dépendances KDE PIM
+n Bibliothèques KDE PIM
+i Installer (Alpine) :: apk add kmail
+d Site officiel | https://kontact.kde.org/
+
+@ geary | Geary | LGPL-2.1+ | stable | 1 | oui |
+s Client e-mail simple et moderne de GNOME.
+c protocols=IMAP, SMTP ; calendar=false ; interface=Graphique ; pgp=Non
++ Très simple ; Léger
+- Pas d'agenda ; Pas de PGP
+n GTK
+i Installer (Alpine) :: apk add geary
+d Site officiel | https://wiki.gnome.org/Apps/Geary
+
+@ aerc | aerc | MIT | stable | 4 | oui |
+s Client e-mail en terminal, rapide et piloté au clavier.
+c protocols=IMAP, SMTP, JMAP, Maildir ; calendar=false ; interface=Terminal ; pgp=GnuPG
++ Rapide ; Scriptable
+- Configuration manuelle ; Pas d'agenda
+l Flux de travail e-mail au clavier.
+i Installer (Alpine) :: apk add aerc
+d Site officiel | https://aerc-mail.org/
+
+@ neomutt | NeoMutt | GPL-2.0+ | stable | 4 | oui |
+s Client e-mail en terminal très configurable, héritier de Mutt.
+c protocols=IMAP, POP3, SMTP ; calendar=false ; interface=Terminal ; pgp=GnuPG
++ Très configurable ; Léger
+- Courbe d'apprentissage élevée
+n msmtp pour l'envoi ; isync (mbsync) pour la copie locale
+i Installer (Alpine) :: apk add neomutt
+d Site officiel | https://neomutt.org/
+
+# CAT tasks | software | Tâches et projets | Suivre ses tâches et ses échéances. | Un gestionnaire de tâches liste ce qui reste à faire, avec priorités et dates. | Gestion de tâches
+crit interface | Interface | text
+crit sync | Synchronisation | text
+crit model | Modèle | text
+crit offline | Fonctionne hors ligne | bool
+
+@ taskwarrior | Taskwarrior | MIT | stable | 3 | oui |
+s Gestionnaire de tâches en ligne de commande, rapide et très filtrable.
+c interface=Terminal ; sync=Serveur de synchronisation (optionnel) ; model=Tâches avec priorités et dépendances ; offline=true
++ Très rapide ; Filtres puissants
+- Courbe d'apprentissage
+l Gestion de tâches par filtres et rapports.
+i Installer (Alpine) :: apk add task
+i Ajouter une tâche :: task add "Écrire le rapport" due:friday
+d Site officiel | https://taskwarrior.org/
+
+@ taskwarrior-tui | taskwarrior-tui | MIT | stable | 3 | oui |
+s Interface en terminal pour Taskwarrior.
+c interface=Terminal (TUI) ; sync=Via Taskwarrior ; model=Tâches Taskwarrior ; offline=true
++ Visuelle ; Raccourcis clavier
+- Nécessite Taskwarrior
+r taskwarrior
+n Taskwarrior
+i Installer (Alpine) :: apk add taskwarrior-tui
+d Dépôt | https://github.com/kdheepak/taskwarrior-tui
+
+@ todoman | todoman | ISC | stable | 3 | oui |
+s Gestionnaire de tâches en terminal basé sur CalDAV, avec vdirsyncer.
+c interface=Terminal ; sync=CalDAV via vdirsyncer ; model=Listes et échéances ; offline=true
++ Se synchronise avec Nextcloud et d'autres ; Simple
+- Demande de configurer vdirsyncer
+n vdirsyncer pour la synchronisation
+i Installer (Alpine) :: apk add todoman vdirsyncer
+d Documentation | https://todoman.readthedocs.io/
+
+@ super-productivity | Super Productivity | MIT | stable | 1 | flatpak |
+s Gestionnaire de tâches avec minuteur, suivi du temps et intégrations Jira ou GitHub.
+c interface=Graphique (Electron) ; sync=Dropbox ou WebDAV (option) ; model=Tâches avec suivi du temps ; offline=true
++ Suivi du temps intégré ; Intégrations
+- Application Electron lourde
+n Flatpak
+i Installer (Flatpak) :: flatpak install flathub com.super_productivity.SuperProductivity
+d Site officiel | https://super-productivity.com/
+
+# CAT ebooks | software | Livres numériques et références | Lire, ranger et citer des livres et des articles. | Ces outils lisent les livres numériques, gèrent une bibliothèque ou aident à citer des sources. | Livre numérique
+crit formats | Formats | text
+crit library | Bibliothèque | bool
+crit conversion | Conversion de formats | bool
+crit interface | Interface | text
+#h formats | Types de fichiers pris en charge.
+#h library | Rangement des livres dans une collection recherchable.
+#h conversion | Transformation d'un format de livre en un autre.
+
+@ calibre | calibre | GPL-3.0 | stable | 2 | partiel |
+s Gestionnaire de bibliothèque de livres numériques, avec conversion et serveur de partage.
+c formats=EPUB, MOBI, PDF, AZW3 et plus ; library=true ; conversion=true ; interface=Graphique
++ Conversion de presque tous les formats ; Envoi vers les liseuses
+- Lourd (Qt et Python) ; Seulement dans le dépôt testing d'Alpine
+n Dépôt testing d'Alpine ; Qt et Python
+i Installer (Alpine, testing) :: apk add calibre
+d Site officiel | https://calibre-ebook.com/
+
+@ foliate | Foliate | GPL-3.0+ | stable | 1 | oui |
+s Lecteur de livres numériques simple et élégant.
+c formats=EPUB, MOBI, AZW3, FB2, CBZ ; library=false ; conversion=false ; interface=Graphique
++ Très agréable à lire ; Léger
+- Pas de bibliothèque avancée
+n GTK4
+i Installer (Alpine) :: apk add foliate
+d Dépôt | https://github.com/johnfactotum/foliate
+
+@ koreader | KOReader | AGPL-3.0 | stable | 2 | oui |
+s Lecteur de documents pensé pour les liseuses, disponible aussi sur ordinateur.
+c formats=EPUB, PDF, DjVu, CBZ ; library=true ; conversion=false ; interface=Graphique
++ Très bon pour les PDF et les liseuses ; Très réglable
+- Interface orientée liseuse
+i Installer (Alpine) :: apk add koreader
+d Site officiel | https://koreader.rocks/
+
+@ zotero | Zotero | AGPL-3.0 | stable | 2 | oui |
+s Gestionnaire de références bibliographiques : collecte, annote et cite les sources.
+c formats=PDF, pages web, citations (BibTeX, CSL) ; library=true ; conversion=false ; interface=Graphique
++ Capture depuis le navigateur ; Citations pour Word, LibreOffice
+- Synchronisation de fichiers limitée en gratuit
+i Installer (Alpine) :: apk add zotero
+d Site officiel | https://www.zotero.org/

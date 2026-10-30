@@ -1,0 +1,412 @@
+# CAT photo-editor | software | Retouche d'image et photo | Retoucher, dessiner et développer des photos. | Ces outils modifient des images (calques, retouches) ou développent des photos RAW issues d'un appareil. | Retouche d'image
+crit focus | Orientation | text
+crit layers | Calques | bool
+crit raw | Fichiers RAW | enum
+crit psd_support | Fichiers Photoshop (PSD) | enum
+crit ease | Facilité | enum
+#h focus | Usage principal de l'outil.
+#h layers | Superposition de couches d'image modifiables séparément.
+#h raw | Les fichiers RAW sont les images brutes du capteur de l'appareil photo.
+#h psd_support | Ouverture et enregistrement des fichiers Photoshop.
+#h ease | Facilité de prise en main.
+
+@ gimp | GIMP | GPL-3.0+ | stable | 3 | oui |
+s Retouche photo et images, la référence libre type Photoshop.
+c focus=Retouche et montage photo ; layers=true ; raw=partiel (module externe) ; psd_support=limité ; ease=moyenne
++ Très complet ; Beaucoup de plugins ; Libre
+- Interface déroutante au début ; PSD limité
+l Calques, masques et retouche non destructive.
+n Bibliothèques GTK
+i Installer (Alpine) :: apk add gimp
+d Site officiel | https://www.gimp.org/
+
+@ krita | Krita | GPL-3.0+ | stable | 2 | oui |
+s Peinture et illustration numérique, très complète pour les artistes.
+c focus=Dessin et peinture numérique ; layers=true ; raw=non ; psd_support=bon ; ease=moyenne
++ Excellents pinceaux ; Animation 2D ; Bon support PSD
+- Moins adapté à la retouche photo
+n Bibliothèques Qt ; Une tablette graphique est conseillée
+i Installer (Alpine) :: apk add krita
+d Site officiel | https://krita.org/
+
+@ pinta | Pinta | MIT | stable | 1 | oui |
+s Éditeur d'images simple, dans l'esprit de Paint.NET.
+c focus=Retouche simple ; layers=true ; raw=non ; psd_support=non ; ease=facile
++ Très simple ; Léger
+- Fonctions limitées
+n Environnement .NET (inclus dans le paquet)
+i Installer (Alpine) :: apk add pinta
+d Site officiel | https://www.pinta-project.com/
+
+@ photocraft | PhotoCraft (ArtCraft) | MIT ou Apache-2.0 | experimental | 3 | difficile |
+s Éditeur d'images par calques, alternative libre à Photoshop, écrit en Rust. En alpha.
+c focus=Retouche par calques ; layers=true ; raw=non ; psd_support=complet (PSD, PSB) ; ease=moyenne
++ Fichiers PSD et PSB gérés ; Moderne, accélération GPU ; Libre
+- Version alpha ; Pas de paquet Alpine
+l Tester un projet libre en phase précoce.
+n AppImage (prévue pour glibc) ou compilation avec Rust ; Pilote graphique Vulkan ou OpenGL
+i Compiler :: git clone https://github.com/storytold/artcraft ;; # suivre le README du dépôt
+p Alpha : garder GIMP en secours pour les travaux importants.
+d Dépôt ArtCraft | https://github.com/storytold/artcraft
+
+@ darktable | darktable | GPL-3.0+ | stable | 3 | oui |
+s Développement de photos RAW et catalogue non destructif, dans l'esprit de Lightroom.
+c focus=Photo RAW et catalogue ; layers=false ; raw=complet ; psd_support=non ; ease=difficile
++ Très complet ; Non destructif ; Libre
+- Beaucoup de réglages ; Demande une bonne carte graphique pour être fluide
+n Bibliothèques GTK ; OpenCL optionnel pour accélérer
+i Installer (Alpine) :: apk add darktable
+d Site officiel | https://www.darktable.org/
+
+@ rawtherapee | RawTherapee | GPL-3.0+ | stable | 3 | oui |
+s Développement RAW précis avec beaucoup de réglages.
+c focus=Photo RAW ; layers=false ; raw=complet ; psd_support=non ; ease=difficile
++ Excellente qualité de développement ; Libre
+- Pas de catalogue avancé ; Interface dense
+n Bibliothèques GTK
+i Installer (Alpine) :: apk add rawtherapee
+d Site officiel | https://rawtherapee.com/
+
+@ lightcraft | LightCraft (ArtCraft) | MIT ou Apache-2.0 | experimental | 3 | difficile |
+s Bibliothèque photo et développement RAW, alternative libre à Lightroom. En développement.
+c focus=Photo RAW et catalogue ; layers=false ; raw=partiel (alpha) ; psd_support=non ; ease=moyenne
++ Importe des presets Lightroom ; Moderne, accélération GPU
+- Version alpha ; Pas de paquet Alpine
+n AppImage (prévue pour glibc) ou compilation avec Rust ; Pilote graphique Vulkan ou OpenGL
+i Compiler :: git clone https://github.com/storytold/artcraft ;; # suivre le README du dépôt
+p Alpha : ne pas y stocker l'unique copie de tes photos.
+d Dépôt ArtCraft | https://github.com/storytold/artcraft
+
+# CAT vector | software | Dessin vectoriel | Dessiner des logos, schémas et illustrations qui restent nets à toute taille. | Le dessin vectoriel décrit des formes par des courbes, pas par des points. Il reste net à n'importe quelle taille. | Dessin vectoriel
+crit formats | Formats | text
+crit ease | Facilité | enum
+crit extensions | Extensions | enum
+crit musl_support | Fonctionne sur musl | enum
+
+@ inkscape | Inkscape | GPL-2.0+ | stable | 3 | oui |
+s Dessin vectoriel libre : logos, illustrations, affiches, schémas.
+c formats=SVG (natif), PDF, EPS, PNG ; ease=moyenne ; extensions=très large ; musl_support=oui
++ Très complet ; SVG natif ; Beaucoup d'extensions
+- Peut être lent sur de gros fichiers
+n Bibliothèques GTK
+i Installer (Alpine) :: apk add inkscape
+d Site officiel | https://inkscape.org/
+
+@ vectorcraft | VectorCraft (ArtCraft) | MIT ou Apache-2.0 | experimental | 3 | difficile |
+s Illustration vectorielle écrite en Rust, alternative libre à Illustrator. En développement.
+c formats=Entrée SVG et PDF, sortie SVG, PDF, PNG, JPEG, WebP ; ease=moyenne ; extensions=peu (projet jeune) ; musl_support=difficile
++ Rapide ; Moderne ; Libre
+- Version alpha ; Pas de paquet Alpine
+n AppImage (prévue pour glibc) ou compilation avec Rust ; Pilote graphique Vulkan ou OpenGL
+i Compiler :: git clone https://github.com/storytold/artcraft ;; # suivre le README du dépôt
+p Les polices et effets complexes peuvent s'afficher différemment des fichiers d'origine.
+d Dépôt ArtCraft | https://github.com/storytold/artcraft
+
+# CAT video-editor | software | Montage vidéo | Couper, assembler et habiller des vidéos. | Un logiciel de montage assemble des vidéos, du son et des titres sur une ligne de temps. | Montage vidéo
+crit tracks | Pistes | text
+crit gpu_accel | Accélération GPU | bool
+crit effects | Effets | enum
+crit ease | Facilité | enum
+crit musl_support | Fonctionne sur musl | enum
+#h tracks | Nombre de couches vidéo et audio superposables.
+#h gpu_accel | Calculs d'images confiés à la carte graphique pour aller plus vite.
+#h effects | Choix de transitions, filtres et corrections.
+
+@ kdenlive | Kdenlive | GPL-3.0+ | stable | 3 | oui |
+s Montage vidéo complet de KDE, multipistes, avec effets et fichiers proxy.
+c tracks=Multipistes ; gpu_accel=false ; effects=riches ; ease=moyenne ; musl_support=oui
++ Complet ; Proxys pour les gros fichiers ; Libre
+- Peut planter sur de très gros projets
+n Bibliothèques Qt et KDE ; MLT et FFmpeg
+i Installer (Alpine) :: apk add kdenlive
+d Site officiel | https://kdenlive.org/
+
+@ shotcut | Shotcut | GPL-3.0+ | stable | 2 | oui |
+s Montage vidéo multiplateforme, simple d'accès.
+c tracks=Multipistes ; gpu_accel=false ; effects=bons ; ease=facile ; musl_support=oui
++ Simple ; Beaucoup de filtres ; Formats variés
+- Interface moins intuitive pour les gros projets
+n Bibliothèques Qt ; MLT et FFmpeg
+i Installer (Alpine) :: apk add shotcut
+d Site officiel | https://shotcut.org/
+
+@ pitivi | Pitivi | LGPL-2.1+ | stable | 2 | partiel |
+s Éditeur vidéo de GNOME, simple.
+c tracks=Multipistes ; gpu_accel=false ; effects=basiques ; ease=facile ; musl_support=partiel
++ Très simple ; Intégré à GNOME
+- Moins de fonctions ; Seulement dans le dépôt testing d'Alpine
+n Dépôt testing d'Alpine ; GStreamer
+i Installer (Alpine, testing) :: apk add pitivi
+d Site officiel | https://www.pitivi.org/
+
+@ openshot | OpenShot | GPL-3.0 | stable | 1 | flatpak |
+s Montage vidéo très simple pour débuter.
+c tracks=Multipistes ; gpu_accel=false ; effects=basiques ; ease=facile ; musl_support=flatpak
++ Très facile à prendre en main ; Titres animés
+- Moins stable sur de gros projets ; Absent des dépôts Alpine
+n Flatpak
+i Installer (Flatpak) :: flatpak install flathub org.openshot.OpenShot
+d Site officiel | https://www.openshot.org/
+
+@ filmcraft | FilmCraft (ArtCraft) | MIT ou Apache-2.0 | experimental | 3 | difficile |
+s Montage vidéo écrit en Rust avec accélération GPU, alternative libre à Premiere Pro. En développement.
+c tracks=Multipistes avec moniteurs source et programme ; gpu_accel=true ; effects=basiques (alpha) ; ease=moyenne ; musl_support=difficile
++ Accélération GPU ; Moderne ; Libre
+- Version alpha ; Ne lit pas encore les projets Premiere (.prproj)
+n AppImage (prévue pour glibc) ou compilation avec Rust ; Pilote graphique Vulkan
+i Compiler :: git clone https://github.com/storytold/artcraft ;; # suivre le README du dépôt
+p Alpha : exporter souvent et garder Kdenlive en secours.
+d Dépôt ArtCraft | https://github.com/storytold/artcraft
+
+# CAT video-convert | software | Conversion vidéo | Changer le format ou réduire le poids d'une vidéo. | Ces outils transforment une vidéo d'un format à un autre, ou la compressent. | Transcodage
+crit formats | Formats | text
+crit interface | Interface | text
+crit presets | Préréglages | bool
+crit batch | Traitement par lot | bool
+#h presets | Réglages prêts à l'emploi (téléphone, web, TV).
+#h batch | Convertir plusieurs fichiers d'un coup.
+
+@ handbrake | HandBrake | GPL-2.0+ | stable | 1 | oui |
+s Convertisseur vidéo avec préréglages, simple à utiliser.
+c formats=MP4, MKV, WebM (H.264, H.265, AV1) ; interface=Graphique ; presets=true ; batch=true
++ Préréglages prêts à l'emploi ; Simple
+- Moins souple que FFmpeg
+n Bibliothèques GTK ; Encodeurs de FFmpeg
+i Installer (Alpine) :: apk add handbrake
+d Site officiel | https://handbrake.fr/
+
+@ ffmpeg | FFmpeg | LGPL-2.1+ ou GPL | stable | 4 | oui |
+s Boîte à outils en ligne de commande qui lit, convertit et traite presque tous les formats audio et vidéo.
+c formats=Presque tous ; interface=Terminal ; presets=false ; batch=true
++ Extrêmement puissant ; Base de nombreux autres logiciels
+- Commandes complexes
+l Codecs, conteneurs et filtres.
+i Installer (Alpine) :: apk add ffmpeg
+i Convertir :: ffmpeg -i entree.mkv -c:v libx264 -crf 23 sortie.mp4
+d Documentation | https://ffmpeg.org/documentation.html
+
+# CAT screen-capture | software | Capture et streaming | Enregistrer l'écran ou diffuser en direct. | Ces outils enregistrent ce qui s'affiche à l'écran, ou l'envoient en direct sur internet. | Enregistrement d'écran
+crit streaming | Diffusion en direct | bool
+crit wayland | Support Wayland | enum
+crit formats | Formats de sortie | text
+crit ease | Facilité | enum
+
+@ obs-studio | OBS Studio | GPL-2.0+ | stable | 3 | oui |
+s Enregistrement et diffusion en direct avec scènes et sources multiples.
+c streaming=true ; wayland=bon (PipeWire) ; formats=MKV, MP4, flux RTMP et SRT ; ease=moyenne
++ Référence du streaming ; Scènes et sources multiples ; Libre
+- Beaucoup de réglages
+n PipeWire et xdg-desktop-portal pour Wayland ; Encodeur matériel optionnel
+i Installer (Alpine) :: apk add obs-studio
+d Site officiel | https://obsproject.com/
+
+@ simplescreenrecorder | SimpleScreenRecorder | GPL-3.0+ | stable | 1 | oui |
+s Enregistreur d'écran simple pour X11.
+c streaming=false ; wayland=non (X11) ; formats=MKV, MP4, WebM, OGG ; ease=facile
++ Très simple ; Léger
+- Ne fonctionne pas sous Wayland
+n Session X11
+i Installer (Alpine) :: apk add simplescreenrecorder
+d Site officiel | https://www.maartenbaert.be/simplescreenrecorder/
+
+@ wf-recorder | wf-recorder | MIT | stable | 3 | oui |
+s Enregistrement d'écran en ligne de commande pour Wayland (compositeurs wlroots).
+c streaming=false ; wayland=natif (wlroots) ; formats=MP4, WebM via FFmpeg ; ease=difficile
++ Léger ; Scriptable
+- Réservé aux compositeurs wlroots (Sway, Hyprland, MangoWC)
+n FFmpeg
+i Installer (Alpine) :: apk add wf-recorder
+i Enregistrer :: wf-recorder -f video.mp4
+d Dépôt | https://github.com/ammen99/wf-recorder
+
+# CAT audio-editor | software | Audio et musique (création) | Éditer du son et composer de la musique. | Ces outils éditent des enregistrements sonores, ou servent à composer et mixer de la musique. | Édition audio
+crit type | Type | text
+crit multitrack | Multipiste | bool
+crit plugins | Plugins | text
+crit ease | Facilité | enum
+crit musl_support | Fonctionne sur musl | enum
+#h multitrack | Plusieurs pistes audio superposées.
+#h plugins | Effets et instruments ajoutés (LV2, VST).
+
+@ audacity | Audacity | GPL-2.0+ | stable | 2 | oui |
+s Édition audio simple : coupe, nettoyage de bruit, effets.
+c type=Éditeur audio ; multitrack=true ; plugins=VST3, LV2, Nyquist ; ease=facile ; musl_support=oui
++ Très répandu ; Simple ; Beaucoup d'effets
+- Pas conçu pour la composition musicale
+n PipeWire, JACK ou ALSA
+i Installer (Alpine) :: apk add audacity
+d Site officiel | https://www.audacityteam.org/
+
+@ tenacity | Tenacity | GPL-2.0+ | stable | 2 | partiel |
+s Variante communautaire d'Audacity.
+c type=Éditeur audio ; multitrack=true ; plugins=VST3, LV2, Nyquist ; ease=facile ; musl_support=partiel
++ Interface proche d'Audacity ; Sans télémétrie
+- Seulement dans le dépôt testing d'Alpine ; Communauté plus petite
+n Dépôt testing d'Alpine
+i Installer (Alpine, testing) :: apk add tenacity
+d Site officiel | https://tenacityaudio.org/
+
+@ ardour | Ardour | GPL-2.0+ | stable | 4 | flatpak |
+s Station audio numérique (DAW) professionnelle pour enregistrer et mixer.
+c type=DAW (studio) ; multitrack=true ; plugins=LV2, VST3, LADSPA ; ease=difficile ; musl_support=flatpak
++ Qualité professionnelle ; Libre
+- Courbe d'apprentissage élevée ; Absent des dépôts Alpine
+n Flatpak ; JACK ou PipeWire-JACK
+i Installer (Flatpak) :: flatpak install flathub org.ardour.Ardour
+d Site officiel | https://ardour.org/
+
+@ lmms | LMMS | GPL-2.0+ | stable | 3 | oui |
+s Création musicale par boucles et synthétiseurs, dans l'esprit de FL Studio.
+c type=DAW (boucles) ; multitrack=true ; plugins=LV2, LADSPA ; ease=moyenne ; musl_support=oui
++ Idéal pour commencer la composition ; Synthétiseurs inclus
+- Pas conçu pour enregistrer des instruments
+n Bibliothèques Qt
+i Installer (Alpine) :: apk add lmms
+d Site officiel | https://lmms.io/
+
+@ hydrogen | Hydrogen | GPL-2.0+ | stable | 2 | oui |
+s Boîte à rythmes avec séquenceur.
+c type=Boîte à rythmes ; multitrack=false ; plugins=non ; ease=facile ; musl_support=oui
++ Simple ; Sons de batterie inclus
+- Un seul rôle
+n Bibliothèques Qt
+i Installer (Alpine) :: apk add hydrogen
+d Site officiel | https://hydrogen-music.org/
+
+@ musescore | MuseScore | GPL-3.0 | stable | 2 | oui |
+s Éditeur de partitions musicales.
+c type=Notation musicale ; multitrack=true ; plugins=sons intégrés ; ease=moyenne ; musl_support=oui
++ Partitions de qualité ; Lecture audio intégrée
+- Spécialisé dans la notation
+n Bibliothèques Qt
+i Installer (Alpine) :: apk add musescore
+d Site officiel | https://musescore.org/
+
+@ soundcraft | SoundCraft (ArtCraft) | MIT ou Apache-2.0 | experimental | 3 | difficile |
+s Station audio numérique écrite en Rust, alternative libre aux DAW de studio. En développement.
+c type=DAW (studio) ; multitrack=true ; plugins=À vérifier (alpha) ; ease=moyenne ; musl_support=difficile
++ Moderne ; Libre
+- Version alpha ; Pas d'échange de sessions AAF ou OMF pour l'instant
+n AppImage (prévue pour glibc) ou compilation avec Rust
+i Compiler :: git clone https://github.com/storytold/artcraft ;; # suivre le README du dépôt
+p Alpha : exporter régulièrement ses pistes en WAV.
+d Dépôt ArtCraft | https://github.com/storytold/artcraft
+
+# CAT 3d-cad | software | 3D, CAO et électronique | Modéliser des objets, des pièces et des circuits. | Ces outils dessinent des objets en 3D, des pièces mécaniques précises ou des circuits électroniques. | Conception assistée par ordinateur
+crit focus | Orientation | text
+crit parametric | Modélisation paramétrique | bool
+crit formats | Formats | text
+crit ease | Facilité | enum
+#h parametric | Les dimensions restent modifiables après coup : changer une cote met à jour la pièce.
+
+@ blender | Blender | GPL-2.0+ | stable | 4 | oui |
+s Suite 3D complète : modélisation, animation, rendu, montage vidéo.
+c focus=Modélisation, animation, rendu ; parametric=false ; formats=FBX, OBJ, glTF, STL, USD ; ease=difficile
++ Extrêmement complet ; Libre ; Grande communauté
+- Courbe d'apprentissage élevée ; Demande une carte graphique récente
+n Carte graphique compatible OpenGL 4.3 ou récente ; Python inclus
+i Installer (Alpine) :: apk add blender
+d Site officiel | https://www.blender.org/
+
+@ freecad | FreeCAD | LGPL-2.1+ | stable | 4 | oui |
+s CAO paramétrique libre pour pièces mécaniques et architecture.
+c focus=CAO mécanique ; parametric=true ; formats=STEP, STL, DXF, IGES ; ease=difficile
++ Paramétrique ; Scriptable en Python ; Libre
+- Courbe d'apprentissage ; Interface chargée
+n Qt ; Python
+i Installer (Alpine) :: apk add freecad
+d Site officiel | https://www.freecad.org/
+
+@ openscad | OpenSCAD | GPL-2.0 | stable | 3 | oui |
+s Modélisation 3D par code, idéale pour des pièces paramétriques à imprimer.
+c focus=3D par script ; parametric=true ; formats=STL, 3MF, DXF, SVG ; ease=moyenne
++ Précis ; Versionnable avec Git
+- Demande d'écrire du code ; Pas de modélisation libre à la souris
+n Bibliothèques Qt
+i Installer (Alpine) :: apk add openscad
+d Site officiel | https://openscad.org/
+
+@ kicad | KiCad | GPL-3.0+ | stable | 4 | oui |
+s Conception de circuits électroniques : schéma et circuit imprimé.
+c focus=Électronique (PCB) ; parametric=false ; formats=Gerber, STEP, PDF ; ease=difficile
++ Complet ; Standard pour le matériel libre ; Export vers les fabricants
+- Courbe d'apprentissage
+n Bibliothèques wxWidgets ; Bibliothèques de composants (volumineuses)
+i Installer (Alpine) :: apk add kicad
+d Site officiel | https://www.kicad.org/
+
+@ cadcraft | CADCraft (ArtCraft) | MIT ou Apache-2.0 | experimental | 3 | difficile |
+s CAO 2D écrite en Rust, alternative libre à AutoCAD. En développement.
+c focus=Dessin technique 2D ; parametric=false ; formats=DXF (partiel) ; ease=moyenne
++ Moderne ; Libre
+- Version alpha ; Perd les éléments non gérés à l'enregistrement
+n AppImage (prévue pour glibc) ou compilation avec Rust
+i Compiler :: git clone https://github.com/storytold/artcraft ;; # suivre le README du dépôt
+p Ne pas écraser les fichiers DXF d'origine : enregistrer une copie.
+d Dépôt ArtCraft | https://github.com/storytold/artcraft
+
+# CAT slicer | software | Impression 3D | Préparer des pièces pour une imprimante 3D. | Un trancheur (slicer) découpe un modèle 3D en couches et génère les instructions pour l'imprimante. | Impression 3D
+crit printers | Imprimantes gérées | text
+crit profiles | Profils | text
+crit ease | Facilité | enum
+
+@ cura | UltiMaker Cura | LGPL-3.0 | stable | 2 | partiel |
+s Trancheur très répandu, avec beaucoup de profils d'imprimantes.
+c printers=Très large ; profiles=Nombreux profils prêts à l'emploi ; ease=facile
++ Très répandu ; Beaucoup de profils
+- Seulement dans le dépôt testing d'Alpine
+n Dépôt testing d'Alpine ; Qt et Python
+i Installer (Alpine, testing) :: apk add cura
+d Site officiel | https://ultimaker.com/software/ultimaker-cura/
+
+@ prusaslicer | PrusaSlicer | AGPL-3.0 | stable | 3 | flatpak |
+s Trancheur complet de Prusa, avec beaucoup de réglages et de supports.
+c printers=Prusa et beaucoup d'autres ; profiles=Profils Prusa et génériques ; ease=moyenne
++ Réglages très fins ; Qualité d'impression
+- Absent des dépôts Alpine
+n Flatpak
+i Installer (Flatpak) :: flatpak install flathub com.prusa3d.PrusaSlicer
+d Site officiel | https://www.prusa3d.com/page/prusaslicer_424/
+
+# CAT layout | software | Mise en page et composition | Composer des documents, affiches, livres et publications. | Ces outils mettent en page des documents, des livres ou des affiches, avec ou sans code. | Publication assistée par ordinateur
+crit output | Sortie | text
+crit cmyk | Couleurs CMJN | bool
+crit ease | Facilité | enum
+crit formats | Formats | text
+#h cmyk | Couleurs d'impression professionnelle (cyan, magenta, jaune, noir).
+#h output | Résultat produit par l'outil.
+
+@ scribus | Scribus | GPL-2.0+ | stable | 3 | oui |
+s Mise en page pour la presse et l'impression, dans l'esprit d'InDesign.
+c output=PDF prêt pour l'imprimeur ; cmyk=true ; ease=difficile ; formats=PDF, SVG, EPS
++ Couleurs CMJN ; Libre
+- Courbe d'apprentissage ; Interface datée
+n Bibliothèques Qt ; Polices installées
+i Installer (Alpine) :: apk add scribus
+d Site officiel | https://www.scribus.net/
+
+@ designcraft | DesignCraft (ArtCraft) | MIT ou Apache-2.0 | experimental | 3 | difficile |
+s Mise en page et publication, alternative libre à InDesign. En développement.
+c output=À vérifier (alpha) ; cmyk=null ; ease=moyenne ; formats=À vérifier
++ Moderne ; Libre
+- Version alpha ; Peu d'informations publiées
+n AppImage (prévue pour glibc) ou compilation avec Rust
+i Compiler :: git clone https://github.com/storytold/artcraft ;; # suivre le README du dépôt
+d Dépôt ArtCraft | https://github.com/storytold/artcraft
+
+@ typst | Typst | Apache-2.0 | stable | 3 | oui |
+s Composition de documents par code, alternative moderne à LaTeX.
+c output=PDF ; cmyk=null ; ease=moyenne ; formats=PDF, PNG, SVG
++ Compilation instantanée ; Syntaxe plus simple que LaTeX
+- Écosystème plus jeune
+i Installer (Alpine) :: apk add typst
+d Site officiel | https://typst.app/
+
+@ texlive | TeX Live (LaTeX) | Licences libres variées | stable | 4 | oui |
+s Composition de documents scientifiques et de livres avec LaTeX.
+c output=PDF ; cmyk=true ; ease=difficile ; formats=PDF, DVI
++ Qualité typographique ; Standard scientifique
+- Courbe d'apprentissage ; Installation volumineuse
+n Plusieurs Go pour une installation complète
+i Installer (Alpine) :: apk add texlive
+d Site officiel | https://tug.org/texlive/

@@ -1,0 +1,19 @@
+# USE compositor
+@ i3 | i3 | BSD-3-Clause | stable | 3 | oui |
+s Gestionnaire de fenêtres en tiling pour X11, très léger, configuré par un fichier texte.
+c protocol=X11 ; layout=tiling ; config_style=Fichier texte ; footprint_mb=null ; effects=aucun
++ Très léger ; Stable ; Énormément de documentation
+- Seulement X11 ; Pas d'animations
+l Gestion de fenêtres au clavier sous X11.
+n Session X11 (Xorg)
+i Installer (Alpine) :: apk add i3wm
+d Site officiel | https://i3wm.org/
+
+@ openbox | Openbox | GPL-2.0+ | stable | 2 | oui |
+s Gestionnaire de fenêtres flottantes pour X11, minimaliste et très léger.
+c protocol=X11 ; layout=flottante ; config_style=Fichiers XML ; footprint_mb=null ; effects=aucun
++ Extrêmement léger ; Menus personnalisables
+- Seulement X11 ; Développement peu actif
+n Session X11 (Xorg) ; Une barre et un menu à ajouter
+i Installer (Alpine) :: apk add openbox
+d Site officiel | http://openbox.org/

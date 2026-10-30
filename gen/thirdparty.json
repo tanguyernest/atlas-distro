@@ -1,0 +1,6 @@
+{
+ "_note": "Paquets absents des dépôts officiels mais fournis par un dépôt tiers connu. Ils restent ⚠️ tant que le tutoriel n'active pas ce dépôt avant.",
+ "fedora": {"steam": "RPM Fusion", "ffmpeg": "RPM Fusion", "handbrake": "RPM Fusion", "kodi": "RPM Fusion", "telegram-desktop": "RPM Fusion"},
+ "debian": {"tailscale": "Tailscale (pkgs.tailscale.com)"},
+ "ubuntu": {"tailscale": "Tailscale (pkgs.tailscale.com)"}
+}
