@@ -26,7 +26,14 @@ const res=await p.evaluate(()=>{
     if(DISTRO_STATUS._meta[base]&&!/Noms de paquets vérifiés le \d{4}-\d\d-\d\d sur /.test(md))out.bad.push('date de vérification absente: '+obj+' '+base);
     // parcours « depuis zéro » : blocs présents, dans l'ordre, avant « Mettre à jour »
     if(SCRATCH_BASES.includes(base)){
-      const T=['Créer une machine virtuelle de test',"Démarrer la VM sur l'ISO",'Partitionner le disque','Installer la base à la main','Configurer le système (chroot)',"Installer le chargeur d'amorçage",'Quitter le chroot et éteindre','Démarrer sur le disque','Mettre à jour le système'];
+      // la connexion du live est vérifiée avant le partitionnement (après setup-interfaces sur Alpine)
+      const T=['Créer une machine virtuelle de test'].concat(base==='alpine'?["Démarrer la VM sur l'ISO",'Vérifier la connexion internet du système live']:['Vérifier la connexion internet du système live','Préparer le système live'],['Partitionner le disque','Installer la base à la main','Configurer le système (chroot)',"Installer le chargeur d'amorçage",'Quitter le chroot et éteindre','Démarrer sur le disque','Mettre à jour le système']);
+      {const sec=md.split(/^### /m).find(x=>/^\d+\. Vérifier la connexion internet du système live/.test(x))||'';
+       if(!/^\*\*État :\*\* ⚠️/m.test(sec))out.bad.push('étape connexion pas ⚠️: '+obj+' '+base);
+       if(!/Câble :/.test(sec)||!/Wi-Fi :/.test(sec)||!/connexion est automatique/.test(sec))out.bad.push('étape connexion incomplète: '+obj+' '+base)}
+      {const sec=md.split(/^### /m).find(x=>/^\d+\. Configurer le système \(chroot\)/.test(x))||'';
+       if(!/resolv\.conf/.test(sec))out.bad.push('resolv.conf absent du chroot: '+obj+' '+base)}
+      md.split(/^### /m).filter(x=>/^\d+\. Réseau : /.test(x)).forEach(x=>{if(!/configure le réseau du système installé/.test(x))out.bad.push('brique réseau sans précision live/installé: '+obj+' '+base)});
       const pos=T.map(t=>md.indexOf('. '+t));
       if(pos.some(x=>x<0))out.bad.push('bloc manquant: '+T.filter((t,n)=>pos[n]<0).join(', ')+' '+obj+' '+base);
       else if(pos.some((x,n)=>n&&x<pos[n-1]))out.bad.push('blocs dans le désordre: '+obj+' '+base);
@@ -37,7 +44,7 @@ const res=await p.evaluate(()=>{
     // Void et Gentoo : blocs « depuis zéro » toujours ⚠️, jamais 🧪
     if(base==='void'||base==='gentoo'){
       if(/🧪 Testé en VM le/.test(md))out.bad.push('🧪 sur '+base+' ('+obj+')');
-      md.split(/^### /m).filter(x=>/^\d+\. (Créer une machine|Démarrer la VM|Partitionner|Installer la base|Configurer le système|Installer le chargeur|Quitter le chroot|Démarrer sur le disque|Configurer le bureau)/.test(x))
+      md.split(/^### /m).filter(x=>/^\d+\. (Créer une machine|Démarrer la VM|Vérifier la connexion|Préparer le système live|Partitionner|Installer la base|Configurer le système|Installer le chargeur|Quitter le chroot|Démarrer sur le disque|Configurer le bureau)/.test(x))
         .forEach(x=>{if(!/^\*\*État :\*\* ⚠️/m.test(x))out.bad.push('bloc pas ⚠️ sur '+base+': '+x.split('\n')[0]+' ('+obj+')')});
     }
     if(base==='gentoo'&&!/\*\*Compilation longue\*\*/.test(md))out.bad.push('avertissement compilation absent: '+obj);

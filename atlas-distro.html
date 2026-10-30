@@ -2575,8 +2575,45 @@ function scratchSteps(baseId,BD,stack){
     gentoo:{notes:["L'ISO minimale ouvre directement un shell `root`. Le réseau filaire est configuré tout seul (DHCP).","Elle contient déjà les outils de partitionnement, de formatage et `cryptsetup`.","`chronyd -q` met l'horloge à l'heure : une date fausse fait échouer la vérification de l'archive."],
       cmds:["chronyd -q"],verify:["ping -c 2 gentoo.org","date"],pkgs:[]}
   }[baseId];
-  withPkgs(S({key:"live",where:"live",title:"Démarrer la VM sur l'ISO",why:"Le système live sert d'atelier : c'est depuis lui que tu installes la base sur le disque.",
-    notes:live.notes,cmds:live.cmds,verify:live.verify}),live.pkgs);
+  // 2 bis. connexion internet du live : tout le reste télécharge des paquets
+  const wpa=(conf,dhcp)=>`\`wpa_passphrase NOM_DU_RESEAU MOT_DE_PASSE > ${conf}\`, \`wpa_supplicant -B -i wlan0 -c ${conf}\`, puis \`${dhcp} wlan0\``;
+  const NET={
+    alpine:{host:"dl-cdn.alpinelinux.org",
+      cable:"`setup-interfaces` (étape précédente) choisit DHCP par défaut. Pour relancer à la main : `ip link set eth0 up` puis `udhcpc -i eth0`.",
+      wifi:"relance `setup-interfaces`, choisis `wlan0`, puis le nom du réseau et le mot de passe (il utilise wpa_supplicant). Si aucune interface `wlan0` n'apparaît, le firmware manque sur l'ISO standard : prends l'ISO « extended » ou un câble. Relance ensuite `setup-apkrepos -c -1` et le `apk add` de l'étape précédente."},
+    debian:{host:"deb.debian.org",login:"Connecte-toi d'abord au système live : session `user`, mot de passe `live`.",
+      cable:"normalement automatique. Sinon, `sudo dhcpcd enp1s0` ou `sudo dhclient enp1s0`, selon l'outil présent sur l'ISO.",
+      wifi:"si `nmcli` existe : `sudo nmcli device wifi connect NOM_DU_RESEAU password MOT_DE_PASSE`. Sinon, en root : "+wpa("/tmp/wifi.conf","dhcpcd")+". L'ISO live « standard » peut manquer du firmware Wi-Fi : un câble est plus sûr."},
+    ubuntu:{host:"archive.ubuntu.com",login:"La connexion se règle dans l'installateur, à l'écran « Network configuration », avant d'ouvrir le shell.",
+      cable:"automatique (DHCP) dans l'écran « Network configuration ».",
+      wifi:"dans le même écran, choisis l'interface Wi-Fi, puis le réseau et le mot de passe. La connexion reste active dans le shell."},
+    arch:{host:"archlinux.org",login:"L'ISO ouvre directement un shell `root`.",
+      cable:"automatique : systemd-networkd et le DHCP sont actifs sur l'ISO.",
+      wifi:"`iwctl station wlan0 scan`, `iwctl station wlan0 get-networks`, puis `iwctl station wlan0 connect NOM_DU_RESEAU` (il demande le mot de passe). Si le Wi-Fi est bloqué : `rfkill unblock wifi`."},
+    fedora:{host:"fedoraproject.org",login:"Choisis d'abord « Essayer Fedora » et ouvre un terminal.",
+      cable:"automatique (NetworkManager).",
+      wifi:"menu en haut à droite du bureau, ou `nmcli device wifi connect NOM_DU_RESEAU password MOT_DE_PASSE`."},
+    void:{host:"repo-default.voidlinux.org",login:"Connecte-toi d'abord en `root`, mot de passe `voidlinux`.",
+      cable:"automatique (service dhcpcd de l'ISO). Sinon : `dhcpcd eth0`.",
+      wifi:wpa("/etc/wpa_supplicant/wpa_supplicant.conf","dhcpcd")+"."},
+    gentoo:{host:"distfiles.gentoo.org",login:"L'ISO minimale ouvre directement un shell `root`.",
+      cable:"automatique (dhcpcd). Sinon : `dhcpcd enp1s0`.",
+      wifi:"`net-setup wlan0` (assistant de l'ISO, il demande le réseau et le mot de passe), ou à la main : "+wpa("/tmp/wifi.conf","dhcpcd")+"."}
+  }[baseId];
+  const netStep=()=>S({key:"net",where:"live",title:"Vérifier la connexion internet du système live",
+    why:"Les étapes suivantes téléchargent les paquets de la base : le système live doit être connecté avant le partitionnement.",
+    notes:(NET.login?[NET.login]:[]).concat(["Dans une VM QEMU (`-nic user`), la connexion est automatique : les deux `ping` doivent répondre.",
+      "Le premier `ping` teste l'accès à Internet par une adresse IP, le second teste aussi les noms (DNS). Si seul le premier répond : `echo 'nameserver 1.1.1.1' > /etc/resolv.conf` (en root).",
+      "Sur une vraie machine, si rien ne répond (remplace `eth0`, `enp1s0` ou `wlan0` par le nom donné par `ip link`) :",
+      "  - Câble : "+NET.cable,"  - Wi-Fi : "+NET.wifi,
+      "Ce réglage ne vaut que pour le système live. Le réseau du système installé se règle plus loin, dans le chroot et avec la brique « Réseau »."]),
+    cmds:[A?"ip addr":"ip -br addr","ping -c 3 1.1.1.1"],verify:[`ping -c 2 ${NET.host}`]});
+  if(!A)netStep();
+  // sans Alpine, la connexion est vérifiée d'abord : ce bloc ne fait plus que préparer les outils du live
+  withPkgs(S({key:"live",where:"live",title:A?"Démarrer la VM sur l'ISO":"Préparer le système live",why:"Le système live sert d'atelier : c'est depuis lui que tu installes la base sur le disque.",
+    notes:live.notes.concat(A?["Sans connexion, `setup-apkrepos` et `apk add` échouent : l'étape suivante explique comment vérifier et réparer la connexion."]:[]),cmds:live.cmds,verify:live.verify}),live.pkgs);
+  // Alpine : setup-interfaces (bloc testé ci-dessus) règle le réseau, la vérification vient juste après
+  if(A)netStep();
 
   // 3. partitionnement
   const bootFs=uefi||bl==="limine"?"vfat":"ext4";
@@ -2668,6 +2705,7 @@ function scratchSteps(baseId,BD,stack){
   const cnotes=["Les premières commandes entrent dans le système installé (`chroot`) : la suite s'exécute à l'intérieur, comme s'il avait démarré.",
     "Fuseau horaire : `Europe/Paris`. Langue : `fr_FR.UTF-8`. Nom de la machine : `atlas`. Utilisateur : `moi`. Change-les si tu veux.",
     "`passwd` demande le mot de passe deux fois : d'abord pour root, puis pour `moi`."];
+  cnotes.push(ARCH?"`arch-chroot` copie tout seul `/etc/resolv.conf` du live : le DNS marche dans le chroot.":"La copie de `/etc/resolv.conf` donne au chroot le DNS du système live : sans elle, les téléchargements faits dans le chroot échouent.");
   if(A)cnotes.push("La dernière ligne active une connexion sur la console série (`ttyS0`), utile dans la VM.");
   if(FED)cnotes.push("`touch /.autorelabel` demande à SELinux de réétiqueter les fichiers au premier démarrage (il redémarre une fois tout seul).");
   if(VOID){cnotes.push("Void utilise runit : un service s'active avec un lien de `/etc/sv/<service>` vers `/etc/runit/runsvdir/default/` (dans le chroot) ou `/var/service/` (sur le système démarré). `agetty-ttyS0` ouvre une connexion sur la console série de la VM.","`xbps-reconfigure -fa` termine la configuration de tous les paquets et recrée l'initramfs du noyau (dracut).");
@@ -2841,10 +2879,12 @@ function buildTutorial(){
 
   // briques de la pile
   const SKIP=new Set(["Distribution de base","Bibliothèque C","Système d'init","Gestionnaire de paquets","Mises à jour","Modèle d'image"].concat(SCR?["Noyau","Chargeur d'amorçage","Système de fichiers","Chiffrement du disque"]:[]));
+  const netTitles=[];
   stack.forEach(x=>{
     if(SKIP.has(x.label)||!x.tool)return;
     const t=byId(x.tool);if(!t)return;
     const r=toolPkgs(t,baseId);
+    if(t.category==="network")netTitles.push(x.label+" : "+x.name);
     if(r.nothing){
       const pc=postCmds(t.id,baseId);
       if(pc.length){steps.push({title:x.label+" : "+x.name,state:"check",why:x.why,notes:["Déjà fourni par la base : il reste à l'installer sur le disque."],cmds:pc,verify:POSTVERIFY[t.id]||[],stateNote:"Commandes non testées : adapte le disque et le point de montage de la partition EFI."});return}
@@ -2862,6 +2902,8 @@ function buildTutorial(){
     steps.push(st);
   });
 
+  // la brique réseau règle le système installé, pas le live
+  steps.filter(s=>netTitles.includes(s.title)).forEach(s=>(s.notes=s.notes||[]).unshift("Cette brique configure le réseau du système installé, après son démarrage sur le disque. Elle ne sert pas au système live de l'ISO (voir l'étape « Vérifier la connexion internet du système live »)."));
   // dépôts
   const repoCmds=[],repoNotes=[];
   const chosenIds=[...stack.map(x=>x.tool),...Object.values(sel).flat()].filter(Boolean);
