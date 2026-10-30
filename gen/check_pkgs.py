@@ -1,5 +1,5 @@
 # Compare les paquets de l'app (list_pkgs.js) aux index officiels (fetch_indexes.sh).
-# Écrit gen/distro_status.json et injecte DISTRO_STATUS dans atlas-distro.html.
+# Écrit gen/distro_status.json et injecte DISTRO_STATUS et FLATHUB_STATUS dans atlas-distro.html.
 # Usage : python3 -I gen/check_pkgs.py /chemin/vers/idx pkgs.json
 # États : ok, virtual (nom fourni par un autre paquet), virtual-group (groupe pacman),
 #         thirdparty (dépôt tiers, voir thirdparty.json), absent.
@@ -50,7 +50,7 @@ PARSERS = {'debian': lambda: deb('deb'), 'ubuntu': lambda: deb('ubu'), 'arch': a
 wanted = json.load(open(pkgs_file))
 third = json.load(open(os.path.join(here, 'thirdparty.json')))
 meta = json.load(open(os.path.join(idx, 'meta.json')))
-status = {'_meta': meta, '_thirdparty': {}}
+status = {'_meta': {b: meta[b] for b in PARSERS}, '_thirdparty': {}}
 for base, parse in PARSERS.items():
     names, prov, groups = parse()
     st, tp = {}, {}
@@ -68,13 +68,21 @@ for base, parse in PARSERS.items():
     for k in ('virtual', 'virtual-group', 'thirdparty', 'absent'):
         if k in by: print(f'  {k} : ' + ' '.join(by[k]))
 
+flathub = set(json.load(open(os.path.join(idx, 'flathub-appstream.json'))))
+fh = {'_meta': meta['flathub'], 'ids': {i: ('ok' if i in flathub else 'absent') for i in wanted['_flatpak']}}
+miss = [i for i, s in fh['ids'].items() if s == 'absent']
+print(f"== flathub : {len(fh['ids']) - len(miss)} ok, {len(miss)} absent" + (' : ' + ' '.join(miss) if miss else ''))
+
 json.dump(status, open(os.path.join(here, 'distro_status.json'), 'w'), ensure_ascii=False, indent=1)
+json.dump(fh, open(os.path.join(here, 'flathub_status.json'), 'w'), ensure_ascii=False, indent=1)
 html = open(HTML, encoding='utf-8').read()
-line = 'const DISTRO_STATUS=' + json.dumps(status, ensure_ascii=False, separators=(',', ':')) + ';'
-if re.search(r'^const DISTRO_STATUS=.*;$', html, re.M):
-    html = re.sub(r'^const DISTRO_STATUS=.*;$', lambda m: line, html, count=1, flags=re.M)
-else:
+def inject(html, name, data):
+    line = f'const {name}=' + json.dumps(data, ensure_ascii=False, separators=(',', ':')) + ';'
+    if re.search(rf'^const {name}=.*;$', html, re.M):
+        return re.sub(rf'^const {name}=.*;$', lambda m: line, html, count=1, flags=re.M)
     m = re.search(r'^const ALPINE_STATUS=.*;$', html, re.M)
-    html = html[:m.end()] + '\n' + line + html[m.end():]
+    return html[:m.end()] + '\n' + line + html[m.end():]
+html = inject(html, 'DISTRO_STATUS', status)
+html = inject(html, 'FLATHUB_STATUS', fh)
 open(HTML, 'w', encoding='utf-8').write(html)
-print('DISTRO_STATUS injecté dans', os.path.normpath(HTML))
+print('DISTRO_STATUS et FLATHUB_STATUS injectés dans', os.path.normpath(HTML))

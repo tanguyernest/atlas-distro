@@ -13,7 +13,9 @@ ctx.window=ctx;vm.createContext(ctx);
 vm.runInContext(html.slice(j,k),ctx);
 const out={};BASES.forEach(b=>out[b]={});
 const add=(base,pkgs,src)=>{if(!out[base])return;pkgs.filter(p=>!p.startsWith('group:')).forEach(p=>{const s=out[base][p]=out[base][p]||[];if(!s.includes(src))s.push(src)})};
-vm.runInContext('TOOLS',ctx).forEach(t=>BASES.forEach(b=>add(b,ctx.toolPkgs(t,b).pkgs||[],t.id)));
+const fp=new Set();
+vm.runInContext('TOOLS',ctx).forEach(t=>['alpine',...BASES].forEach(b=>{const r=ctx.toolPkgs(t,b);add(b,r.pkgs||[],t.id);if(r.flatpak)fp.add(r.flatpak)}));
+out._flatpak=[...fp].sort();
 // paquets passés à pkgState pendant la génération (pilotes graphiques, etc.)
 const orig=ctx.pkgState;
 ctx.pkgState=(base,pkgs)=>{add(base,pkgs,'tutoriel');return orig(base,pkgs)};
@@ -27,3 +29,4 @@ for(const o of OBJECTIVES.filter(o=>o.ready)){const tr=TREES[o.id];
  }}`,ctx);
 fs.writeFileSync(process.argv[3],JSON.stringify(out,null,1));
 BASES.forEach(b=>console.log(b,Object.keys(out[b]).length,'paquets'));
+console.log('flatpak',out._flatpak.length,'identifiants');

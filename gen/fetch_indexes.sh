@@ -1,5 +1,5 @@
 #!/bin/sh
-# Télécharge les index officiels des dépôts (Debian, Ubuntu, Arch, Fedora) dans le dossier $1.
+# Télécharge les index officiels des dépôts (Debian, Ubuntu, Arch, Fedora, Flathub) dans le dossier $1.
 # Écrit aussi $1/meta.json : version de chaque base et date de vérification.
 # Usage : sh gen/fetch_indexes.sh /chemin/vers/idx
 set -eu
@@ -26,11 +26,14 @@ for r in releases updates; do
   get "$url/$p" "$d/fed-$r-primary.xml.zst"
 done
 
+get https://flathub.org/api/v2/appstream "$d/flathub-appstream.json"
+
 today=$(date +%F)
 cat > "$d/meta.json" <<J
 {"debian":{"label":"$DEBIAN_LABEL","verified_on":"$today","sources":"$DEBIAN, $DEBIAN-updates : main contrib non-free non-free-firmware"},
  "ubuntu":{"label":"$UBUNTU_LABEL","verified_on":"$today","sources":"$UBUNTU, $UBUNTU-updates : main restricted universe multiverse"},
  "arch":{"label":"$ARCH_LABEL","verified_on":"$today","sources":"core extra multilib"},
- "fedora":{"label":"$FEDORA_LABEL","verified_on":"$today","sources":"Everything + updates"}}
+ "fedora":{"label":"$FEDORA_LABEL","verified_on":"$today","sources":"Everything + updates"},
+ "flathub":{"label":"Flathub","verified_on":"$today","sources":"flathub.org/api/v2/appstream"}}
 J
 echo "index téléchargés dans $d"

@@ -24,6 +24,10 @@ const res=await p.evaluate(()=>{
     const verified=base==='alpine'||!!DISTRO_STATUS[base];
     if(!verified&&base!=='undecided'&&/\*\*État :\*\* 🟡/.test(md))out.bad.push('état vérifié sur base non vérifiée: '+obj+' '+base);
     if(DISTRO_STATUS._meta[base]&&!/Noms de paquets vérifiés le \d{4}-\d\d-\d\d sur /.test(md))out.bad.push('date de vérification absente: '+obj+' '+base);
+    // flatpak install seulement dans l'étape « Préparer Flatpak », qui liste chaque identifiant
+    {const secs=md.split(/^### /m);const fpSec=secs.find(x=>/^\d+\. Préparer Flatpak/.test(x))||'';
+     secs.filter(x=>x!==fpSec&&!/^Construire/.test(x)).forEach(x=>{if(/flatpak install/.test(x))out.bad.push('flatpak install hors « Préparer Flatpak »: '+obj+' '+base)});
+     (md.match(/Installé avec Flatpak \(`([^`]+)`/g)||[]).forEach(m=>{const id=m.split('`')[1];if(!fpSec.includes('flatpak install -y flathub '+id))out.bad.push('identifiant absent de « Préparer Flatpak »: '+id+' '+obj+' '+base)})}
     // un paquet de dépôt tiers ne passe jamais en 🟡
     if(/\*\*État :\*\* 🟡[^\n]*Dépôt tiers requis/.test(md))out.bad.push('dépôt tiers en 🟡: '+obj+' '+base);
     // commandes de gestionnaire cohérentes avec la base
