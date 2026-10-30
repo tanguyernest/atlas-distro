@@ -1,9 +1,10 @@
 // Liste, par base, les noms de paquets que l'app peut écrire dans un tutoriel.
 // Usage : node gen/list_pkgs.js atlas-distro.html sortie.json
 // Charge le <script> de l'app dans une VM node (faux DOM), parcourt toutes les fiches
-// et génère les tutoriels de chaque parcours pour capter aussi les paquets hors fiches (pilotes).
+// et génère les tutoriels de chaque parcours (UEFI et BIOS) pour capter aussi les paquets hors fiches
+// (pilotes, blocs « distro depuis zéro »).
 const fs=require('fs'),vm=require('vm');
-const BASES=['debian','ubuntu','arch','fedora'];
+const BASES=['debian','ubuntu','arch','fedora','void','gentoo'];
 const html=fs.readFileSync(process.argv[2],'utf8');
 const i=html.indexOf('<script'),j=html.indexOf('>',i)+1,k=html.lastIndexOf('</script>');
 const stub=new Proxy(function(){},{get:(t,p)=>p===Symbol.toPrimitive?()=>'':stub,apply:()=>stub,construct:()=>stub,set:()=>true});
@@ -21,8 +22,8 @@ const orig=ctx.pkgState;
 ctx.pkgState=(base,pkgs)=>{add(base,pkgs,'tutoriel');return orig(base,pkgs)};
 vm.runInContext(`
 for(const o of OBJECTIVES.filter(o=>o.ready)){const tr=TREES[o.id];
- for(const base of ${JSON.stringify(BASES)})for(const gpu of ['amd','intel','nvidia',null])for(const mix of [0,1]){
-  Object.keys(HW).forEach(k=>delete HW[k]);if(gpu)HW.gpu=gpu;
+ for(const base of ${JSON.stringify(BASES)})for(const gpu of ['amd','intel','nvidia',null])for(const mix of [0,1])for(const boot of ['uefi','bios']){
+  Object.keys(HW).forEach(k=>delete HW[k]);if(gpu)HW.gpu=gpu;HW.boot=boot;
   G.obj=o.id;G.base=base;G.manual={};G.keep={};G.changed=[];G.hwAuto={};G.stage=null;G.scope=gpu?'precise':'general';
   G.ans=tr.questions.map(q=>mix?Math.min(1,q.o.length-1):0);G.i=tr.questions.length;G.sw={};
   buildTutorial();

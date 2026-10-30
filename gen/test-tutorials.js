@@ -34,6 +34,16 @@ const res=await p.evaluate(()=>{
       if(/Le partitionnement et l'installation de la base : étape manuelle/.test(md))out.bad.push('ligne « ne couvre pas » restée: '+obj+' '+base);
       const db=md.indexOf('. Configurer le bureau');if(db>=0&&db<md.indexOf('. Mettre à jour le système'))out.bad.push('bureau avant les paquets: '+obj+' '+base);
     }
+    // Void et Gentoo : blocs « depuis zéro » toujours ⚠️, jamais 🧪
+    if(base==='void'||base==='gentoo'){
+      if(/🧪 Testé en VM le/.test(md))out.bad.push('🧪 sur '+base+' ('+obj+')');
+      md.split(/^### /m).filter(x=>/^\d+\. (Créer une machine|Démarrer la VM|Partitionner|Installer la base|Configurer le système|Installer le chargeur|Quitter le chroot|Démarrer sur le disque|Configurer le bureau)/.test(x))
+        .forEach(x=>{if(!/^\*\*État :\*\* ⚠️/m.test(x))out.bad.push('bloc pas ⚠️ sur '+base+': '+x.split('\n')[0]+' ('+obj+')')});
+    }
+    if(base==='gentoo'&&!/\*\*Compilation longue\*\*/.test(md))out.bad.push('avertissement compilation absent: '+obj);
+    if(base==='gentoo'&&!/gentoo-kernel-bin/.test(md))out.bad.push('gentoo-kernel-bin absent: '+obj);
+    // statut de la base dans l'en-tête
+    if(BASEDEF[base]&&!md.includes('> Parcours « distro depuis zéro » sur '+BASEDEF[base].name+' : '+BASE_STATUS[baseStatus(base)]))out.bad.push('statut de base absent: '+obj+' '+base);
     // 🧪 seulement pour une base qui a des tests enregistrés
     {const labels=Object.values(VM_TESTS).flatMap(b=>Object.values(b.tests).map(t=>t.label));
      (md.match(/🧪 Testé en VM le \d{4}-\d\d-\d\d, sur [^—\n]+/g)||[]).forEach(m=>{const l=m.split(', sur ')[1].trim();if(!labels.includes(l))out.bad.push('🧪 sans test enregistré: '+l+' '+obj+' '+base)})}
@@ -49,11 +59,18 @@ const res=await p.evaluate(()=>{
       if(f==='apt'&&/\bapk add\b|\bpacman -S\b/.test(md.replace(/Alpine[^\n]*/g,'')))out.bad.push('commande étrangère sur '+base+' ('+obj+')');
       if(f==='pacman'&&/\bapk add\b|\bapt install\b/.test(md))out.bad.push('commande étrangère sur '+base+' ('+obj+')');
       if(f==='apk'&&base==='alpine'&&/\bapt install\b|\bpacman -S\b|\bdnf install\b/.test(md))out.bad.push('commande étrangère sur '+base+' ('+obj+')');
+      if((f==='xbps'||f==='emerge')&&/\b(apk add|apt install|pacman -S|dnf install)\b/.test(md))out.bad.push('commande étrangère sur '+base+' ('+obj+')');
+      if(f==='xbps'&&/\bemerge\b/.test(md)||f==='emerge'&&/\bxbps-install\b/.test(md))out.bad.push('commande étrangère sur '+base+' ('+obj+')');
     }
     if(mix===0&&['gaming:alpine','light:debian','server:fedora','secure:arch','office:ubuntu'].includes(obj+':'+base))out.samples[obj+'-'+base]=md;
    }
   }
  }
+ // statut affiché sur l'écran de choix de la base
+ const want={alpine:'tested',debian:'written',ubuntu:'written',arch:'written',fedora:'written',void:'written',gentoo:'written'};
+ Object.keys(BASEDEF).forEach(b=>{const e=want[b]||'none';if(baseStatus(b)!==e)out.bad.push('statut '+b+' : '+baseStatus(b)+' au lieu de '+e)});
+ G.base=null;G.obj='gaming';const scr=baseScreen();
+ Object.keys(BASEDEF).forEach(b=>{const m=scr.match(new RegExp('data-base="'+b+'">.*?</button>'));if(!m||!m[0].includes(BASE_STATUS[want[b]||'none']))out.bad.push('statut absent de la carte '+b)});
  return out;
 });
 console.log('tutoriels générés:',res.n,'| problèmes:',res.bad.length);
