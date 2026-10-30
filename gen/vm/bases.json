@@ -1,0 +1,5 @@
+{
+ "alpine": {"label": "Alpine 3.24.3", "iso": "alpine-standard-3.24.3-x86_64.iso",
+            "kernel": "boot/vmlinuz-lts", "initrd": "boot/initramfs-lts",
+            "append": "modules=loop,squashfs,sd-mod,usb-storage quiet console=ttyS0,115200", "login": "root"}
+}

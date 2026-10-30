@@ -24,6 +24,19 @@ const res=await p.evaluate(()=>{
     const verified=base==='alpine'||!!DISTRO_STATUS[base];
     if(!verified&&base!=='undecided'&&/\*\*État :\*\* 🟡/.test(md))out.bad.push('état vérifié sur base non vérifiée: '+obj+' '+base);
     if(DISTRO_STATUS._meta[base]&&!/Noms de paquets vérifiés le \d{4}-\d\d-\d\d sur /.test(md))out.bad.push('date de vérification absente: '+obj+' '+base);
+    // parcours « depuis zéro » : blocs présents, dans l'ordre, avant « Mettre à jour »
+    if(SCRATCH_BASES.includes(base)){
+      const T=['Créer une machine virtuelle de test',"Démarrer la VM sur l'ISO",'Partitionner le disque','Installer la base à la main','Configurer le système (chroot)',"Installer le chargeur d'amorçage",'Quitter le chroot et éteindre','Démarrer sur le disque','Mettre à jour le système'];
+      const pos=T.map(t=>md.indexOf('. '+t));
+      if(pos.some(x=>x<0))out.bad.push('bloc manquant: '+T.filter((t,n)=>pos[n]<0).join(', ')+' '+obj+' '+base);
+      else if(pos.some((x,n)=>n&&x<pos[n-1]))out.bad.push('blocs dans le désordre: '+obj+' '+base);
+      if(!/\*\*Ne suis jamais le partitionnement sur ta vraie machine/.test(md))out.bad.push('avertissement VM absent: '+obj+' '+base);
+      if(/Le partitionnement et l'installation de la base : étape manuelle/.test(md))out.bad.push('ligne « ne couvre pas » restée: '+obj+' '+base);
+      const db=md.indexOf('. Configurer le bureau');if(db>=0&&db<md.indexOf('. Mettre à jour le système'))out.bad.push('bureau avant les paquets: '+obj+' '+base);
+    }
+    // 🧪 seulement pour une base qui a des tests enregistrés
+    {const labels=Object.values(VM_TESTS).flatMap(b=>Object.values(b.tests).map(t=>t.label));
+     (md.match(/🧪 Testé en VM le \d{4}-\d\d-\d\d, sur [^—\n]+/g)||[]).forEach(m=>{const l=m.split(', sur ')[1].trim();if(!labels.includes(l))out.bad.push('🧪 sans test enregistré: '+l+' '+obj+' '+base)})}
     // flatpak install seulement dans l'étape « Préparer Flatpak », qui liste chaque identifiant
     {const secs=md.split(/^### /m);const fpSec=secs.find(x=>/^\d+\. Préparer Flatpak/.test(x))||'';
      secs.filter(x=>x!==fpSec&&!/^Construire/.test(x)).forEach(x=>{if(/flatpak install/.test(x))out.bad.push('flatpak install hors « Préparer Flatpak »: '+obj+' '+base)});

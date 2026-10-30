@@ -1,0 +1,203 @@
+{
+ "alpine": {
+  "label": "Alpine 3.24.3",
+  "tests": {
+   "scratch-vm:b421d751": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Créer une machine virtuelle de test"
+   },
+   "scratch-live:ba9d387c": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Démarrer la VM sur l'ISO"
+   },
+   "scratch-part:f1d70221": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Partitionner le disque (UEFI)"
+   },
+   "scratch-base:ef53601f": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Installer la base à la main"
+   },
+   "scratch-config:e4faecf1": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Configurer le système (chroot)"
+   },
+   "scratch-boot:60e7203c": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Installer le chargeur d'amorçage : Limine"
+   },
+   "scratch-poweroff:84df871c": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Quitter le chroot et éteindre"
+   },
+   "scratch-diskboot:25038536": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Démarrer sur le disque"
+   },
+   "etape:Activer les dépôts nécessaires:08a56525": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Activer les dépôts nécessaires"
+   },
+   "etape:Mettre à jour le système:393d9ec7": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Mettre à jour le système"
+   },
+   "etape:Outils de base : BusyBox:218de97e": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Outils de base : BusyBox"
+   },
+   "etape:Serveur d'affichage : Xorg (X11):1896482e": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Serveur d'affichage : Xorg (X11)"
+   },
+   "etape:Bureau : Xfce:a725d3de": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Bureau : Xfce"
+   },
+   "etape:Son : PipeWire:3e6cbcb6": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Son : PipeWire"
+   },
+   "etape:Réseau : NetworkManager:7cc7da9c": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Réseau : NetworkManager"
+   },
+   "etape:Pilotes graphiques:423f819e": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Pilotes graphiques"
+   },
+   "scratch-desktop:c6c3e92b": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Configurer le bureau : Xfce"
+   },
+   "etape:Navigation web : Firefox:7af4edae": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Navigation web : Firefox"
+   },
+   "etape:Lecteur audio et vidéo : mpv:801d063e": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Lecteur audio et vidéo : mpv"
+   },
+   "etape:Gestionnaire de mots de passe : KeePassXC:979cb1c2": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Gestionnaire de mots de passe : KeePassXC"
+   },
+   "etape:Surveillance système : htop:7b566798": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Surveillance système : htop"
+   },
+   "etape:Archives : File Roller:d47ab40e": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Archives : File Roller"
+   },
+   "etape:Gestionnaire de fichiers : Thunar:713e9d7a": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Gestionnaire de fichiers : Thunar"
+   },
+   "etape:Terminal : Alacritty:62507a8a": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Terminal : Alacritty"
+   },
+   "etape:Shell : Bash:a6b1dbe6": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Shell : Bash"
+   },
+   "etape:Captures d'écran et presse-papiers : Flameshot:33a9a5e6": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Captures d'écran et presse-papiers : Flameshot"
+   },
+   "etape:Accès distant en ligne de commande : OpenSSH:455e3f5e": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Accès distant en ligne de commande : OpenSSH"
+   },
+   "etape:Activer les services:d69f01dd": {
+    "date": "2026-10-30",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Activer les services"
+   }
+  }
+ }
+}
