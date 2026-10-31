@@ -1,0 +1,42 @@
+Données et textes d'Atlas distro
+Licence : Creative Commons Attribution - Partage dans les mêmes conditions 4.0 International (CC BY-SA 4.0)
+Texte juridique : https://creativecommons.org/licenses/by-sa/4.0/legalcode.fr
+Résumé : https://creativecommons.org/licenses/by-sa/4.0/deed.fr
+
+Copyright (c) 2026 Les contributeurs d'Atlas distro
+
+CE QUI EST COUVERT
+
+- Les données de atlas-distro.html : couches, catégories, fiches d'outils,
+  aides, parcours, arbres de questions, bases, étapes et commandes du tutoriel,
+  états de vérification (LAYERS, CATS, TOOLS, HELP, OBJECTIVES, TREES, BASEDEF,
+  DISTRO_STATUS, FLATHUB_STATUS, VM_TESTS et autres tables de données).
+- Les sources de ces données : gen/d1.txt à gen/d7.txt, gen/*.json, gen/vm/bases.json.
+- Les textes de l'interface, le README, et les tutoriels .md générés par l'app.
+
+Le code est sous licence MIT : voir LICENSE. Quand un même fichier mélange code
+et données (atlas-distro.html), chaque partie garde sa licence.
+
+TU PEUX
+
+- Partager : copier et redistribuer ces données sur tout support et format.
+- Adapter : les modifier, les transformer et créer à partir d'elles,
+  y compris à des fins commerciales.
+
+À CONDITION DE
+
+- Citer la source : « Atlas distro et ses contributeurs », avec un lien vers le
+  dépôt et vers la licence, et indiquer si des modifications ont été faites.
+- Partager dans les mêmes conditions : diffuser tes modifications sous CC BY-SA 4.0.
+
+FOURNI SANS GARANTIE
+
+Ces données et ces textes sont fournis « en l'état », sans garantie d'aucune
+sorte, expresse ou implicite, notamment d'exactitude, d'adéquation à un usage
+particulier ou d'absence d'erreur. Les commandes décrites peuvent effacer des
+données ou rendre un système inutilisable. Tu les exécutes à tes propres
+risques. En aucun cas les auteurs ne peuvent être tenus responsables d'un
+dommage, d'une perte de données ou de tout autre préjudice lié à leur usage
+(voir aussi la section 5 du texte juridique de la licence).
+
+Seul le texte juridique officiel fait foi.

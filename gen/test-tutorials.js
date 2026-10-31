@@ -84,10 +84,13 @@ const res=await p.evaluate(()=>{
       if(links.length!==1){out.bad.push('lien de signalement absent ou en double: '+id);return}
       const url=links[0].slice(links[0].indexOf('](')+2,-1);let u;
       try{u=new URL(url)}catch(err){out.bad.push('lien invalide: '+id);return}
-      if(!url.startsWith(REPO_URL+'/issues/new?'))out.bad.push('lien hors REPO_URL: '+id);
-      const t=u.searchParams.get('title')||'',bd=u.searchParams.get('body')||'';
-      if(!t.includes(id)||!bd.includes('Étape : '+id))out.bad.push('identifiant absent du lien: '+id);
-      ['Commande qui échoue','Base : '+(BASEDEF[bid]||{}).name,'Parcours : ','Version de l\'app : '+APP_VERSION].forEach(k=>{if(!bd.includes(k))out.bad.push('champ « '+k+' » absent du lien: '+id)});
+      if(!url.startsWith(REPO_URL+'/issues/new?template=commande-qui-echoue.yml&'))out.bad.push('lien hors REPO_URL ou sans modèle: '+id);
+      const q=k=>u.searchParams.get(k)||'';
+      if(!q('title').includes(id)||!q('etape').startsWith(id+' '))out.bad.push('identifiant absent du lien: '+id);
+      // les clés doivent être les id des champs de .github/ISSUE_TEMPLATE/commande-qui-echoue.yml (vérifié plus bas, côté Node)
+      const keys=[...u.searchParams.keys()].filter(k=>k!=='template'&&k!=='title').sort().join(',');
+      if(keys!=='base,etape,parcours,version')out.bad.push('champs du lien inattendus ('+keys+'): '+id);
+      if(q('base')!==(BASEDEF[bid]||{}).name||!q('parcours')||q('version')!==APP_VERSION)out.bad.push('champ mal rempli dans le lien: '+id);
       if(url.length>8000)out.bad.push('lien trop long: '+id)});
      if(new Set(ids).size!==ids.length)out.bad.push('identifiants en double: '+obj+' '+base)}
     {const i=md.indexOf('\n## Signaler un problème\n');const sec=i<0?'':md.slice(i);
@@ -106,6 +109,12 @@ const res=await p.evaluate(()=>{
  Object.keys(BASEDEF).forEach(b=>{const m=scr.match(new RegExp('data-base="'+b+'">.*?</button>'));if(!m||!m[0].includes(BASE_STATUS[want[b]||'none']))out.bad.push('statut absent de la carte '+b)});
  return out;
 });
+// modèles de ticket : les champs remplis par le lien existent, et les champs demandés sont là
+{const dir=require('path').resolve(__dirname,'../.github/ISSUE_TEMPLATE');
+ const ids=f=>{try{return [...fs.readFileSync(dir+'/'+f,'utf8').matchAll(/^\s+id: (\S+)$/gm)].map(m=>m[1])}catch(err){res.bad.push('modèle absent: '+f);return []}};
+ const a=ids('commande-qui-echoue.yml'),b=ids('paquet-introuvable.yml');
+ ['base','parcours','etape','commande','erreur','version'].forEach(k=>{if(!a.includes(k))res.bad.push('champ « '+k+' » absent de commande-qui-echoue.yml')});
+ ['base','paquet','erreur'].forEach(k=>{if(!b.includes(k))res.bad.push('champ « '+k+' » absent de paquet-introuvable.yml')})}
 console.log('tutoriels générés:',res.n,'| problèmes:',res.bad.length);
 [...new Set(res.bad)].slice(0,25).forEach(x=>console.log(' -',x));
 for(const [k,v] of Object.entries(res.samples))fs.writeFileSync((process.env.MDOUT||'/tmp/mdout')+'/'+k+'.md',v);

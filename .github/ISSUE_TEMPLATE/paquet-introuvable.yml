@@ -1,0 +1,64 @@
+name: Paquet introuvable
+description: Un paquet cité par le tutoriel n'existe pas (ou plus) dans les dépôts de la base.
+title: "[paquet] nom-du-paquet sur Base"
+labels: ["bug"]
+# Mêmes id que commande-qui-echoue.yml pour les champs communs.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Les noms de paquets sont vérifiés dans les index officiels à la date indiquée en tête du tutoriel. Ils peuvent avoir changé depuis.
+        N'ajoute ni nom d'utilisateur, ni chemin de ta machine, ni mot de passe.
+  - type: input
+    id: base
+    attributes:
+      label: Base
+      description: Distribution et version (par exemple Debian 13, Fedora 44).
+      placeholder: Debian 13
+    validations:
+      required: true
+  - type: input
+    id: parcours
+    attributes:
+      label: Parcours
+      placeholder: Léger
+  - type: input
+    id: etape
+    attributes:
+      label: Identifiant d'étape
+      description: Indiqué sous le titre de l'étape, de la forme base-parcours-NN.
+      placeholder: debian-light-12 (Installer le bureau)
+  - type: input
+    id: paquet
+    attributes:
+      label: Paquet introuvable
+      placeholder: nom-du-paquet
+    validations:
+      required: true
+  - type: textarea
+    id: commande
+    attributes:
+      label: Commande
+      description: La commande d'installation lancée.
+      render: bash
+  - type: textarea
+    id: erreur
+    attributes:
+      label: Message d'erreur
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: verification
+    attributes:
+      label: Date de vérification des paquets
+      description: Indiquée en tête du tutoriel (« Noms de paquets vérifiés le … »).
+  - type: input
+    id: remplacement
+    attributes:
+      label: Nom correct, si tu le connais
+  - type: input
+    id: version
+    attributes:
+      label: Version de l'app
+      placeholder: 0.1.0

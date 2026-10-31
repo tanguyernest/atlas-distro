@@ -1,0 +1,61 @@
+name: Commande qui échoue
+description: Une commande du tutoriel renvoie une erreur ou ne fait pas ce qui est annoncé.
+title: "[identifiant] Titre de l'étape"
+labels: ["bug"]
+# Les id base, parcours, etape et version sont remplis par le lien « Signale-la » du tutoriel :
+# ne les renomme pas sans changer issueUrl() dans atlas-distro.html.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci ! Le lien « Signale-la » du tutoriel remplit déjà la base, le parcours, l'étape et la version.
+        N'ajoute ni nom d'utilisateur, ni chemin de ta machine, ni mot de passe.
+  - type: input
+    id: base
+    attributes:
+      label: Base
+      description: Distribution de départ (Alpine, Debian, Ubuntu, Arch, Fedora, Void, Gentoo…).
+      placeholder: Alpine
+    validations:
+      required: true
+  - type: input
+    id: parcours
+    attributes:
+      label: Parcours
+      placeholder: Léger
+    validations:
+      required: true
+  - type: input
+    id: etape
+    attributes:
+      label: Identifiant d'étape
+      description: Indiqué sous le titre de l'étape, de la forme base-parcours-NN.
+      placeholder: alpine-light-07 (Partitionner le disque)
+    validations:
+      required: true
+  - type: textarea
+    id: commande
+    attributes:
+      label: Commande
+      description: La commande exacte que tu as lancée.
+      render: bash
+    validations:
+      required: true
+  - type: textarea
+    id: erreur
+    attributes:
+      label: Message d'erreur
+      description: Le message complet, copié tel quel.
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version de l'app
+      placeholder: 0.1.0
+  - type: textarea
+    id: contexte
+    attributes:
+      label: Contexte (facultatif)
+      description: VM ou machine réelle, UEFI ou BIOS, version de l'ISO, choix faits dans l'app (bloc « Signaler un problème » en fin de tutoriel).

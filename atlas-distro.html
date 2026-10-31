@@ -157,6 +157,7 @@ details.grp[open]>summary::before{content:"▾ "}
 <header>
   <h1>Atlas distro</h1>
   <div class="sub">Comparer les briques d'une distribution Linux</div>
+  <div class="warn" id="disclaimer"></div>
 </header>
 <div class="tabs"><button class="tab" id="tabG">Me guider</button><button class="tab" id="tabC">Comparer</button></div>
 <div id="guide" class="g"></div>
@@ -2435,12 +2436,15 @@ const ST={
  info:"ℹ️ Rien à installer séparément",
  tested:"🧪 Testé en VM"
 };
+// ---------- Avertissement (en haut de l'app et en tête du tutoriel ; même texte dans le README) ----------
+const WARNING=["⚠️ Outil d'apprentissage, fourni sans garantie.","Suis ce tutoriel d'abord dans une machine virtuelle, pas sur ta machine principale.","Ne lance jamais une commande que tu ne comprends pas.","Sauvegarde tes données avant de toucher aux disques.","Seul Alpine a été testé en VM. Les autres bases sont écrites mais pas encore testées."];
 // ---------- Signalement d'erreurs ----------
 const APP_VERSION="0.1.0";  // version provisoire
 const REPO_URL="https://github.com/A-REMPLACER/atlas-distro";  // provisoire : remplacer par l'URL réelle du dépôt
 // encodeURIComponent laisse ( ) ! ' * : les parenthèses casseraient un lien Markdown
 function urlPart(s){return encodeURIComponent(s).replace(/[()!'*]/g,c=>"%"+c.charCodeAt(0).toString(16).toUpperCase())}
-function issueUrl(title,body){return REPO_URL+"/issues/new?title="+urlPart(title)+"&body="+urlPart(body)}
+// formulaire .github/ISSUE_TEMPLATE/<template> : chaque clé de fields est l'id d'un champ du formulaire
+function issueUrl(template,title,fields){return REPO_URL+"/issues/new?template="+template+"&title="+urlPart(title)+Object.keys(fields).map(k=>"&"+k+"="+urlPart(fields[k])).join("")}
 function stLabel(s){return s.state==="tested"&&s.tested?`🧪 Testé en VM le ${s.tested.date}, sur ${s.tested.label}`:(ST[s.state]||ST.check)}
 function famOf(base){return FAMILY[base]||"none"}
 function sysPkgs(tid,base){
@@ -3005,6 +3009,7 @@ function buildTutorial(){
   // ---------- rédaction ----------
   P(`# Distro ${obj.name.toLowerCase()} sur ${BD.name} : tutoriel pas à pas`);
   P("");
+  WARNING.forEach((w,i)=>P((i?"> - ":"> **")+w+(i?"":"**")));P("");
   P(`> Généré par l'Atlas distro le ${date}. Les données sont écrites à la main : relis chaque étape avant de l'exécuter, surtout celles marquées ⚠️.`);
   P("");
   const VM=DISTRO_STATUS._meta[baseId];
@@ -3051,9 +3056,7 @@ function buildTutorial(){
     if(s.verify&&s.verify.length){P("**Vérifier :**");P("");P("```bash");s.verify.forEach(c=>P(c));P("```");P("")}
     if(s.pitfalls&&s.pitfalls.length){P("**Pièges :**");s.pitfalls.forEach(n=>P("- "+n));P("")}
     if(s.docs&&s.docs.length){P("**Documentation :** "+s.docs.map(d=>`[${d[0]}](${d[1]})`).join(", "));P("")}
-    const body=["**Commande qui échoue :**","(colle ici la commande)","","**Message d'erreur :**","(colle ici le message)","",
-      `- Base : ${BD.name}`,`- Parcours : ${obj.name}`,`- Étape : ${ref} (${s.title})`,`- Version de l'app : ${APP_VERSION}`].join("\n");
-    P(`Une erreur ici ? [Signale-la](${issueUrl(`[${ref}] ${s.title}`,body)})`);P("");
+    P(`Une erreur ici ? [Signale-la](${issueUrl("commande-qui-echoue.yml",`[${ref}] ${s.title}`,{base:BD.name,parcours:obj.name,etape:`${ref} (${s.title})`,version:APP_VERSION})})`);P("");
   });
   P("## Liste complète des paquets");P("");
   if(allPkgs.length){P("```text");P(allPkgs.join("\n"));P("```")}else P("Aucun paquet listé pour cette base.");
@@ -3076,7 +3079,7 @@ function buildTutorial(){
   const swNames=[...new Set(Object.values(sel).flat())].filter(id=>!stack.some(x=>x.tool===id)).map(id=>(byId(id)||{}).name).filter(Boolean);
   const hwParts=HWQ.filter(q=>HW[q.id]).map(q=>hwLabel(q.id,HW[q.id]));
   P("## Signaler un problème");P("");
-  P(`Copie ce bloc, remplis les trois dernières lignes et colle-le dans un [nouveau signalement](${REPO_URL}/issues/new). N'y ajoute ni nom d'utilisateur ni chemin de ta machine.`);P("");
+  P(`Copie ce bloc, remplis les trois dernières lignes et colle-le dans un [nouveau signalement](${REPO_URL}/issues/new/choose). N'y ajoute ni nom d'utilisateur ni chemin de ta machine.`);P("");
   P("```text");
   P(`Version de l'app : ${APP_VERSION}`);
   P(`Date de vérification des paquets : ${VM?VM.verified_on:"non enregistrée pour cette base"}`);
@@ -3223,6 +3226,7 @@ function setMode(m){
 $("cmpBackBtn").onclick=()=>{setMode("guide");scrollTo(0,0)};
 $("tabG").onclick=()=>setMode("guide");
 $("tabC").onclick=()=>setMode("compare");
+$("disclaimer").innerHTML="<b>"+esc(WARNING[0])+"</b> "+WARNING.slice(1).map(esc).join(" ");
 setCat("init");
 setMode("guide");
 </script>

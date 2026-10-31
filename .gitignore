@@ -1,1 +1,17 @@
 __pycache__/
+node_modules/
+
+# VM : ISO, disques, résultats du banc de test
+vm/
+*.iso
+*.qcow2
+*.img
+results.json
+
+# journaux et captures
+*.log
+logs/
+captures/
+screenshots/
+*.ppm
+ecran-*.png
