@@ -41,6 +41,23 @@ const r=await p.evaluate(()=>{
    names.forEach(n=>{const re=new RegExp('(^|[^\\w-])'+n.replace(/[.+]/g,'\\$&')+'($|[^\\w-])');if(re.test(k)&&!re.test(v))bad.push('nom d\'outil perdu ('+n+'): '+k.slice(0,50))});
    if(sig(k)!==sig(v))bad.push('variables/commandes modifiées dans FRAG: '+k.slice(0,50));
   })}
+ // 4b2. aide « ? » : mêmes clés que HELP, texte non vide et différent du français, lien Wikipédia anglais, noms/commandes conservés
+ {const fk=Object.keys(HELP),ek=Object.keys(HELP_EN);
+  fk.filter(k=>!ek.includes(k)).forEach(k=>bad.push('HELP_EN manquant: '+k));
+  ek.filter(k=>!fk.includes(k)).forEach(k=>bad.push('HELP_EN en trop: '+k));
+  const tok=x=>(String(x).match(/`[^`]*`/g)||[]).join('|');
+  fk.filter(k=>HELP_EN[k]).forEach(k=>{const f=HELP[k],e=HELP_EN[k];
+   if(!String(e[0]||'').trim())bad.push('HELP_EN vide: '+k);
+   else if(e[0]===f[0])bad.push('HELP_EN identique au français: '+k);
+   if(!!f[1]!==!!e[1])bad.push('HELP_EN lien Wikipédia absent/en trop: '+k);
+   if(tok(f[0])!==tok(e[0]))bad.push('HELP_EN commandes modifiées: '+k)});
+  const lw=ek.filter(k=>/[éèàùçêâîôûœ]/.test(HELP_EN[k].join(' ')));lw.forEach(k=>bad.push('HELP_EN accent français: '+k));
+  const a=document.getElementById('sh-a'),L0=LANG;
+  setLang('en',true);openHelp('cat:kernel','Kernel');if(!a.href.startsWith('https://en.wikipedia.org/'))bad.push('lien aide en: '+a.href);
+  if(document.getElementById('sh-p').textContent!==HELP_EN['cat:kernel'][0])bad.push('texte aide en');
+  setLang('fr',true);openHelp('cat:kernel','Noyau');if(!a.href.startsWith('https://fr.wikipedia.org/'))bad.push('lien aide fr: '+a.href);
+  if(document.getElementById('sh-p').textContent!==HELP['cat:kernel'][0])bad.push('texte aide fr');
+  closeHelp();setLang(L0,true)}
  // 4c. mode anglais : les écrans du guide ne contiennent plus de français (hors données des fiches)
  {const FRW=/[éèàùçêâîôûœ]|\b(le|la|les|une|des|pour|ton|tes|avec|pas|est|sur|ou)\b|\bun\b/i;
   // noms de fiches (TOOLS) : données traduites au lot 6, pas ici
