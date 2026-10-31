@@ -2,6 +2,8 @@
 // Vérifie : parité des clés fr/en, couche anglaise valide (liste blanche), commandes et identifiants
 // d'étape identiques entre langues sur les combinaisons base × parcours × mode.
 const {chromium}=require('playwright');
+// textes déjà identiques en anglais (noms propres, outils, identifiants) : pas de traduction nécessaire
+const KEEP=new Set(['Alpine Linux','Arch Linux','Void Linux','Gentoo Linux','Linux From Scratch','Raspberry Pi OS','Tiny Core Linux','Tiny Core','Rocky Linux','Linux LTS','KDE Plasma','Steam + Proton','Portage (emerge)','BusyBox init','pkgtools (slackpkg)','apt (Debian)','apt (Ubuntu)','dnf (Fedora)','zypper (openSUSE)','apt (Devuan)','apt (Raspberry Pi OS)','dnf (Rocky)','dnf (AlmaLinux)','pacman -S','xbps-install -S','nix profile install nixpkgs#']);
 (async()=>{
 const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844}});
 const errs=[];p.on('pageerror',x=>errs.push(x.message));
@@ -29,6 +31,39 @@ const r=await p.evaluate(()=>{
  const snap=()=>JSON.stringify([TOOLS,CATS,LAYERS,OBJECTIVES,HELP,BASEDEF]);
  const start=LANG;setLang('fr',true);const s0=snap();setLang('en',true);setLang('fr',true);
  if(snap()!==s0)bad.push('retour en fr différent de l\'original');
+ // 4b. FRAG : valeurs non vides, mêmes noms d'outils, mêmes passages en code
+ {const names=[...new Set(TOOLS.map(t=>t.name).filter(n=>/^[A-Za-z][\w.+-]{3,}$/.test(n)&&!/^(Archives|Terminal|Shell|Notifications|Jeux|Son|ranger)$/i.test(n)))];
+  Object.keys(FRAG).forEach(k=>{const v=FRAG[k];
+   if(!String(v).trim())bad.push('FRAG vide: '+k.slice(0,40));
+   names.forEach(n=>{const re=new RegExp('(^|[^\\w-])'+n.replace(/[.+]/g,'\\$&')+'($|[^\\w-])');if(re.test(k)&&!re.test(v))bad.push('nom d\'outil perdu ('+n+'): '+k.slice(0,50))});
+   if(sig(k)!==sig(v))bad.push('variables/commandes modifiées dans FRAG: '+k.slice(0,50));
+  })}
+ // 4c. mode anglais : les écrans du guide ne contiennent plus de français (hors données des fiches)
+ {const FRW=/[éèàùçêâîôûœ]|\b(le|la|les|une|des|pour|ton|tes|avec|pas|est|sur|ou)\b|\bun\b/i;
+  // noms de fiches (TOOLS) : données traduites au lot 6, pas ici
+  const TNAMES=TOOLS.map(x=>x.name).filter(n=>n.length>3).sort((a,b)=>b.length-a.length);
+  const probe=(tag)=>{const el=document.getElementById('guide');const t=el.textContent.replace(/\s+/g,' ');
+   // les listes de pros/cons/résumés viennent des fiches (lot 6) : on les retire
+   const clone=el.cloneNode(true);clone.querySelectorAll('.pan,.sw,pre,details.grp:has(pre)').forEach(x=>x.remove());
+   let txt=clone.textContent.replace(/\s+/g,' ');TNAMES.forEach(n=>{txt=txt.split(n).join('')});
+   const m=txt.match(new RegExp('.{0,40}('+FRW.source+').{0,40}','i'));if(m)bad.push('français résiduel en anglais ['+tag+'] : …'+m[0]+'…')};
+  setLang('en',true);
+  const reset=()=>{Object.keys(HW).forEach(k=>delete HW[k]);G.obj=null;G.i=0;G.ans=[];G.manual={};G.keep={};G.changed=[];G.hwAuto={};G.stage=null;G.sw={};G.base=null;G.scope=null;G.hwI=-1;G.hwMsg=null};
+  reset();renderGuide();probe('portée');
+  G.scope='general';renderGuide();probe('base');
+  G.scope='precise';G.stage='hw';G.hwI=-1;renderGuide();probe('modèle');
+  G.hwMsg='hw.unknown_model';renderGuide();probe('modèle+msg');G.hwMsg=null;
+  HWQ.forEach((q,i)=>{G.hwI=i;renderGuide();probe('matériel '+q.id)});
+  G.hwI=HWQ.length;Object.assign(HW,{arch:'x86-intel',gpu:'nvidia',ram:'4',boot:'bios',wifi:'broadcom',disk:'emmc'});renderGuide();probe('récap matériel');G.stage=null;renderGuide();
+  for(const base of ['undecided','alpine','debian'])for(const obj of OBJECTIVES.filter(o=>o.ready).map(o=>o.id)){
+   G.base=base;G.obj=null;G.stage=null;G.i=0;G.ans=[];renderGuide();if(base==='undecided')probe('base écran');
+   G.obj=obj;const tr=TREES[obj];
+   for(let i=0;i<=tr.questions.length;i++){G.i=i;G.ans=tr.questions.map((q,k)=>k<i?(k%2):undefined).slice(0,i);renderGuide();probe('guide '+base+' '+obj+' q'+i)}
+   G.ans=tr.questions.map((q,k)=>(k+1)%2);G.i=tr.questions.length;renderGuide();probe('résultat '+base+' '+obj);
+   G.open='0,1';renderGuide();probe('alt '+base+' '+obj);G.open=null;
+   G.stage='md';renderGuide();probe('md '+base+' '+obj);G.stage='sw';renderGuide();probe('logiciels '+base+' '+obj);G.stage=null;
+  }
+  G.manual={};setLang('fr',true);reset()}
  // 5. tutoriels fr/en : commandes et identifiants identiques, identifiants valides et uniques
  const objs=OBJECTIVES.filter(o=>o.ready).map(o=>o.id),bases=Object.keys(BASEDEF).concat(['undecided']);
  const grab=md=>{const ids=[...md.matchAll(/^Identifiant : `([^`]+)`/gm)].map(m=>m[1]);
@@ -50,9 +85,45 @@ const r=await p.evaluate(()=>{
   if(!f.ids.length)bad.push('aucun identifiant: '+tag);
  }
  setLang(start,true);
+ out.keys=Object.keys(I18N.fr);out.frag=Object.keys(FRAG);
  return out;
 });
 if(errs.length)r.bad.push('pageerror: '+errs[0]);
+// source : clés tx() utilisées/déclarées, FRAG sans clé périmée, textes de l'arbre tous couverts
+{const fs=require('fs'),path=require('path');
+ const src=fs.readFileSync(path.resolve(__dirname,'../atlas-distro.html'),'utf8');
+ const flat=src.replace(/\\'/g,"'");
+ const used=new Set([...src.matchAll(/\btx\((?:"([\w.]+)"|(?:[^"()]*\?\s*)?"([\w.]+)"\s*:\s*"([\w.]+)")/g)].flatMap(m=>m.slice(1).filter(Boolean)));
+ [...src.matchAll(/\btx\(([^()]*?"[\w.]+"[^()]*?)[,)]/g)].forEach(m=>[...m[1].matchAll(/"([a-z]+\.[\w.]+)"/g)].forEach(x=>used.add(x[1])));
+ [...src.matchAll(/data-(?:i|ip|ia)="([\w.]+)"/g)].forEach(m=>used.add(m[1]));
+ [...src.matchAll(/G\.hwMsg=v\?"([\w.]+)"/g)].forEach(m=>used.add(m[1]));
+ const known=new Set(r.keys);
+ used.forEach(k=>{if(!known.has(k))r.bad.push('clé tx() inconnue: '+k)});
+ known.forEach(k=>{if(!used.has(k)&&!/^lang\./.test(k))r.bad.push('clé I18N jamais utilisée: '+k)});
+ r.frag.forEach(k=>{if(!flat.includes(k)&&!flat.includes(k.replace(/"/g,'\\"')))r.bad.push('clé FRAG périmée (absente du code): '+k.slice(0,60))});
+ // textes français de l'arbre, des objectifs et des bases : tous dans FRAG
+ const a=src.indexOf('const OBJECTIVES='),b=src.indexOf('const G={obj');
+ const pat=/"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'/g;const FRW=/[éèàùçêâîôûœ]|\b(le|la|les|un|une|des|et|pour|ton|ta|tes|ou|de|du|sur|avec|pas|ce|cette|Oui|Non|ne|est|en|au|aux|que|qui)\b/;
+ const SINGLE=new Set(['Bureautique','Noyau','Bureau','Son','Tableur','Présentations','Développement','Conteneurs','Sauvegarder','Création','Organisation','Virtualisation','Téléchargements','Loisirs','Lanceur','Réseau','Récents']);
+ const miss=new Set();let m;const region=src.slice(a,b);
+ // petit lexeur : chaînes '...' et "..." hors commentaires, gabarits `...` et expressions régulières (apostrophes des commentaires)
+ const lits=[];{let i=0;const n=region.length;
+  while(i<n){const c=region[i],d=region[i+1];
+   if(c==='/'&&d==='/'){while(i<n&&region[i]!=='\n')i++;continue}
+   if(c==='/'&&d==='*'){i=region.indexOf('*/',i+2)+2;continue}
+   if(c==='`'){i++;let depth=0;while(i<n&&!(region[i]==='`'&&!depth)){if(region[i]==='\\'){i+=2;continue}if(region[i]==='$'&&region[i+1]==='{'){depth++;i+=2;continue}if(region[i]==='}'&&depth)depth--;i++}i++;continue}
+   if(c==='"'||c==="'"){let j=i+1,sTxt='';while(j<n&&region[j]!==c){if(region[j]==='\\'){sTxt+=region[j+1];j+=2;continue}sTxt+=region[j];j++}lits.push(sTxt);i=j+1;continue}
+   i++}}
+ for(const t of lits){
+  if(!/[A-Za-zÀ-ÿ]{3,}/.test(t))continue;
+  const prose=(FRW.test(t)&&/[A-Za-zÀ-ÿ]{3,}/.test(t)&&!/^[\w\-./:=#%?&;,() ]*$/.test(t))||SINGLE.has(t)||(/ /.test(t)&&/^[A-ZÉ]/.test(t)&&/[a-zé]{3,} [a-zé]{2,}/.test(t)&&!/[=<>{}\[\]()]/.test(t));
+  if(!prose)continue;
+  if(r.frag.includes(t))continue;
+  if(r.frag.some(k=>k.length>=8&&t.includes(k)))continue;
+  if(KEEP.has(t))continue;
+  miss.add(t)}
+ [...miss].slice(0,60).forEach(t=>r.bad.push('texte de l\'arbre sans traduction: '+t.slice(0,80)));
+}
 // fichiers hors page : formulaires de ticket (id inchangés) et README fr/en
 {const fs=require('fs'),path=require('path'),root=path.resolve(__dirname,'..');
  const ids=f=>[...fs.readFileSync(path.join(root,'.github/ISSUE_TEMPLATE',f),'utf8').matchAll(/^    id: (\w+)/gm)].map(m=>m[1]).join(',');

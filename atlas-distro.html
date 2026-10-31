@@ -158,26 +158,26 @@ details.grp[open]>summary::before{content:"▾ "}
 <header>
   <h1>Atlas distro</h1>
   <button class="ghost" id="langBtn" type="button"></button>
-  <div class="sub">Comparer les briques d'une distribution Linux</div>
+  <div class="sub" data-i="ui.sub"></div>
   <div class="warn" id="disclaimer"></div>
 </header>
-<div class="tabs"><button class="tab" id="tabG">Me guider</button><button class="tab" id="tabC">Comparer</button></div>
+<div class="tabs"><button class="tab" id="tabG" data-i="ui.tab_guide"></button><button class="tab" id="tabC" data-i="ui.tab_compare"></button></div>
 <div id="guide" class="g"></div>
 <div id="compare">
-<div id="cmpBack" class="hidden" style="padding:8px 14px 0"><button class="ghost" id="cmpBackBtn">← Retour à mon parcours</button></div>
+<div id="cmpBack" class="hidden" style="padding:8px 14px 0"><button class="ghost" id="cmpBackBtn" data-i="ui.back_path"></button></div>
 <div class="bar">
-  <input id="q" type="search" placeholder="Rechercher un outil (ex. musl, sway, apk)">
+  <input id="q" type="search" data-ip="ui.search_ph">
   <div id="res" class="results"></div>
   <div class="row2">
-    <div class="selq"><select id="layer" aria-label="Couche"></select><button class="qm" id="layerQ" aria-label="Aide : couche">?</button></div>
-    <div class="selq"><select id="cat" aria-label="Catégorie"></select><button class="qm" id="catQ" aria-label="Aide : catégorie">?</button></div>
+    <div class="selq"><select id="layer" data-ia="ui.layer"></select><button class="qm" id="layerQ" data-ia="ui.help_layer">?</button></div>
+    <div class="selq"><select id="cat" data-ia="ui.cat"></select><button class="qm" id="catQ" data-ia="ui.help_cat">?</button></div>
   </div>
 </div>
 <div id="desc" class="desc"></div>
 <div id="main"></div>
 </div>
-<div id="sheet" class="hidden"><div id="sh-bg"></div><div class="sh-card"><b id="sh-t"></b><p id="sh-p"></p><a id="sh-a" target="_blank" rel="noopener">En savoir plus</a><button id="sh-x">Fermer</button></div></div>
-<footer>Fiches rédigées à la main. « À vérifier » = fiche pas encore relue contre la source officielle.</footer>
+<div id="sheet" class="hidden"><div id="sh-bg"></div><div class="sh-card"><b id="sh-t"></b><p id="sh-p"></p><a id="sh-a" target="_blank" rel="noopener" data-i="ui.more"></a><button id="sh-x" data-i="ui.close"></button></div></div>
+<footer data-i="ui.footer"></footer>
 
 <script>
 /* ============ DONNÉES ============ */
@@ -1449,7 +1449,7 @@ function getHelp(k){
   const m=/^crit:[^.]+\.(.+)$/.exec(k);
   return m?HELP["crit:"+m[1]]:null;
 }
-const qm=(k,t)=>getHelp(k)?`<button class="qm" data-help="${esc(k)}" data-t="${esc(t)}" aria-label="Aide : ${esc(t)}">?</button>`:"";
+const qm=(k,t)=>getHelp(k)?`<button class="qm" data-help="${esc(k)}" data-t="${esc(t)}" aria-label="${tx("ui.help_of",{t:esc(t)})}">?</button>`:"";
 function openHelp(k,t){
   const h=getHelp(k);if(!h)return;
   $("sh-t").textContent=t;$("sh-p").textContent=h[0];
@@ -1483,9 +1483,9 @@ const MODELS={
  "raspberry pi 4":{label:"Raspberry Pi 4",arch:"arm",gpu:"other",boot:"other",wifi:"broadcom",disk:"emmc"}
 };
 function hwLabel(id,v){const q=HWQ.find(x=>x.id===id);const o=q&&q.o.find(y=>y[0]===v);return o?o[1]:v}
-function hwSummary(){
-  const parts=HWQ.filter(q=>HW[q.id]).map(q=>hwLabel(q.id,HW[q.id]));
-  return (HW.model?HW.model+" · ":"")+(parts.length?parts.join(" · "):"aucun détail");
+function hwSummary(ui){
+  const parts=HWQ.filter(q=>HW[q.id]).map(q=>ui?trx(hwLabel(q.id,HW[q.id])):hwLabel(q.id,HW[q.id]));
+  return (HW.model?HW.model+" · ":"")+(parts.length?parts.join(" · "):(ui?tx("hw.none"):"aucun détail"));
 }
 function hwNotes(){
   const n=[];
@@ -1519,14 +1519,14 @@ function setCat(cat,keep){
 
 function fmt(c,v){
   if(v===null||v===undefined||v==="")return '<span class="no">—</span>';
-  if(c.type==="bool")return v?'<span class="ok">✓ oui</span>':'<span class="no">✗ non</span>';
+  if(c.type==="bool")return v?'<span class="ok">'+tx("cmp.yes")+'</span>':'<span class="no">'+tx("cmp.no")+'</span>';
   if(c.type==="number")return esc(v)+(c.unit?" "+esc(c.unit):"");
   return esc(v);
 }
 function review(t){
-  if(!t.last_reviewed)return '<span class="badge">À vérifier</span>';
+  if(!t.last_reviewed)return '<span class="badge">'+tx("cmp.to_check")+'</span>';
   const m=(Date.now()-new Date(t.last_reviewed))/2.6e9;
-  return m>12?'<span class="badge">À revérifier</span>':'<span class="tag">Relu '+esc(t.last_reviewed)+'</span>';
+  return m>12?'<span class="badge">'+tx("cmp.recheck")+'</span>':'<span class="tag">'+tx("cmp.reviewed",{d:esc(t.last_reviewed)})+'</span>';
 }
 const names=ids=>ids.map(i=>{const t=byId(i);return t?t.name:i}).join(", ");
 const list=a=>a&&a.length?"<ul>"+a.map(x=>"<li>"+esc(x)+"</li>").join("")+"</ul>":'<span class="no">—</span>';
@@ -1540,31 +1540,31 @@ function render(){
   $("layerQ").dataset.help="layer:"+state.layer;$("layerQ").dataset.t=LAYERS.find(l=>l.id===state.layer).name;
   $("catQ").dataset.help="cat:"+state.cat;$("catQ").dataset.t=cat.name;
   const all=toolsOf(cat.id);
-  if(!all.length){$("main").innerHTML='<div class="empty">Aucune fiche pour cette catégorie pour l\'instant.</div>';return}
+  if(!all.length){$("main").innerHTML='<div class="empty">'+tx("cmp.empty")+'</div>';return}
   const cols=state.sel.map(byId).filter(Boolean);
   const rows=[];
   const R=(label,fn,qb)=>rows.push({label,vals:cols.map(fn),qb});
   const S=l=>rows.push({sec:l});
-  R("Résumé",t=>esc(t.summary));
-  R("Licence",t=>esc(t.license||"—"));
-  R("Maturité",t=>esc(t.maturity||"—"));
-  R("Difficulté",t=>t.difficulty?`<span title="${t.difficulty}/5">${"●".repeat(t.difficulty)}${"○".repeat(5-t.difficulty)}</span>`:"—");
-  R("Fiche",review);
-  S("Critères");
+  R(tx("row.summary"),t=>esc(t.summary));
+  R(tx("row.license"),t=>esc(t.license||"—"));
+  R(tx("row.maturity"),t=>esc(t.maturity||"—"));
+  R(tx("row.difficulty"),t=>t.difficulty?`<span title="${t.difficulty}/5">${"●".repeat(t.difficulty)}${"○".repeat(5-t.difficulty)}</span>`:"—");
+  R(tx("row.sheet"),review);
+  S(tx("sec.criteria"));
   cat.criteria.forEach(c=>R(c.label,t=>fmt(c,t.criteria&&t.criteria[c.key]),qm("crit:"+cat.id+"."+c.key,c.label)));
-  S("Bilan");
-  R("Avantages",t=>list(t.pros));
-  R("Limites",t=>list(consFor(t)));
-  R("On apprend",t=>esc(t.learn||"—"));
-  R("Utilisé par",t=>esc((t.used_by||[]).join(", ")||"—"));
-  S("Compatibilité");
-  R("Nécessite",t=>t.requires.length?esc(names(t.requires)):'<span class="no">—</span>');
-  R("Incompatible",t=>t.conflicts.length?`<span class="conf">${esc(names(t.conflicts))}</span>`:'<span class="no">—</span>');
-  R("Va bien avec",t=>t.works_well_with.length?esc(names(t.works_well_with)):'<span class="no">—</span>');
-  S("Mise en œuvre");
-  R("Commandes",t=>cmdsFor(t).length?cmdsFor(t).map(s=>`<details><summary>${esc(s.title)}</summary><pre>${esc(s.commands.join("\n"))}</pre></details>`).join(""):"—");
-  R("Pièges",t=>list(t.pitfalls));
-  R("Docs",t=>t.docs.length?"<ul>"+t.docs.map(d=>`<li><a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.label)}</a></li>`).join("")+"</ul>":"—");
+  S(tx("sec.review"));
+  R(tx("row.pros"),t=>list(t.pros));
+  R(tx("row.cons"),t=>list(consFor(t)));
+  R(tx("row.learn"),t=>esc(t.learn||"—"));
+  R(tx("row.used_by"),t=>esc((t.used_by||[]).join(", ")||"—"));
+  S(tx("sec.compat"));
+  R(tx("row.requires"),t=>t.requires.length?esc(names(t.requires)):'<span class="no">—</span>');
+  R(tx("row.conflicts"),t=>t.conflicts.length?`<span class="conf">${esc(names(t.conflicts))}</span>`:'<span class="no">—</span>');
+  R(tx("row.works_with"),t=>t.works_well_with.length?esc(names(t.works_well_with)):'<span class="no">—</span>');
+  S(tx("sec.impl"));
+  R(tx("row.commands"),t=>cmdsFor(t).length?cmdsFor(t).map(s=>`<details><summary>${esc(s.title)}</summary><pre>${esc(s.commands.join("\n"))}</pre></details>`).join(""):"—");
+  R(tx("row.pitfalls"),t=>list(t.pitfalls));
+  R(tx("row.docs"),t=>t.docs.length?"<ul>"+t.docs.map(d=>`<li><a href="${esc(d.url)}" target="_blank" rel="noopener">${esc(d.label)}</a></li>`).join("")+"</ul>":"—");
   // filtre « lignes identiques »
   let vis=rows;
   if(state.hideSame&&cols.length>1){
@@ -1572,9 +1572,9 @@ function render(){
     vis=vis.filter((r,i)=>!r.sec||(vis[i+1]&&!vis[i+1].sec));
   }
   const hidden=rows.filter(r=>!r.sec).length-vis.filter(r=>!r.sec).length;
-  const sel=(t,i)=>`<select data-col="${i}">${all.map(o=>`<option value="${o.id}"${o.id===t.id?" selected":""}>${esc(o.name)}</option>`).join("")}</select>${cols.length>1?`<button data-rm="${i}">retirer ✕</button>`:""}`;
-  let h=`<div class="vbar"><div class="seg"><button data-view="table" class="${state.view==="table"?"on":""}">Tableau</button><button data-view="crit" class="${state.view==="crit"?"on":""}">Par critère</button></div>
-   <label class="chk"><input type="checkbox" id="hs"${state.hideSame?" checked":""}> Masquer les lignes identiques${state.hideSame&&hidden?` (${hidden} masquée${hidden>1?"s":""})`:""}</label></div>`;
+  const sel=(t,i)=>`<select data-col="${i}">${all.map(o=>`<option value="${o.id}"${o.id===t.id?" selected":""}>${esc(o.name)}</option>`).join("")}</select>${cols.length>1?`<button data-rm="${i}">${tx("cmp.remove")}</button>`:""}`;
+  let h=`<div class="vbar"><div class="seg"><button data-view="table" class="${state.view==="table"?"on":""}">${tx("cmp.table")}</button><button data-view="crit" class="${state.view==="crit"?"on":""}">${tx("cmp.by_crit")}</button></div>
+   <label class="chk"><input type="checkbox" id="hs"${state.hideSame?" checked":""}> ${tx("cmp.hide_same")}${state.hideSame&&hidden?" "+tx(hidden>1?"cmp.hidden_many":"cmp.hidden_one",{n:hidden}):""}</label></div>`;
   if(state.view==="table"){
     h+=`<div class="wrap"><table style="width:${100+cols.length*150}px;min-width:100%"><thead><tr><th class="corner"></th>`;
     cols.forEach((t,i)=>{h+=`<td class="hd">${sel(t,i)}</td>`});
@@ -1592,7 +1592,7 @@ function render(){
     });
     h+="</div>";
   }
-  if(cols.length<Math.min(maxCols(),all.length))h+='<button class="add" id="add">+ Ajouter une colonne</button>';
+  if(cols.length<Math.min(maxCols(),all.length))h+='<button class="add" id="add">'+tx("cmp.add_col")+'</button>';
   $("main").innerHTML=h;
 }
 
@@ -1619,7 +1619,7 @@ $("q").oninput=e=>{
   const q=e.target.value.trim().toLowerCase();
   if(!q){$("res").innerHTML="";return}
   const hits=TOOLS.filter(t=>(t.name+" "+t.summary).toLowerCase().includes(q)).slice(0,8);
-  $("res").innerHTML=hits.length?hits.map(t=>{const c=CATS.find(x=>x.id===t.category);return `<button class="chip" data-tool="${t.id}">${esc(t.name)} <small>${esc(c.name)}</small></button>`}).join(""):'<span class="no" style="font-size:13px">Aucun résultat</span>';
+  $("res").innerHTML=hits.length?hits.map(t=>{const c=CATS.find(x=>x.id===t.category);return `<button class="chip" data-tool="${t.id}">${esc(t.name)} <small>${esc(c.name)}</small></button>`}).join(""):'<span class="no" style="font-size:13px">'+tx("cmp.no_result")+'</span>';
 };
 $("res").addEventListener("click",e=>{
   const b=e.target.closest("[data-tool]");if(!b)return;
@@ -2053,8 +2053,8 @@ function diffAlt(tree,eff,unk,i,k,base){
   const e=eff.slice();e[i]=k;const u=unk.slice();u[i]=false;
   const alt=tree.resolve(e,u),out=[];
   alt.forEach(x=>{const y=base.find(z=>z.label===x.label);
-    if(!y||y.name!==x.name)out.push(`<li><b>${esc(x.label)}</b> : ${esc(x.name)}</li>`);
-    else if(strip(y.why)!==strip(x.why))out.push(`<li><b>${esc(x.label)}</b> : ${esc(x.name)}, ${esc(strip(x.why))}</li>`)});
+    if(!y||y.name!==x.name)out.push(`<li><b>${esc(trx(x.label))}</b> : ${esc(trx(x.name))}</li>`);
+    else if(strip(y.why)!==strip(x.why))out.push(`<li><b>${esc(trx(x.label))}</b> : ${esc(trx(x.name))}, ${esc(trx(strip(x.why)))}</li>`)});
   return out.slice(0,3).join("");
 }
 function applyManual(raw){
@@ -2066,17 +2066,17 @@ function applyManual(raw){
 }
 function issueHtml(tree,label,issues){
   return issues.filter(x=>x.at[0]===label).map(x=>{
-    if(G.keep[x.id])return `<div class="kept">⚠ ${esc(x.msg)} (tu as gardé ton choix)</div>`;
+    if(G.keep[x.id])return `<div class="kept">⚠ ${esc(trx(x.msg))} ${tx("g.kept")}</div>`;
     const btn=x.fixes.map(f=>f.type==="tool"
-      ?`<button class="p" data-fix="${esc(f.label)}|${esc(f.tool)}">${esc(f.text)}</button>`
-      :`<button class="p" data-fixa="${f.q},${f.k}">${esc(f.text)} ⚠</button>`).join("");
+      ?`<button class="p" data-fix="${esc(f.label)}|${esc(f.tool)}">${esc(trx(f.text))}</button>`
+      :`<button class="p" data-fixa="${f.q},${f.k}">${esc(trx(f.text))} ⚠</button>`).join("");
     const hasA=x.fixes.some(f=>f.type==="answer");
-    return `<div class="warn">⚠ ${esc(x.msg)}<div>${btn}<button data-keep="${esc(x.id)}">Garder mon choix</button></div>${hasA?'<div style="margin-top:6px;font-size:12px">⚠ = change l\'objectif de départ que tu as choisi.</div>':""}</div>`;
+    return `<div class="warn">⚠ ${esc(trx(x.msg))}<div>${btn}<button data-keep="${esc(x.id)}">${tx("g.keep")}</button></div>${hasA?'<div style="margin-top:6px;font-size:12px">'+tx("g.fix_goal")+'</div>':""}</div>`;
   }).join("");
 }
 function changedHtml(tree,eff){
   if(!G.changed.length)return "";
-  return `<div class="warn" style="margin:0 0 12px">⚠ <b>Ton objectif de départ a changé.</b>`+G.changed.map((c,ix)=>`<div style="margin-top:4px">« ${esc(tree.questions[c.i].t)} » : <s>${esc(tree.questions[c.i].o[c.from])}</s> → <b>${esc(tree.questions[c.i].o[c.to])}</b> <button data-undochg="${ix}">Annuler</button></div>`).join("")+`</div>`;
+  return `<div class="warn" style="margin:0 0 12px">⚠ <b>${tx("g.goal_changed")}</b>`+G.changed.map((c,ix)=>`<div style="margin-top:4px">« ${esc(trx(tree.questions[c.i].t))} » : <s>${esc(trx(tree.questions[c.i].o[c.from]))}</s> → <b>${esc(trx(tree.questions[c.i].o[c.to]))}</b> <button data-undochg="${ix}">${tx("g.cancel")}</button></div>`).join("")+`</div>`;
 }
 const bdeps=d=>typeof d==="function"?d():d;
 function brickHtml(tree,label,raw,stack,issues){
@@ -2085,27 +2085,27 @@ function brickHtml(tree,label,raw,stack,issues){
   const r=raw.find(z=>z.label===label);
   const cats=r.cats||[r.cat];
   const alts=cats.flatMap(c=>toolsOf(c)).filter(t=>t.id!==x.tool&&(!r.pick||r.pick(t)));
-  h+=`<div class="bk"><div class="lb">${esc(label)}${qm("cat:"+r.cat,label)}</div><b>${esc(x.name)}</b>${x.manual?'<span class="mn">choix manuel</span>':""}`;
+  h+=`<div class="bk"><div class="lb">${esc(trx(label))}${qm("cat:"+r.cat,trx(label))}</div><b>${esc(trx(x.name))}</b>${x.manual?'<span class="mn">'+tx("ui.manual")+'</span>':""}`;
   alts.forEach(t=>{h+=`<button class="tchip${G.tip===label+"|"+t.id?" on":""}" data-tc="${esc(label)}|${t.id}">${esc(t.name)}${x.manual&&r&&r.tool===t.id?" ★":""}</button>`});
   const tt=alts.find(t=>G.tip===label+"|"+t.id);
-  if(tt)h+=`<div class="pan"><div><b>${esc(tt.name)}</b> : ${esc(tt.summary)}</div>${tt.pros.length?`<div style="margin-top:4px"><b>Pour :</b> ${esc(tt.pros.slice(0,2).join(" ; "))}</div>`:""}${consFor(tt).length?`<div><b>Contre :</b> ${esc(consFor(tt).slice(0,2).join(" ; "))}</div>`:""}<div style="margin-top:8px"><button data-use="${esc(label)}|${tt.id}">Choisir cet outil</button><button class="o" data-cmp="${tt.category}" data-tool="${tt.id}">Comparateur</button></div></div>`;
-  if(x.manual)h+=`<button class="undo" data-undo="${esc(label)}">↺ Revenir à la recommandation (${esc(r.name)})</button>`;
-  if(label==="Distribution de base"&&BN[G.base])h+=`<button class="undo" data-undo="${esc(label)}">↺ Laisser l'atlas conseiller une base</button>`;
+  if(tt)h+=`<div class="pan"><div><b>${esc(tt.name)}</b> : ${esc(tt.summary)}</div>${tt.pros.length?`<div style="margin-top:4px"><b>${tx("g.pros")}</b> ${esc(tt.pros.slice(0,2).join(" ; "))}</div>`:""}${consFor(tt).length?`<div><b>${tx("g.cons")}</b> ${esc(consFor(tt).slice(0,2).join(" ; "))}</div>`:""}<div style="margin-top:8px"><button data-use="${esc(label)}|${tt.id}">${tx("g.use_tool")}</button><button class="o" data-cmp="${tt.category}" data-tool="${tt.id}">${tx("g.compare_btn")}</button></div></div>`;
+  if(x.manual)h+=`<button class="undo" data-undo="${esc(label)}">${tx("g.revert",{n:esc(trx(r.name))})}</button>`;
+  if(label==="Distribution de base"&&BN[G.base])h+=`<button class="undo" data-undo="${esc(label)}">${tx("g.advise_base")}</button>`;
   h+=issueHtml(tree,label,issues)+"</div>";
   return h;
 }
 function treeHtml(tree,upto,eff,unk,raw,stack,issues){
   const objName=OBJECTIVES.find(o=>o.id===G.obj).name;
-  let h=changedHtml(tree,eff)+`<div class="tree"><div class="tn"><div class="tq">Objectif</div><span class="ch">${esc(objName)}</span>`;
+  let h=changedHtml(tree,eff)+`<div class="tree"><div class="tn"><div class="tq">${tx("g.objective")}</div><span class="ch">${esc(trx(objName))}</span>`;
   Object.entries(tree.bricks).forEach(([label,deps])=>{if(!bdeps(deps).length)h+=brickHtml(tree,label,raw,stack,issues)});
   h+="</div>";
   for(let i=0;i<upto;i++){
     const q=tree.questions[i];
-    h+=`<div class="tn"><div class="tq">${esc(q.t)}${G.hwAuto[i]?" <i>(d'après ton matériel)</i>":""}</div><span class="ch">${esc(q.o[eff[i]])}${unk[i]?" (par défaut)":""}</span>`;
+    h+=`<div class="tn"><div class="tq">${esc(trx(q.t))}${G.hwAuto[i]?" <i>"+tx("g.from_hw")+"</i>":""}</div><span class="ch">${esc(trx(q.o[eff[i]]))}${unk[i]?" "+tx("g.default"):""}</span>`;
     q.o.forEach((o,k)=>{if(k===eff[i])return;const key=i+","+k;
-      h+=`<button class="alt-b${G.open===key?" on":""}" data-alt="${key}">${esc(o)}</button>`;
+      h+=`<button class="alt-b${G.open===key?" on":""}" data-alt="${key}">${esc(trx(o))}</button>`;
       if(G.open===key){const d=diffAlt(tree,eff,unk,i,k,raw);
-        h+=`<div class="pan"><div>Si tu réponds « ${esc(o)} » :</div>${d?"<ul>"+d+"</ul>":"<div>Aucun changement dans la pile.</div>"}<button data-pick="${key}">Choisir cette réponse</button></div>`}
+        h+=`<div class="pan"><div>${tx("g.if_answer",{o:esc(trx(o))})}</div>${d?"<ul>"+d+"</ul>":"<div>"+tx("g.no_change")+"</div>"}<button data-pick="${key}">${tx("g.pick")}</button></div>`}
     });
     Object.entries(tree.bricks).forEach(([label,deps])=>{
       const dd=bdeps(deps);if(!dd.length||Math.max(...dd)!==i)return;
@@ -2120,8 +2120,8 @@ function renderGuide(){
   if(!G.scope||G.stage==="hw"){el.innerHTML=hwScreens();return}
   if(!G.base){el.innerHTML=baseScreen();return}
   if(!G.obj){
-    el.innerHTML=hwBanner()+'<h2>Quel est ton objectif ?</h2><p class="lead">Réponds à quelques questions simples. L\'atlas choisit les briques techniques et t\'explique pourquoi.</p>'+
-     OBJECTIVES.map(o=>`<button class="card" data-obj="${o.id}"${o.ready?"":" disabled"}><b>${esc(o.name)}</b><span>${esc(o.desc)}${o.ready?"":" — bientôt"}</span></button>`).join("")+'<button class="ghost" data-objback="1">← Retour</button>';
+    el.innerHTML=hwBanner()+'<h2>'+tx("g.goal_q")+'</h2><p class="lead">'+tx("g.goal_lead")+'</p>'+
+     OBJECTIVES.map(o=>`<button class="card" data-obj="${o.id}"${o.ready?"":" disabled"}><b>${esc(trx(o.name))}</b><span>${esc(trx(o.desc))}${o.ready?"":tx("g.soon")}</span></button>`).join("")+'<button class="ghost" data-objback="1">'+tx("g.back")+'</button>';
     return;
   }
   const tree=TREES[G.obj],n=tree.questions.length;
@@ -2132,18 +2132,18 @@ function renderGuide(){
   if(G.i<n){
     const q=tree.questions[G.i];
     el.innerHTML=hwBanner()+treeHtml(tree,G.i,eff,unk,raw,stack,issues)+`<div id="qcur"><div class="prog"><i style="width:${Math.round(G.i/n*100)}%"></i></div>
-     <div class="rk">Question ${G.i+1} sur ${n}</div>
-     <p class="q">${esc(q.t)}</p>
-     ${q.o.map((o,k)=>`<button class="opt" data-a="${k}">${esc(o)}</button>`).join("")}
-     <button class="opt" data-a="-1" style="color:var(--mute)">Je ne sais pas</button>
-     <button class="ghost" data-back="1">← Retour</button></div>`;
+     <div class="rk">${tx("g.q_n",{i:G.i+1,n})}</div>
+     <p class="q">${esc(trx(q.t))}</p>
+     ${q.o.map((o,k)=>`<button class="opt" data-a="${k}">${esc(trx(o))}</button>`).join("")}
+     <button class="opt" data-a="-1" style="color:var(--mute)">${tx("g.dont_know")}</button>
+     <button class="ghost" data-back="1">${tx("g.back")}</button></div>`;
     return;
   }
   const name=OBJECTIVES.find(o=>o.id===G.obj).name;
-  el.innerHTML=hwBanner()+treeHtml(tree,n,eff,unk,raw,stack,issues)+`<div id="qcur"><h2>Ta distro ${esc(name.toLowerCase())}</h2><p class="lead">Voici la pile recommandée, avec la raison de chaque choix.</p>`+
-   stack.map(x=>`<div class="rc"><div class="rk">${esc(x.label)}${qm("cat:"+x.cat,x.label)}</div><div class="rt">${esc(x.name)}${x.manual?'<span class="mn">choix manuel</span>':""}</div><p>${esc(x.why)}</p>${
-     x.cat&&toolsOf(x.cat).length?`<button data-cmp="${x.cat}" data-tool="${x.tool||""}">Comparer les alternatives</button>`:""}${issues.some(z=>z.at.includes(x.label)&&!G.keep[z.id])?'<div class="kept" style="margin-top:8px">⚠ Conflit à régler dans l\'arbre ci-dessus.</div>':""}</div>`).join("")+
-   (G.scope==="precise"&&hwNotes().length?`<div class="hn"><b>Pour ton matériel</b><ul>${hwNotes().map(x=>"<li>"+esc(x)+"</li>").join("")}</ul></div>`:"")+'<button class="big" data-sw="1">Choisir les logiciels →</button><button class="opt" data-md="1" style="margin-top:10px">Générer le tutoriel (.md)</button><button class="ghost" data-back="1">← Modifier mes réponses</button><button class="ghost" data-reset="1">Recommencer</button></div>';
+  el.innerHTML=hwBanner()+treeHtml(tree,n,eff,unk,raw,stack,issues)+`<div id="qcur"><h2>${tx("g.your_distro",{name:esc(trx(name).toLowerCase())})}</h2><p class="lead">${tx("g.stack_lead")}</p>`+
+   stack.map(x=>`<div class="rc"><div class="rk">${esc(trx(x.label))}${qm("cat:"+x.cat,trx(x.label))}</div><div class="rt">${esc(trx(x.name))}${x.manual?'<span class="mn">'+tx("ui.manual")+'</span>':""}</div><p>${esc(trx(x.why))}</p>${
+     x.cat&&toolsOf(x.cat).length?`<button data-cmp="${x.cat}" data-tool="${x.tool||""}">${tx("g.compare_alts")}</button>`:""}${issues.some(z=>z.at.includes(x.label)&&!G.keep[z.id])?'<div class="kept" style="margin-top:8px">'+tx("g.conflict_above")+'</div>':""}</div>`).join("")+
+   (G.scope==="precise"&&hwNotes().length?`<div class="hn"><b>${tx("g.for_hw")}</b><ul>${hwNotes().map(x=>"<li>"+esc(trx(x))+"</li>").join("")}</ul></div>`:"")+'<button class="big" data-sw="1">'+tx("g.choose_sw")+'</button><button class="opt" data-md="1" style="margin-top:10px">'+tx("g.gen_md")+'</button><button class="ghost" data-back="1">'+tx("g.edit_answers")+'</button><button class="ghost" data-reset="1">'+tx("g.restart")+'</button></div>';
 }
 
 function swMusl(t){return t.musl||(t.criteria&&t.criteria.musl_support)||"oui"}
@@ -2163,8 +2163,8 @@ function swIssues(tree,stack,sel){
   chosen.forEach(tid=>{
     const t=byId(tid);if(!t)return;
     if(libc==="musl"){const m=swMusl(t);
-      if(m==="non"||m==="difficile")out.push({tid,kind:"musl",msg:t.name+" est prévu pour glibc (musl : "+(m==="non"?"non pris en charge":"difficile")+")."});}
-    (t.requires||[]).forEach(r=>{const rt=byId(r);if(rt&&!chosen.has(r))out.push({tid,kind:"req",need:r,msg:t.name+" a besoin de "+rt.name+"."})});
+      if(m==="non"||m==="difficile")out.push({tid,kind:"musl",msg:tx("sw.musl",{n:t.name,s:tx(m==="non"?"sw.musl_no":"sw.musl_hard")})});}
+    (t.requires||[]).forEach(r=>{const rt=byId(r);if(rt&&!chosen.has(r))out.push({tid,kind:"req",need:r,msg:tx("sw.needs",{a:t.name,b:rt.name})})});
   });
   return out;
 }
@@ -2175,39 +2175,39 @@ function swToggle(fid,tid,tree,stack,eff){
 }
 function softwareHtml(tree,stack,eff){
   const sel=swSelection(tree,stack,eff),issues=swIssues(tree,stack,sel);
-  let h='<div class="sw"><h2>Tes logiciels</h2><p class="lead">Active ce dont tu as besoin, fonction par fonction. Tu peux choisir plusieurs outils pour la même fonction.</p>';
+  let h='<div class="sw"><h2>'+tx("sw.title")+'</h2><p class="lead">'+tx("sw.lead")+'</p>';
   tree.software.groups.forEach(g=>{
     const nsel=new Set(g.funcs.flatMap(f=>sel[f.id])).size;
     const isOpen=G.swOpen[g.name]===true;
-    h+=`<details class="grp" data-grp="${esc(g.name)}"${isOpen?" open":""}><summary>${esc(g.name)} <span class="cnt">${nsel?nsel+" choisi"+(nsel>1?"s":""):g.funcs.length+" fonctions"}</span></summary>`;
+    h+=`<details class="grp" data-grp="${esc(g.name)}"${isOpen?" open":""}><summary>${esc(trx(g.name))} <span class="cnt">${nsel?tx(nsel>1?"sw.chosen_many":"sw.chosen_one",{n:nsel}):tx("sw.n_funcs",{n:g.funcs.length})}</span></summary>`;
     g.funcs.forEach(f=>{
       const cur=sel[f.id];
-      h+=`<div class="rc"><div class="rt">${esc(f.label)}${qm("func:"+f.id,f.label)}</div><div class="rk" style="margin-bottom:4px">${cur.length?cur.length+" choisi"+(cur.length>1?"s":""):"Aucun"}</div>`;
+      h+=`<div class="rc"><div class="rt">${esc(trx(f.label))}${qm("func:"+f.id,trx(f.label))}</div><div class="rk" style="margin-bottom:4px">${cur.length?tx(cur.length>1?"sw.chosen_many":"sw.chosen_one",{n:cur.length}):tx("sw.none")}</div>`;
       f.tools.forEach(tid=>{const t=byId(tid);if(!t)return;
         const on=cur.includes(tid),bad=swBad(tid,stack);
         h+=`<button class="tchip${on?" sel":""}${bad?" dim":""}" data-swtc="${f.id}|${tid}">${on?"✓ ":""}${esc(t.name)}${bad?" ⚠":""}</button>`});
       const tip=f.tools.find(tid=>G.swTip===f.id+"|"+tid);
       if(tip){const t=byId(tip),on=cur.includes(tip),is=issues.filter(x=>x.tid===tip);
-        h+=`<div class="pan"><div><b>${esc(t.name)}</b>${t.suite?` <span class="nofiche">suite ${esc(t.suite)}</span>`:""} : ${esc(t.summary)}</div>`+
-          (t.pros.length?`<div style="margin-top:4px"><b>Pour :</b> ${esc(t.pros.slice(0,2).join(" ; "))}</div>`:"")+
-          (consFor(t).length?`<div><b>Contre :</b> ${esc(consFor(t).slice(0,2).join(" ; "))}</div>`:"")+
-          (needsFor(t).length?`<div style="margin-top:4px"><b>À installer en plus :</b><ul>${needsFor(t).map(n=>"<li>"+esc(n)+"</li>").join("")}</ul></div>`:"")+(cmdsFor(t).length?`<div style="margin-top:4px"><b>${esc(cmdsFor(t)[0].title)} :</b><pre>${esc(cmdsFor(t)[0].commands.join("\n"))}</pre></div>`:"")+
-          (swBad(tip,stack)&&!is.length?`<div class="conf" style="margin-top:4px">⚠ ${esc(t.name)} est prévu pour glibc (musl : ${swMusl(t)==="non"?"non pris en charge":"difficile"}).</div>`:is.map(x=>`<div class="conf" style="margin-top:4px">⚠ ${esc(x.msg)}</div>`).join(""))+
-          `<div style="margin-top:8px"><button data-swtoggle="${f.id}|${tip}">${on?"Retirer":"Ajouter"}</button><button class="o" data-cmp="${t.category}" data-tool="${tip}">Comparateur</button></div></div>`}
+        h+=`<div class="pan"><div><b>${esc(t.name)}</b>${t.suite?` <span class="nofiche">${tx("sw.suite",{s:esc(t.suite)})}</span>`:""} : ${esc(t.summary)}</div>`+
+          (t.pros.length?`<div style="margin-top:4px"><b>${tx("g.pros")}</b> ${esc(t.pros.slice(0,2).join(" ; "))}</div>`:"")+
+          (consFor(t).length?`<div><b>${tx("g.cons")}</b> ${esc(consFor(t).slice(0,2).join(" ; "))}</div>`:"")+
+          (needsFor(t).length?`<div style="margin-top:4px"><b>${tx("sw.also_install_c")}</b><ul>${needsFor(t).map(n=>"<li>"+esc(n)+"</li>").join("")}</ul></div>`:"")+(cmdsFor(t).length?`<div style="margin-top:4px"><b>${esc(cmdsFor(t)[0].title)} :</b><pre>${esc(cmdsFor(t)[0].commands.join("\n"))}</pre></div>`:"")+
+          (swBad(tip,stack)&&!is.length?`<div class="conf" style="margin-top:4px">⚠ ${tx("sw.musl",{n:esc(t.name),s:tx(swMusl(t)==="non"?"sw.musl_no":"sw.musl_hard")})}</div>`:is.map(x=>`<div class="conf" style="margin-top:4px">⚠ ${esc(x.msg)}</div>`).join(""))+
+          `<div style="margin-top:8px"><button data-swtoggle="${f.id}|${tip}">${tx(on?"sw.remove":"sw.add")}</button><button class="o" data-cmp="${t.category}" data-tool="${tip}">${tx("g.compare_btn")}</button></div></div>`}
       // alertes sur les outils choisis de cette fonction
       cur.forEach(tid=>{issues.filter(x=>x.tid===tid).forEach(x=>{
         const key="sw-"+x.kind+"-"+tid;
-        if(G.keep[key]){h+=`<div class="kept">⚠ ${esc(x.msg)} (tu as gardé ton choix)</div>`;return}
+        if(G.keep[key]){h+=`<div class="kept">⚠ ${esc(x.msg)} ${tx("g.kept")}</div>`;return}
         let fx="";
         if(x.kind==="musl"){
           const alt=f.tools.filter(o=>o!==tid&&!cur.includes(o)&&!swBad(o,stack)).slice(0,2);
-          fx=alt.map(o=>`<button class="p" data-swrep="${f.id}|${tid}|${o}">Remplacer par ${esc(byId(o).name)}</button>`).join("")+`<button class="p" data-fix="Bibliothèque C|glibc">Passer à glibc</button>`;
+          fx=alt.map(o=>`<button class="p" data-swrep="${f.id}|${tid}|${o}">${tx("sw.replace_by",{n:esc(byId(o).name)})}</button>`).join("")+`<button class="p" data-fix="Bibliothèque C|glibc">${tx("sw.to_glibc")}</button>`;
         }else{
           const rf=swFuncOf(tree,x.need);
-          fx=rf?`<button class="p" data-swadd="${rf.id}|${x.need}">Ajouter ${esc(byId(x.need).name)}</button>`:"";
-          fx+=`<button class="p" data-swtoggle="${f.id}|${tid}">Retirer ${esc(byId(tid).name)}</button>`;
+          fx=rf?`<button class="p" data-swadd="${rf.id}|${x.need}">${tx("sw.add_n",{n:esc(byId(x.need).name)})}</button>`:"";
+          fx+=`<button class="p" data-swtoggle="${f.id}|${tid}">${tx("sw.remove_n",{n:esc(byId(tid).name)})}</button>`;
         }
-        h+=`<div class="warn">⚠ ${esc(x.msg)}<div>${fx}<button data-keep="${key}">Garder mon choix</button></div></div>`})});
+        h+=`<div class="warn">⚠ ${esc(x.msg)}<div>${fx}<button data-keep="${key}">${tx("g.keep")}</button></div></div>`})});
       h+="</div>";
     });
     h+="</details>";
@@ -2217,9 +2217,9 @@ function softwareHtml(tree,stack,eff){
   const needs={};
   chosen.forEach(tid=>{const t=byId(tid);if(!t)return;needsFor(t).forEach(n=>{if(chosen.some(c=>(byId(c)||{}).name===n))return;(needs[n]=needs[n]||[]).push(t.name)})});
   const nk=Object.keys(needs);
-  h+=`<h3>À installer en plus</h3><div class="rc">`+(nk.length?`<ul>${nk.map(n=>`<li><b>${esc(n)}</b><br><span class="nofiche">pour ${esc(needs[n].join(", "))}</span></li>`).join("")}</ul>`:'<span class="nofiche">Rien de plus pour ta sélection.</span>')+`</div>`;
-  h+=`<div class="nofiche" style="margin:6px 0 0">${chosen.length} logiciel${chosen.length>1?"s":""} choisi${chosen.length>1?"s":""}.</div>`;
-  return h+'<button class="big" data-md="1" style="margin-top:16px">Générer le tutoriel (.md)</button><button class="ghost" data-swback="1">← Retour à la pile système</button></div>';
+  h+=`<h3>${tx("sw.also_install")}</h3><div class="rc">`+(nk.length?`<ul>${nk.map(n=>`<li><b>${esc(n)}</b><br><span class="nofiche">${tx("sw.for",{l:esc(needs[n].join(", "))})}</span></li>`).join("")}</ul>`:'<span class="nofiche">'+tx("sw.nothing")+'</span>')+`</div>`;
+  h+=`<div class="nofiche" style="margin:6px 0 0">${tx(chosen.length>1?"sw.count_many":"sw.count_one",{n:chosen.length})}</div>`;
+  return h+'<button class="big" data-md="1" style="margin-top:16px">'+tx("g.gen_md")+'</button><button class="ghost" data-swback="1">'+tx("sw.back")+'</button></div>';
 }
 
 
@@ -2298,45 +2298,45 @@ function needsFor(t){const b=curBase();return b&&b!=="alpine"?t.needs.filter(n=>
 function consFor(t){const b=curBase();return b&&b!=="alpine"?t.cons.filter(n=>!/Alpine/.test(n)):t.cons}
 function hwBanner(){
   const parts=[];
-  if(G.scope==="precise")parts.push(`💻 ${esc(hwSummary())}<button data-hwedit="1">Modifier</button>`);
-  if(G.base)parts.push(`🐧 Base : ${BN[G.base]?esc(BN[G.base]):"à conseiller"}<button data-baseedit="1">Modifier</button>`);
+  if(G.scope==="precise")parts.push(`💻 ${esc(hwSummary(true))}<button data-hwedit="1">${tx("hwb.edit")}</button>`);
+  if(G.base)parts.push(`${tx("hwb.base",{b:BN[G.base]?esc(BN[G.base]):tx("hwb.advise")})}<button data-baseedit="1">${tx("hwb.edit")}</button>`);
   return parts.length?`<div class="hwb">${parts.join("<br>")}</div>`:"";
 }
 function baseScreen(){
-  const card=(k,v)=>`<button class="card" data-base="${k}"><b>${esc(v.name)}</b><span>${esc(v.desc)}</span><i class="bst">${BASE_STATUS[baseStatus(k)]}</i></button>`;
+  const card=(k,v)=>`<button class="card" data-base="${k}"><b>${esc(v.name)}</b><span>${esc(trx(v.desc))}</span><i class="bst">${trx(BASE_STATUS[baseStatus(k)])}</i></button>`;
   const main=Object.entries(BASEDEF).filter(([k,v])=>v.main),other=Object.entries(BASEDEF).filter(([k,v])=>!v.main);
-  return hwBanner()+`<h2>Sur quelle base construire ta distro ?${qm("cat:base-distro","Distribution de base")}</h2><p class="lead">La base décide du gestionnaire de paquets, de la bibliothèque C et de l'init.</p>`+
+  return hwBanner()+`<h2>${tx("b.q")}${qm("cat:base-distro",trx("Distribution de base"))}</h2><p class="lead">${tx("b.lead")}</p>`+
    main.map(([k,v])=>card(k,v)).join("")+
-   `<button class="card" data-base="undecided"><b>Pas encore décidé</b><span>L'atlas te conseille une base selon ton objectif.</span></button>`+
-   `<details class="grp" ${G.baseMore?"open":""} data-more="1"><summary>Autres bases <span class="cnt">${other.length} bases</span></summary>${other.map(([k,v])=>card(k,v)).join("")}</details>`+
-   `<button class="ghost" data-baseback="1">← Retour</button>`;
+   `<button class="card" data-base="undecided"><b>${tx("b.undecided")}</b><span>${tx("b.undecided_d")}</span></button>`+
+   `<details class="grp" ${G.baseMore?"open":""} data-more="1"><summary>${tx("b.others")} <span class="cnt">${tx("b.n_bases",{n:other.length})}</span></summary>${other.map(([k,v])=>card(k,v)).join("")}</details>`+
+   `<button class="ghost" data-baseback="1">${tx("g.back")}</button>`;
 }
 function hwScreens(){
-  if(!G.scope)return `<h2>Pour quoi est cette distro ?</h2><p class="lead">Si tu connais l'ordinateur, l'atlas adapte les choix à son matériel.</p>
-   <button class="card" data-scope="general"><b>Une distro générale</b><span>Sans ordinateur précis en tête.</span></button>
-   <button class="card" data-scope="precise"><b>Un ordinateur précis</b><span>L'atlas tient compte du processeur, de la carte graphique, de la RAM…</span></button>`;
-  if(G.hwI===-1)return `<h2>Quel est ton ordinateur ?</h2><p class="lead">Donne son modèle, ou passe pour saisir les composants.</p>
-   ${G.hwMsg?`<div class="warn" style="margin:0 0 10px">${esc(G.hwMsg)}</div>`:""}
-   <input id="hwm" class="inp" list="hwml" placeholder="Ex. ThinkPad T480" value="${esc(HW.model||"")}">
+  if(!G.scope)return `<h2>${tx("hw.purpose_q")}</h2><p class="lead">${tx("hw.purpose_lead")}</p>
+   <button class="card" data-scope="general"><b>${tx("hw.general")}</b><span>${tx("hw.general_d")}</span></button>
+   <button class="card" data-scope="precise"><b>${tx("hw.precise")}</b><span>${tx("hw.precise_d")}</span></button>`;
+  if(G.hwI===-1)return `<h2>${tx("hw.computer_q")}</h2><p class="lead">${tx("hw.computer_lead")}</p>
+   ${G.hwMsg?`<div class="warn" style="margin:0 0 10px">${tx(G.hwMsg)}</div>`:""}
+   <input id="hwm" class="inp" list="hwml" placeholder="${tx("hw.model_ph")}" value="${esc(HW.model||"")}">
    <datalist id="hwml">${Object.values(MODELS).map(m=>`<option value="${esc(m.label)}">`).join("")}</datalist>
-   <button class="big" data-hwmodel="1" style="margin:0 0 6px">Valider le modèle</button>
-   <button class="opt" data-hwskip="1" style="margin-top:10px">Passer, je saisis les composants</button>
-   <div class="nofiche">Modèles reconnus pour l'instant (exemples, à vérifier) : ThinkPad T480, ThinkPad X230, Raspberry Pi 4.</div>
-   <button class="ghost" data-hwback="1">← Retour</button>`;
+   <button class="big" data-hwmodel="1" style="margin:0 0 6px">${tx("hw.validate")}</button>
+   <button class="opt" data-hwskip="1" style="margin-top:10px">${tx("hw.skip_enter")}</button>
+   <div class="nofiche">${tx("hw.known")}</div>
+   <button class="ghost" data-hwback="1">${tx("g.back")}</button>`;
   if(G.hwI<HWQ.length){
     const q=HWQ[G.hwI];
     return `<div class="prog"><i style="width:${Math.round(G.hwI/HWQ.length*100)}%"></i></div>
-     <div class="rk">Matériel ${G.hwI+1} sur ${HWQ.length}</div>
-     <p class="q">${esc(q.t)}${qm("hw:"+q.id,HWLAB[q.id])}</p>
-     ${q.o.map(o=>`<button class="opt" data-hwa="${o[0]}">${esc(o[1])}</button>`).join("")}
-     <button class="opt" data-hwa="" style="color:var(--mute)">Passer</button>
-     <button class="ghost" data-hwback="1">← Retour</button>`;
+     <div class="rk">${tx("hw.n_of",{i:G.hwI+1,n:HWQ.length})}</div>
+     <p class="q">${esc(trx(q.t))}${qm("hw:"+q.id,trx(HWLAB[q.id]))}</p>
+     ${q.o.map(o=>`<button class="opt" data-hwa="${o[0]}">${esc(trx(o[1]))}</button>`).join("")}
+     <button class="opt" data-hwa="" style="color:var(--mute)">${tx("hw.skip")}</button>
+     <button class="ghost" data-hwback="1">${tx("g.back")}</button>`;
   }
-  return `<h2>Ton matériel</h2><p class="lead">Vérifie, puis continue.</p>
-   <div class="rc">${HW.model?`<div class="rk">Modèle</div><div class="rt">${esc(HW.model)}</div>`:""}
-   <ul>${HWQ.map(q=>`<li><b>${esc(HWLAB[q.id])}</b> : ${HW[q.id]?esc(hwLabel(q.id,HW[q.id])):'<span class="nofiche">non précisé</span>'}</li>`).join("")}</ul></div>
-   <button class="big" data-hwgo="1">Continuer →</button>
-   <button class="ghost" data-hwback="1">← Modifier</button>`;
+  return `<h2>${tx("hw.your")}</h2><p class="lead">${tx("hw.check")}</p>
+   <div class="rc">${HW.model?`<div class="rk">${tx("hw.model")}</div><div class="rt">${esc(HW.model)}</div>`:""}
+   <ul>${HWQ.map(q=>`<li><b>${esc(trx(HWLAB[q.id]))}</b> : ${HW[q.id]?esc(trx(hwLabel(q.id,HW[q.id]))):'<span class="nofiche">'+tx("hw.unspecified")+'</span>'}</li>`).join("")}</ul></div>
+   <button class="big" data-hwgo="1">${tx("hw.continue")}</button>
+   <button class="ghost" data-hwback="1">${tx("hw.modify")}</button>`;
 }
 
 /* ============ GÉNÉRATEUR DE TUTORIEL (.md) ============ */
@@ -2447,9 +2447,820 @@ const APP_VERSION="0.1.0";  // version provisoire
 // Nommé tx et non t : t désigne partout un outil dans ce fichier.
 // Les commandes (cmds, verify), noms de paquets, identifiants et noms d'outils ne sont jamais dans ces tables.
 const I18N={
- fr:{"lang.switch":"English","lang.switch_aria":"Changer la langue : English"},
- en:{"lang.switch":"Français","lang.switch_aria":"Switch language: Français"}
+ fr:{
+ "ui.sub":"Comparer les briques d'une distribution Linux",
+ "ui.tab_guide":"Me guider",
+ "ui.tab_compare":"Comparer",
+ "ui.back_path":"← Retour à mon parcours",
+ "ui.search_ph":"Rechercher un outil (ex. musl, sway, apk)",
+ "ui.layer":"Couche",
+ "ui.cat":"Catégorie",
+ "ui.help_layer":"Aide : couche",
+ "ui.help_cat":"Aide : catégorie",
+ "ui.more":"En savoir plus",
+ "ui.close":"Fermer",
+ "ui.footer":"Fiches rédigées à la main. « À vérifier » = fiche pas encore relue contre la source officielle.",
+ "ui.help_of":"Aide : {t}",
+ "ui.manual":"choix manuel",
+ "cmp.empty":"Aucune fiche pour cette catégorie pour l'instant.",
+ "cmp.yes":"✓ oui",
+ "cmp.no":"✗ non",
+ "cmp.to_check":"À vérifier",
+ "cmp.recheck":"À revérifier",
+ "cmp.reviewed":"Relu {d}",
+ "cmp.remove":"retirer ✕",
+ "cmp.table":"Tableau",
+ "cmp.by_crit":"Par critère",
+ "cmp.hide_same":"Masquer les lignes identiques",
+ "cmp.hidden_one":"({n} masquée)",
+ "cmp.hidden_many":"({n} masquées)",
+ "cmp.add_col":"+ Ajouter une colonne",
+ "cmp.no_result":"Aucun résultat",
+ "row.summary":"Résumé",
+ "row.license":"Licence",
+ "row.maturity":"Maturité",
+ "row.difficulty":"Difficulté",
+ "row.sheet":"Fiche",
+ "sec.criteria":"Critères",
+ "sec.review":"Bilan",
+ "row.pros":"Avantages",
+ "row.cons":"Limites",
+ "row.learn":"On apprend",
+ "row.used_by":"Utilisé par",
+ "sec.compat":"Compatibilité",
+ "row.requires":"Nécessite",
+ "row.conflicts":"Incompatible",
+ "row.works_with":"Va bien avec",
+ "sec.impl":"Mise en œuvre",
+ "row.commands":"Commandes",
+ "row.pitfalls":"Pièges",
+ "row.docs":"Docs",
+ "g.objective":"Objectif",
+ "g.from_hw":"(d'après ton matériel)",
+ "g.default":"(par défaut)",
+ "g.if_answer":"Si tu réponds « {o} » :",
+ "g.no_change":"Aucun changement dans la pile.",
+ "g.pick":"Choisir cette réponse",
+ "g.kept":"(tu as gardé ton choix)",
+ "g.keep":"Garder mon choix",
+ "g.fix_goal":"⚠ = change l'objectif de départ que tu as choisi.",
+ "g.goal_changed":"Ton objectif de départ a changé.",
+ "g.cancel":"Annuler",
+ "g.pros":"Pour :",
+ "g.cons":"Contre :",
+ "g.use_tool":"Choisir cet outil",
+ "g.compare_btn":"Comparateur",
+ "g.revert":"↺ Revenir à la recommandation ({n})",
+ "g.advise_base":"↺ Laisser l'atlas conseiller une base",
+ "g.goal_q":"Quel est ton objectif ?",
+ "g.goal_lead":"Réponds à quelques questions simples. L'atlas choisit les briques techniques et t'explique pourquoi.",
+ "g.soon":" — bientôt",
+ "g.back":"← Retour",
+ "g.q_n":"Question {i} sur {n}",
+ "g.dont_know":"Je ne sais pas",
+ "g.your_distro":"Ta distro {name}",
+ "g.stack_lead":"Voici la pile recommandée, avec la raison de chaque choix.",
+ "g.compare_alts":"Comparer les alternatives",
+ "g.conflict_above":"⚠ Conflit à régler dans l'arbre ci-dessus.",
+ "g.for_hw":"Pour ton matériel",
+ "g.choose_sw":"Choisir les logiciels →",
+ "g.gen_md":"Générer le tutoriel (.md)",
+ "g.edit_answers":"← Modifier mes réponses",
+ "g.restart":"Recommencer",
+ "sw.title":"Tes logiciels",
+ "sw.lead":"Active ce dont tu as besoin, fonction par fonction. Tu peux choisir plusieurs outils pour la même fonction.",
+ "sw.chosen_one":"{n} choisi",
+ "sw.chosen_many":"{n} choisis",
+ "sw.n_funcs":"{n} fonctions",
+ "sw.none":"Aucun",
+ "sw.suite":"suite {s}",
+ "sw.remove":"Retirer",
+ "sw.add":"Ajouter",
+ "sw.also_install":"À installer en plus",
+ "sw.also_install_c":"À installer en plus :",
+ "sw.replace_by":"Remplacer par {n}",
+ "sw.to_glibc":"Passer à glibc",
+ "sw.add_n":"Ajouter {n}",
+ "sw.remove_n":"Retirer {n}",
+ "sw.for":"pour {l}",
+ "sw.nothing":"Rien de plus pour ta sélection.",
+ "sw.count_one":"{n} logiciel choisi.",
+ "sw.count_many":"{n} logiciels choisis.",
+ "sw.back":"← Retour à la pile système",
+ "sw.musl":"{n} est prévu pour glibc (musl : {s}).",
+ "sw.musl_no":"non pris en charge",
+ "sw.musl_hard":"difficile",
+ "sw.needs":"{a} a besoin de {b}.",
+ "b.q":"Sur quelle base construire ta distro ?",
+ "b.lead":"La base décide du gestionnaire de paquets, de la bibliothèque C et de l'init.",
+ "b.undecided":"Pas encore décidé",
+ "b.undecided_d":"L'atlas te conseille une base selon ton objectif.",
+ "b.others":"Autres bases",
+ "b.n_bases":"{n} bases",
+ "hwb.base":"🐧 Base : {b}",
+ "hwb.advise":"à conseiller",
+ "hwb.edit":"Modifier",
+ "hw.purpose_q":"Pour quoi est cette distro ?",
+ "hw.purpose_lead":"Si tu connais l'ordinateur, l'atlas adapte les choix à son matériel.",
+ "hw.general":"Une distro générale",
+ "hw.general_d":"Sans ordinateur précis en tête.",
+ "hw.precise":"Un ordinateur précis",
+ "hw.precise_d":"L'atlas tient compte du processeur, de la carte graphique, de la RAM…",
+ "hw.computer_q":"Quel est ton ordinateur ?",
+ "hw.computer_lead":"Donne son modèle, ou passe pour saisir les composants.",
+ "hw.model_ph":"Ex. ThinkPad T480",
+ "hw.validate":"Valider le modèle",
+ "hw.skip_enter":"Passer, je saisis les composants",
+ "hw.known":"Modèles reconnus pour l'instant (exemples, à vérifier) : ThinkPad T480, ThinkPad X230, Raspberry Pi 4.",
+ "hw.n_of":"Matériel {i} sur {n}",
+ "hw.skip":"Passer",
+ "hw.your":"Ton matériel",
+ "hw.check":"Vérifie, puis continue.",
+ "hw.model":"Modèle",
+ "hw.unspecified":"non précisé",
+ "hw.continue":"Continuer →",
+ "hw.modify":"← Modifier",
+ "hw.none":"aucun détail",
+ "hw.unknown_model":"Modèle non reconnu pour l'instant. Saisis les composants à la place.",
+ "md.title":"Ton tutoriel",
+ "md.lead":"Un fichier Markdown pas à pas : installation de la pile puis construction de l'ISO. {lines} lignes, {steps} étapes, chacune avec son état de vérification.",
+ "md.warn":"⚠️ Aucune étape n'a été testée dans un conteneur ou une machine virtuelle. Les étapes marquées « À vérifier » demandent ta relecture.",
+ "md.dl":"Télécharger le fichier .md",
+ "md.copy":"Copier le texte",
+ "md.copied":"Copié ✓",
+ "md.preview":"Aperçu du fichier",
+ "md.lines":"{n} lignes",
+ "md.back":"← Retour à la pile",
+ "lang.switch":"English",
+ "lang.switch_aria":"Changer la langue : English"
+},
+ en:{
+ "ui.sub":"Compare the building blocks of a Linux distribution",
+ "ui.tab_guide":"Guide me",
+ "ui.tab_compare":"Compare",
+ "ui.back_path":"← Back to my path",
+ "ui.search_ph":"Search for a tool (e.g. musl, sway, apk)",
+ "ui.layer":"Layer",
+ "ui.cat":"Category",
+ "ui.help_layer":"Help: layer",
+ "ui.help_cat":"Help: category",
+ "ui.more":"Learn more",
+ "ui.close":"Close",
+ "ui.footer":"Hand-written sheets. “To check” = sheet not yet reviewed against the official source.",
+ "ui.help_of":"Help: {t}",
+ "ui.manual":"manual choice",
+ "cmp.empty":"No sheet for this category yet.",
+ "cmp.yes":"✓ yes",
+ "cmp.no":"✗ no",
+ "cmp.to_check":"To check",
+ "cmp.recheck":"To re-check",
+ "cmp.reviewed":"Reviewed {d}",
+ "cmp.remove":"remove ✕",
+ "cmp.table":"Table",
+ "cmp.by_crit":"By criterion",
+ "cmp.hide_same":"Hide identical rows",
+ "cmp.hidden_one":"({n} hidden)",
+ "cmp.hidden_many":"({n} hidden)",
+ "cmp.add_col":"+ Add a column",
+ "cmp.no_result":"No result",
+ "row.summary":"Summary",
+ "row.license":"License",
+ "row.maturity":"Maturity",
+ "row.difficulty":"Difficulty",
+ "row.sheet":"Sheet",
+ "sec.criteria":"Criteria",
+ "sec.review":"Review",
+ "row.pros":"Pros",
+ "row.cons":"Limits",
+ "row.learn":"What you learn",
+ "row.used_by":"Used by",
+ "sec.compat":"Compatibility",
+ "row.requires":"Requires",
+ "row.conflicts":"Incompatible",
+ "row.works_with":"Works well with",
+ "sec.impl":"Implementation",
+ "row.commands":"Commands",
+ "row.pitfalls":"Pitfalls",
+ "row.docs":"Docs",
+ "g.objective":"Goal",
+ "g.from_hw":"(from your hardware)",
+ "g.default":"(default)",
+ "g.if_answer":"If you answer “{o}”:",
+ "g.no_change":"No change in the stack.",
+ "g.pick":"Choose this answer",
+ "g.kept":"(you kept your choice)",
+ "g.keep":"Keep my choice",
+ "g.fix_goal":"⚠ = changes the starting goal you chose.",
+ "g.goal_changed":"Your starting goal changed.",
+ "g.cancel":"Undo",
+ "g.pros":"Pros:",
+ "g.cons":"Cons:",
+ "g.use_tool":"Choose this tool",
+ "g.compare_btn":"Compare",
+ "g.revert":"↺ Back to the recommendation ({n})",
+ "g.advise_base":"↺ Let the atlas suggest a base",
+ "g.goal_q":"What is your goal?",
+ "g.goal_lead":"Answer a few simple questions. The atlas picks the technical building blocks and explains why.",
+ "g.soon":" — coming soon",
+ "g.back":"← Back",
+ "g.q_n":"Question {i} of {n}",
+ "g.dont_know":"I don't know",
+ "g.your_distro":"Your {name} distro",
+ "g.stack_lead":"Here is the recommended stack, with the reason for each choice.",
+ "g.compare_alts":"Compare the alternatives",
+ "g.conflict_above":"⚠ Conflict to resolve in the tree above.",
+ "g.for_hw":"For your hardware",
+ "g.choose_sw":"Choose the software →",
+ "g.gen_md":"Generate the tutorial (.md)",
+ "g.edit_answers":"← Edit my answers",
+ "g.restart":"Start over",
+ "sw.title":"Your software",
+ "sw.lead":"Turn on what you need, function by function. You can pick several tools for the same function.",
+ "sw.chosen_one":"{n} chosen",
+ "sw.chosen_many":"{n} chosen",
+ "sw.n_funcs":"{n} functions",
+ "sw.none":"None",
+ "sw.suite":"{s} suite",
+ "sw.remove":"Remove",
+ "sw.add":"Add",
+ "sw.also_install":"Also to install",
+ "sw.also_install_c":"Also to install:",
+ "sw.replace_by":"Replace with {n}",
+ "sw.to_glibc":"Switch to glibc",
+ "sw.add_n":"Add {n}",
+ "sw.remove_n":"Remove {n}",
+ "sw.for":"for {l}",
+ "sw.nothing":"Nothing more for your selection.",
+ "sw.count_one":"{n} software item chosen.",
+ "sw.count_many":"{n} software items chosen.",
+ "sw.back":"← Back to the system stack",
+ "sw.musl":"{n} is designed for glibc (musl: {s}).",
+ "sw.musl_no":"not supported",
+ "sw.musl_hard":"difficult",
+ "sw.needs":"{a} needs {b}.",
+ "b.q":"Which base should your distro be built on?",
+ "b.lead":"The base decides the package manager, the C library and the init.",
+ "b.undecided":"Not decided yet",
+ "b.undecided_d":"The atlas suggests a base based on your goal.",
+ "b.others":"Other bases",
+ "b.n_bases":"{n} bases",
+ "hwb.base":"🐧 Base: {b}",
+ "hwb.advise":"to be suggested",
+ "hwb.edit":"Edit",
+ "hw.purpose_q":"What is this distro for?",
+ "hw.purpose_lead":"If you know the computer, the atlas adapts the choices to its hardware.",
+ "hw.general":"A general distro",
+ "hw.general_d":"No specific computer in mind.",
+ "hw.precise":"A specific computer",
+ "hw.precise_d":"The atlas takes the processor, graphics card, RAM… into account.",
+ "hw.computer_q":"Which computer do you have?",
+ "hw.computer_lead":"Give its model, or skip to enter the components.",
+ "hw.model_ph":"E.g. ThinkPad T480",
+ "hw.validate":"Confirm the model",
+ "hw.skip_enter":"Skip, I'll enter the components",
+ "hw.known":"Models recognized for now (examples, to be checked): ThinkPad T480, ThinkPad X230, Raspberry Pi 4.",
+ "hw.n_of":"Hardware {i} of {n}",
+ "hw.skip":"Skip",
+ "hw.your":"Your hardware",
+ "hw.check":"Check, then continue.",
+ "hw.model":"Model",
+ "hw.unspecified":"not specified",
+ "hw.continue":"Continue →",
+ "hw.modify":"← Edit",
+ "hw.none":"no details",
+ "hw.unknown_model":"Model not recognized yet. Enter the components instead.",
+ "md.title":"Your tutorial",
+ "md.lead":"A step-by-step Markdown file: installing the stack, then building the ISO. {lines} lines, {steps} steps, each with its verification state.",
+ "md.warn":"⚠️ No step has been tested in a container or a virtual machine. Steps marked “To check” need your review.",
+ "md.dl":"Download the .md file",
+ "md.copy":"Copy the text",
+ "md.copied":"Copied ✓",
+ "md.preview":"File preview",
+ "md.lines":"{n} lines",
+ "md.back":"← Back to the stack",
+ "lang.switch":"Français",
+ "lang.switch_aria":"Switch language: Français"
+}
 };
+// Textes composés ou issus des données (arbre, bases, matériel, catégories) : clé = texte français, valeur = anglais.
+// trx() remplace un texte exact, ou les fragments d'au moins 8 caractères d'un texte composé.
+const FRAG={
+ "Bureau léger / minimaliste":"Light / minimalist desktop",
+ "Peu de mémoire, vieux PC, bureau au clavier.":"Little memory, old PC, keyboard-driven desktop.",
+ "Sécurisée / durcie":"Secure / hardened",
+ "Stabilité, mises à jour sûres, petite image.":"Stability, safe updates, small image.",
+ "Texte, tableur, présentations, usage quotidien.":"Text, spreadsheets, presentations, everyday use.",
+ "Gestionnaire d'Alpine : très rapide et minimal.":"Alpine's package manager: very fast and minimal.",
+ "Init d'Alpine : simple et léger.":"Alpine's init: simple and light.",
+ "Minuscule et sécurisée. musl, apk, OpenRC. Pas de Steam.":"Tiny and secure. musl, apk, OpenRC. No Steam.",
+ "Mises à jour prévisibles et peu de casse.":"Predictable updates and little breakage.",
+ "Le plus répandu : tout est documenté et marche sans réglage.":"The most widespread: everything is documented and works without tuning.",
+ "Très stable, énorme dépôt. glibc, apt, systemd.":"Very stable, huge repository. glibc, apt, systemd.",
+ "Versions récentes et très grand choix de logiciels.":"Recent versions and a very large choice of software.",
+ "Rolling release, très récent. glibc, pacman, systemd.":"Rolling release, very recent. glibc, pacman, systemd.",
+ "Versions récentes et historique des transactions.":"Recent versions and transaction history.",
+ "Récente, nouvelle version tous les 6 mois. glibc, dnf, systemd.":"Recent, a new release every 6 months. glibc, dnf, systemd.",
+ "Mises à jour prévisibles, énorme choix de logiciels.":"Predictable updates, huge choice of software.",
+ "Dérivée de Debian, LTS tous les 2 ans. glibc, apt, systemd.":"Derived from Debian, LTS every 2 years. glibc, apt, systemd.",
+ "Gestionnaire de Void : rapide et simple.":"Void's package manager: fast and simple.",
+ "Init de Void : minimaliste et supervisé.":"Void's init: minimalist and supervised.",
+ "Indépendante, rolling. runit, xbps, glibc ou musl au choix.":"Independent, rolling. runit, xbps, glibc or musl as you like.",
+ "Compilation depuis les sources, avec les options que tu choisis.":"Compiles from source, with the options you choose.",
+ "Init par défaut de Gentoo (systemd est possible).":"Gentoo's default init (systemd is possible).",
+ "Tout compilé depuis les sources. Contrôle total, très long.":"Everything compiled from source. Total control, very long.",
+ "Configuration déclarative et retour en arrière natif.":"Declarative configuration and native rollback.",
+ "Init de NixOS.":"NixOS's init.",
+ "Système déclaratif, retour en arrière natif. Langage Nix à apprendre.":"Declarative system, native rollback. You have to learn the Nix language.",
+ "Résolution de dépendances solide, instantanés Btrfs.":"Solid dependency resolution, Btrfs snapshots.",
+ "Leap (stable) ou Tumbleweed (rolling). zypper, Btrfs, YaST.":"Leap (stable) or Tumbleweed (rolling). zypper, Btrfs, YaST.",
+ "Dépôt Debian, sans systemd.":"Debian repository, without systemd.",
+ "Init par défaut de Devuan (OpenRC ou runit en option).":"Devuan's default init (OpenRC or runit optional).",
+ "Debian sans systemd. sysvinit, OpenRC ou runit.":"Debian without systemd. sysvinit, OpenRC or runit.",
+ "Aucun (compilation à la main)":"None (manual compilation)",
+ "LFS n'a pas de gestionnaire : tu compiles chaque composant.":"LFS has no package manager: you compile every component.",
+ "Une des deux éditions du livre (l'autre utilise systemd).":"One of the book's two editions (the other uses systemd).",
+ "Construire un système à la main depuis le livre LFS. Pour apprendre.":"Build a system by hand from the LFS book. For learning.",
+ "Dépôts Debian adaptés à l'ARM.":"Debian repositories adapted to ARM.",
+ "Init de Raspberry Pi OS.":"Raspberry Pi OS's init.",
+ "Système officiel des Raspberry Pi, basé sur Debian (ARM).":"The official Raspberry Pi system, based on Debian (ARM).",
+ "apk (opkg avant la 25.12)":"apk (opkg before 25.12)",
+ "Gestionnaire d'OpenWrt depuis la version 25.12.":"OpenWrt's package manager since version 25.12.",
+ "Pour routeurs et appareils réseau. musl, très léger.":"For routers and network devices. musl, very light.",
+ "Extensions chargées en mémoire.":"Extensions loaded into memory.",
+ "Init minimal de Tiny Core.":"Tiny Core's minimal init.",
+ "11 à 23 Mo, tourne en mémoire. Pour très vieux PC.":"11 to 23 MB, runs in memory. For very old PCs.",
+ "Outils simples, sans résolution automatique des dépendances.":"Simple tools, no automatic dependency resolution.",
+ "Démarrage à l'ancienne par scripts.":"Old-school startup through scripts.",
+ "Init de Rocky Linux.":"Rocky Linux's init.",
+ "Clone de RHEL pour serveurs, support très long.":"RHEL clone for servers, very long support.",
+ "Compatible RHEL pour serveurs, support très long.":"RHEL-compatible for servers, very long support.",
+ "Tu veux lancer des jeux Windows (via Steam) ?":"Do you want to run Windows games (through Steam)?",
+ "Oui":"Yes",
+ "Non, seulement des jeux Linux":"No, only Linux games",
+ "Quelle est ta carte graphique ?":"Which graphics card do you have?",
+ "AMD ou Intel":"AMD or Intel",
+ "Tu préfères les nouveautés ou la stabilité ?":"Do you prefer new features or stability?",
+ "Les nouveautés":"New features",
+ "La stabilité":"Stability",
+ "Tu gardes Windows sur le même PC ?":"Do you keep Windows on the same PC?",
+ "Non":"No",
+ "Comment veux-tu ton bureau ?":"How do you want your desktop?",
+ "Complet, à la souris":"Full-featured, mouse-driven",
+ "Léger, au clavier":"Light, keyboard-driven",
+ "Tu veux que tout marche tout de suite, ou tu aimes bricoler ?":"Do you want everything to work right away, or do you like tinkering?",
+ "Que tout marche tout de suite":"Everything working right away",
+ " (Choix par défaut : tu n'as pas su répondre.)":" (Default choice: you could not answer.)",
+ "Petite, rapide et sécurisée, avec OpenRC. Choisie car tu aimes bricoler et tu n'as pas besoin de Steam.":"Small, fast and secure, with OpenRC. Chosen because you like tinkering and do not need Steam.",
+ "Très stable, énorme choix de logiciels, mises à jour prévisibles.":"Very stable, huge choice of software, predictable updates.",
+ "Versions récentes de Steam, des pilotes et de Mesa, avec des mises à jour en continu.":"Recent versions of Steam, drivers and Mesa, with continuous updates.",
+ "Distribution de base":"Base distribution",
+ "Choisie au départ.":"Chosen at the start.",
+ "Recommandée pour ton objectif : ":"Recommended for your goal: ",
+ "Bibliothèque C":"C library",
+ "Steam et Proton sont conçus pour glibc : musl est exclu.":"Steam and Proton are built for glibc: musl is ruled out.",
+ "glibc reste le choix le plus sûr pour les jeux. musl est possible, mais beaucoup de jeux et d'outils ne démarrent pas dessus.":"glibc remains the safest choice for games. musl is possible, but many games and tools do not start on it.",
+ "Le pilote NVIDIA propriétaire suit le noyau avec du retard : un noyau LTS évite les ruptures après mise à jour.":"The proprietary NVIDIA driver follows the kernel with a delay: an LTS kernel avoids breakage after an update.",
+ "Linux récent (mainline)":"Recent Linux (mainline)",
+ "Meilleur support des cartes récentes. Les pilotes AMD et Intel sont dans le noyau lui-même.":"Better support for recent cards. The AMD and Intel drivers are in the kernel itself.",
+ "Stable et suffisant : les pilotes AMD et Intel sont déjà dans le noyau.":"Stable and enough: the AMD and Intel drivers are already in the kernel.",
+ "Système d'init":"Init system",
+ "Simple et léger. Steam fonctionne aussi sans systemd (Artix, Void), mais il faut configurer la gestion des sessions (elogind).":"Simple and light. Steam also works without systemd (Artix, Void), but you have to set up session management (elogind).",
+ "Chargeur d'amorçage":"Bootloader",
+ "Peut détecter Windows et proposer un menu au démarrage.":"Can detect Windows and offer a menu at startup.",
+ "Ton PC démarre en BIOS : GRUB le gère, pas systemd-boot.":"Your PC boots in BIOS mode: GRUB handles it, systemd-boot does not.",
+ "Très simple, et il va avec systemd.":"Very simple, and it goes with systemd.",
+ "Un seul fichier de configuration, sans dépendre de systemd.":"A single configuration file, without depending on systemd.",
+ "Gestionnaire de paquets":"Package manager",
+ " Il vient avec la base conseillée.":" It comes with the recommended base.",
+ "Wayland (avec XWayland)":"Wayland (with XWayland)",
+ "Standard actuel. XWayland fait tourner les jeux qui utilisent encore X11.":"Current standard. XWayland runs the games that still use X11.",
+ "Bureau complet mais léger : ton PC a peu de mémoire.":"Full-featured but light desktop: your PC has little memory.",
+ "Bureau complet à la souris, bien adapté aux jeux (c'est le mode bureau de SteamOS).":"Full mouse-driven desktop, well suited to games (it is SteamOS's desktop mode).",
+ "Léger au clavier, avec animations. Il évolue vite, comme les nouveautés que tu aimes.":"Light and keyboard-driven, with animations. It evolves fast, like the new features you like.",
+ "Léger au clavier et stable, sans animations.":"Light, keyboard-driven and stable, without animations.",
+ "Faible latence et bien pris en charge par les jeux.":"Low latency and well supported by games.",
+ "Logiciels de jeu":"Gaming software",
+ "Proton fait tourner les jeux Windows sous Linux.":"Proton runs Windows games on Linux.",
+ "Pour les jeux Linux et les émulateurs. Steam reste possible pour les jeux Linux de ta bibliothèque.":"For Linux games and emulators. Steam remains possible for the Linux games in your library.",
+ "Passer à Debian":"Switch to Debian",
+ "Passer à Arch":"Switch to Arch",
+ "Je ne veux plus de jeux Windows":"I no longer want Windows games",
+ " utilise musl : les jeux Windows (Steam, Proton, Wine) demandent glibc.":" uses musl: Windows games (Steam, Proton, Wine) need glibc.",
+ "apk est lié à Alpine (musl) : pas de Steam ni de jeux Windows.":"apk is tied to Alpine (musl): no Steam or Windows games.",
+ "OpenWrt est conçu pour les routeurs : pas de bureau ni de jeux.":"OpenWrt is designed for routers: no desktop or games.",
+ "Tiny Core tourne en mémoire avec très peu de logiciels : mal adapté aux jeux.":"Tiny Core runs in memory with very little software: poorly suited to games.",
+ "Rocky Linux est pensée pour les serveurs : pilotes et logiciels de jeux anciens.":"Rocky Linux is built for servers: old graphics drivers and gaming software.",
+ "AlmaLinux est pensée pour les serveurs : pilotes et logiciels de jeux anciens.":"AlmaLinux is built for servers: old graphics drivers and gaming software.",
+ "Linux From Scratch demande de tout compiler à la main : très long, sans gestionnaire de paquets.":"Linux From Scratch requires compiling everything by hand: very long, no package manager.",
+ "systemd-boot est fourni avec systemd.":"systemd-boot ships with systemd.",
+ "Passer à Limine":"Switch to Limine",
+ "Passer à systemd":"Switch to systemd",
+ "systemd est conçu pour glibc (le support musl est récent).":"systemd is designed for glibc (musl support is recent).",
+ "Passer à glibc":"Switch to glibc",
+ "Passer à OpenRC":"Switch to OpenRC",
+ "Hyprland, Sway et MangoWC fonctionnent uniquement sous Wayland.":"Hyprland, Sway and MangoWC only work under Wayland.",
+ "Passer à Wayland":"Switch to Wayland",
+ "systemd-boot démarre uniquement en UEFI, et ton PC est en BIOS.":"systemd-boot only boots in UEFI, and your PC is in BIOS mode.",
+ "Passer à GRUB":"Switch to GRUB",
+ "Steam est conçu pour x86 : sur ARM, il faut une couche d'émulation (Box64 ou FEX) et les résultats varient.":"Steam is built for x86: on ARM you need an emulation layer (Box64 or FEX) and results vary.",
+ "Avec Nix, Steam demande une configuration particulière (paquet non libre, bibliothèques 32 bits).":"With Nix, Steam needs special configuration (unfree package, 32-bit libraries).",
+ "Écrire (traitement de texte)":"Writing (word processor)",
+ "Présentations":"Presentations",
+ "Lire et modifier des PDF":"Read and edit PDFs",
+ "Développement":"Development",
+ "Éditeur de code":"Code editor",
+ "Multimédia et communication":"Multimedia and communication",
+ "Lecteur audio et vidéo":"Audio and video player",
+ "Voix et communautés":"Voice and communities",
+ "Partage et synchronisation":"Sharing and synchronization",
+ "Envoyer des fichiers entre appareils":"Send files between devices",
+ "Synchroniser des dossiers":"Synchronize folders",
+ "Création":"Creation",
+ "Retoucher et dessiner des images":"Edit and draw images",
+ "Développer des photos RAW":"Develop RAW photos",
+ "Montage vidéo":"Video editing",
+ "Convertir des vidéos":"Convert videos",
+ "Enregistrer l'écran et diffuser":"Record the screen and stream",
+ "Audio et musique (création)":"Audio and music (creation)",
+ "3D, CAO et électronique":"3D, CAD and electronics",
+ "Mise en page et composition":"Layout and typesetting",
+ "Sécurité personnelle":"Personal security",
+ "Gestionnaire de mots de passe":"Password manager",
+ "Chiffrer des fichiers":"Encrypt files",
+ "Antivirus et audit":"Antivirus and auditing",
+ "Notes et connaissances":"Notes and knowledge",
+ "Courriel et agenda":"Email and calendar",
+ "Tâches et projets":"Tasks and projects",
+ "Livres numériques et références":"E-books and references",
+ "Utilitaires système":"System utilities",
+ "Surveillance système":"System monitoring",
+ "Disques et stockage":"Disks and storage",
+ "Instantanés système":"System snapshots",
+ "Gestionnaire de fichiers":"File manager",
+ "Outils en ligne de commande modernes":"Modern command-line tools",
+ "Captures d'écran et presse-papiers":"Screenshots and clipboard",
+ "Environnements isolés (Distrobox)":"Isolated environments (Distrobox)",
+ "Conteneurs système":"System containers",
+ "Réseau et accès distant":"Network and remote access",
+ "Accès distant en ligne de commande":"Remote command-line access",
+ "Bureau à distance":"Remote desktop",
+ "Analyse réseau":"Network analysis",
+ "Téléchargements":"Downloads",
+ "Lecteur de musique":"Music player",
+ "Émulation et jeux rétro":"Emulation and retro games",
+ "Outils de jeu":"Gaming tools",
+ "Médiathèque et streaming vidéo":"Media library and video streaming",
+ "Flux RSS et podcasts":"RSS feeds and podcasts",
+ "Combien de mémoire (RAM) a ta machine ?":"How much memory (RAM) does your machine have?",
+ "2 Go ou moins":"2 GB or less",
+ "8 Go ou plus":"8 GB or more",
+ "Toujours les derniers logiciels et correctifs, avec un risque de casse à surveiller.":"Always the latest software and fixes, with a risk of breakage to watch.",
+ "Une nouvelle version tous les 6 mois : logiciels récents et étapes claires.":"A new release every 6 months: recent software and clear milestones.",
+ "Versions figées et très prévisibles, avec des correctifs de sécurité.":"Frozen versions, very predictable, with security fixes.",
+ "Support très long, idéal pour ne pas toucher au système pendant des années.":"Very long support, ideal for not touching the system for years.",
+ "La plus compatible avec les logiciels du marché.":"The most compatible with software on the market.",
+ "Mises à jour":"Updates",
+ "Très simple et fourni avec systemd.":"Very simple and ships with systemd.",
+ "i3 et Openbox fonctionnent uniquement sous X11.":"i3 and Openbox only work under X11.",
+ "Passer à Xorg":"Switch to Xorg",
+ "Passer à Fedora":"Switch to Fedora",
+ "Barre d'état":"Status bar",
+ "Barre légère et très répandue pour Wayland.":"Light and very common bar for Wayland.",
+ "Barre classique pour X11.":"Classic bar for X11.",
+ "Lanceur d'applications rapide pour Wayland.":"Fast application launcher for Wayland.",
+ "Lanceur et menus très configurables.":"Highly configurable launcher and menus.",
+ "Démon de notifications léger pour Wayland.":"Light notification daemon for Wayland.",
+ "Démon de notifications léger pour X11.":"Light notification daemon for X11.",
+ "Tu préfères la souris ou le clavier pour piloter ton bureau ?":"Do you prefer the mouse or the keyboard to drive your desktop?",
+ "Le clavier (fenêtres rangées automatiquement)":"The keyboard (windows tiled automatically)",
+ "Ton PC a-t-il plus de 10 ans ?":"Is your computer more than 10 years old?",
+ "petite, rapide et économe en mémoire.":"small, fast and memory-efficient.",
+ "stable et très compatible, avec un bureau léger prêt à l'emploi.":"stable and very compatible, with a ready-to-use light desktop.",
+ "Stable et économe : suffisant pour un bureau léger.":"Stable and frugal: enough for a light desktop.",
+ "Système de fichiers":"File system",
+ "Conçu pour les cartes SD et l'eMMC : réduit l'usure.":"Designed for SD cards and eMMC: reduces wear.",
+ "Simple, léger et très éprouvé.":"Simple, light and battle-tested.",
+ "Outils de base":"Base tools",
+ "Un seul petit programme : très économe en espace et en mémoire.":"A single small program: very economical in space and memory.",
+ "Toutes les options habituelles, très compatibles.":"All the usual options, very compatible.",
+ "Fonctionne avec les vieux processeurs graphiques et les vieux pilotes.":"Works with old graphics processors and old drivers.",
+ "Moderne et léger, adapté à un PC récent.":"Modern and light, suited to a recent PC.",
+ "Bureau complet à la souris, très léger.":"Full mouse-driven desktop, very light.",
+ " Convient à 2 Go de RAM.":" Suitable for 2 GB of RAM.",
+ "Fenêtres rangées automatiquement, très léger, pour X11.":"Windows tiled automatically, very light, for X11.",
+ "Léger, au clavier, avec quelques effets.":"Light, keyboard-driven, with a few effects.",
+ "Léger, au clavier, stable et sans animations.":"Light, keyboard-driven, stable and without animations.",
+ "Léger et bien pris en charge.":"Light and well supported.",
+ "Réseau":"Network",
+ "Démon Wi-Fi léger, très économe.":"Light Wi-Fi daemon, very frugal.",
+ "Simple : Wi-Fi, câble et VPN avec une applet.":"Simple: Wi-Fi, cable and VPN with an applet.",
+ "Ce bureau est trop lourd pour 2 Go de RAM ou moins.":"This desktop is too heavy for 2 GB of RAM or less.",
+ "Ton ordinateur peut-il être volé ou perdu ?":"Could your computer be stolen or lost?",
+ "Oui (portable, déplacements)":"Yes (laptop, travel)",
+ "Tu lances souvent des applications téléchargées ou tu ouvres des sites inconnus ?":"Do you often run downloaded applications or visit unknown sites?",
+ "Non, mon usage est maîtrisé":"No, my usage is controlled",
+ "Tu acceptes que certains logiciels ne marchent plus pour gagner en sécurité ?":"Do you accept that some software stops working in exchange for more security?",
+ "Oui, la sécurité d'abord":"Yes, security first",
+ "Non, je veux un équilibre":"No, I want a balance",
+ "Tu es à l'aise pour configurer toi-même des règles de sécurité ?":"Are you comfortable setting up security rules yourself?",
+ "Tu as besoin de jeux Windows ou de logiciels propriétaires ?":"Do you need Windows games or proprietary software?",
+ "SELinux par défaut et glibc pour les logiciels propriétaires.":"SELinux by default and glibc for proprietary software.",
+ "minuscule, compilée avec des protections, avec peu de code à attaquer.":"tiny, compiled with protections, with little code to attack.",
+ "stable, avec AppArmor et des correctifs de sécurité réguliers.":"stable, with AppArmor and regular security fixes.",
+ "Options de durcissement activées par défaut.":"Hardening options enabled by default.",
+ "Stable, avec des correctifs de sécurité longtemps.":"Stable, with security fixes for a long time.",
+ "Simple et très éprouvé : moins de code, moins de surprises.":"Simple and battle-tested: less code, fewer surprises.",
+ "Instantanés pour revenir en arrière après un incident.":"Snapshots to roll back after an incident.",
+ "Très petit : peu de code à auditer.":"Very small: little code to audit.",
+ "Complets et très compatibles.":"Full-featured and very compatible.",
+ "Les applications sont isolées entre elles : un programme ne peut pas espionner les autres, contrairement à X11.":"Applications are isolated from each other: a program cannot spy on the others, unlike X11.",
+ "Petit et simple : peu de surface d'attaque.":"Small and simple: little attack surface.",
+ "Bureau Wayland natif, simple et adapté aux applications isolées.":"Native Wayland desktop, simple and suited to isolated applications.",
+ "Gère aussi les accès au micro et à l'écran par portails.":"Also handles microphone and screen access through portals.",
+ "Léger et sans services inutiles.":"Light and without unnecessary services.",
+ "Complet, avec VPN et Wi-Fi.":"Full-featured, with VPN and Wi-Fi.",
+ "Standard moderne du noyau, règles précises.":"Modern kernel standard, precise rules.",
+ "Simple : quelques commandes pour bloquer l'entrant.":"Simple: a few commands to block incoming traffic.",
+ "Contrôle d'accès":"Access control",
+ "Étiquettes sur tous les fichiers : le plus fin, mais le plus difficile.":"Labels on every file: the finest-grained, but the hardest.",
+ "Alpine n'a pas de politique SELinux complète : AppArmor est la meilleure option disponible. ":"Alpine has no complete SELinux policy: AppArmor is the best available option. ",
+ "Profils par chemins : plus simple et déjà prêt pour beaucoup de logiciels. ":"Path-based profiles: simpler and already ready for a lot of software. ",
+ "Chiffrement du disque":"Disk encryption",
+ "Indispensable si l'appareil peut être volé : sans mot de passe, le disque est illisible.":"Essential if the device can be stolen: without the password, the disk is unreadable.",
+ "Chiffre seulement les dossiers sensibles, sans couche supplémentaire.":"Encrypts only the sensitive folders, with no extra layer.",
+ "Durcissement du noyau":"Kernel hardening",
+ "Options de compilation recommandées par le projet KSPP.":"Build options recommended by the KSPP project.",
+ "Réglages faciles et peu risqués.":"Easy, low-risk settings.",
+ "Isolation des applications":"Application isolation",
+ "Chaque application tourne avec ses propres permissions.":"Each application runs with its own permissions.",
+ "Léger : isole à la demande les programmes sensibles.":"Light: isolates sensitive programs on demand.",
+ "Modèle d'image":"Image model",
+ "Le système est en lecture seule et se met à jour d'un bloc : plus difficile à altérer.":"The system is read-only and updates as a block: harder to tamper with.",
+ "Système classique, simple à entretenir.":"Classic system, easy to maintain.",
+ "Alpine n'a pas de politique SELinux complète (seulement dans testing).":"Alpine has no complete SELinux policy (only in testing).",
+ "Je n'ai pas besoin de logiciels propriétaires":"I do not need proprietary software",
+ "Les logiciels propriétaires et les jeux demandent glibc, pas musl.":"Proprietary software and games need glibc, not musl.",
+ "Ton PC démarre en BIOS : le démarrage sécurisé (Secure Boot) n'existe pas, donc la chaîne de démarrage n'est pas protégée.":"Your PC boots in BIOS mode: Secure Boot does not exist, so the boot chain is not protected.",
+ "Des services classiques (web, fichiers, base de données)":"Ordinary services (web, files, database)",
+ "Le serveur doit-il rester stable pendant des années ?":"Does the server need to stay stable for years?",
+ "Non, des mises à jour fréquentes me vont":"No, frequent updates are fine",
+ "Veux-tu pouvoir revenir en arrière après une mise à jour ratée ?":"Do you want to be able to roll back after a failed update?",
+ "Un écran et un bureau graphique sont-ils nécessaires sur le serveur ?":"Does the server need a screen and a graphical desktop?",
+ "Non, j'administre par SSH":"No, I administer it over SSH",
+ "minuscule et rapide à démarrer, idéale pour héberger des conteneurs.":"tiny and quick to boot, ideal for hosting containers.",
+ "très stable, avec un énorme choix de logiciels et un support long.":"very stable, with a huge choice of software and long support.",
+ "récente, avec des versions fréquentes et SELinux par défaut.":"recent, with frequent releases and SELinux by default.",
+ "Stable et suivi longtemps : le bon choix pour un serveur.":"Stable and maintained for a long time: the right choice for a server.",
+ "Instantanés, sommes de contrôle et chiffrement natif. Demande de la mémoire.":"Snapshots, checksums and native encryption. Needs memory.",
+ "Instantanés pour revenir en arrière après une mise à jour ratée.":"Snapshots to roll back after a failed update.",
+ "Simple et très éprouvé.":"Simple and battle-tested.",
+ "Très petit : idéal en conteneur.":"Very small: ideal in a container.",
+ "Configuration par fichiers, intégrée à systemd.":"File-based configuration, integrated with systemd.",
+ "Un fichier simple : le choix d'Alpine.":"A simple file: Alpine's choice.",
+ "Gestion complète et disponible partout.":"Complete management, available everywhere.",
+ "Simple : quelques commandes pour autoriser SSH et les services.":"Simple: a few commands to allow SSH and the services.",
+ "Actif par défaut sur cette base : contient les services compromis.":"Active by default on this base: contains compromised services.",
+ "Profils par chemins, simples à activer.":"Path-based profiles, simple to enable.",
+ "Protège les données si le serveur est volé. Le déverrouillage à distance demande un petit serveur SSH dans l'initramfs.":"Protects the data if the server is stolen. Remote unlocking needs a small SSH server in the initramfs.",
+ "Réglages simples et peu risqués pour un serveur.":"Simple, low-risk settings for a server.",
+ "Sans démon et sans droits administrateur, compatible avec les commandes Docker.":"Daemonless and rootless, compatible with Docker commands.",
+ "Interface graphique pour gérer les machines virtuelles.":"Graphical interface to manage virtual machines.",
+ "QEMU/KVM : machines virtuelles rapides, pilotables en ligne de commande.":"QEMU/KVM: fast virtual machines, drivable from the command line.",
+ "Compatible avec l'affichage à distance (VNC, RDP).":"Compatible with remote display (VNC, RDP).",
+ "Bureau léger pour un serveur.":"Light desktop for a server.",
+ "Mises à jour atomiques avec retour en arrière.":"Atomic updates with rollback.",
+ "Système classique ; le retour en arrière passe par les instantanés du système de fichiers.":"Classic system; rollback goes through file-system snapshots.",
+ "ZFS demande beaucoup de mémoire : 2 Go ou moins ne suffisent pas.":"ZFS needs a lot of memory: 2 GB or less is not enough.",
+ "Cette base est en continu : les mises à jour fréquentes ne conviennent pas à un serveur qui doit rester stable.":"This base is rolling: frequent updates do not suit a server that must stay stable.",
+ "Passer à Rocky Linux":"Switch to Rocky Linux",
+ "Les mises à jour fréquentes me vont":"Frequent updates are fine",
+ "2 Go de RAM ou moins laissent très peu de place aux machines virtuelles.":"2 GB of RAM or less leaves very little room for virtual machines.",
+ "Je préfère des conteneurs (plus légers)":"I prefer containers (lighter)",
+ "Tu échanges beaucoup de documents avec des personnes qui utilisent Microsoft Office ?":"Do you exchange a lot of documents with people who use Microsoft Office?",
+ "Oui, tout le temps":"Yes, all the time",
+ "Tu fais surtout du texte, ou aussi des tableaux et des présentations ?":"Do you mostly write text, or also spreadsheets and presentations?",
+ "Surtout du texte":"Mostly text",
+ "Texte, tableaux et présentations":"Text, spreadsheets and presentations",
+ "Quel bureau préfères-tu ?":"Which desktop do you prefer?",
+ "Simple et épuré (GNOME)":"Simple and clean (GNOME)",
+ "Léger (Xfce)":"Light (Xfce)",
+ "Tu travailles à plusieurs sur les mêmes documents ?":"Do you work with others on the same documents?",
+ "Tu veux des logiciels récents ou un système très stable ?":"Do you want recent software or a very stable system?",
+ "Récents":"Recent",
+ "Très stable":"Very stable",
+ "récente, avec les derniers logiciels et un bureau moderne.":"recent, with the latest software and a modern desktop.",
+ "très stable : les mises à jour ne bousculent pas ton travail.":"very stable: updates do not disrupt your work.",
+ "Meilleur support du matériel récent.":"Best support for recent hardware.",
+ "Stable : le bureau ne change pas sous tes pieds.":"Stable: the desktop does not change under your feet.",
+ "Très petit.":"Very small.",
+ "Xfce fonctionne encore le mieux sous X11.":"Xfce still works best under X11.",
+ "Standard actuel des bureaux KDE et GNOME.":"Current standard of KDE and GNOME desktops.",
+ "Familier pour qui vient de Windows : barre des tâches, menu et réglages complets.":"Familiar if you come from Windows: taskbar, menu and complete settings.",
+ "Simple et épuré, sans distraction.":"Simple and clean, distraction-free.",
+ "Léger et classique, très stable.":"Light and classic, very stable.",
+ "Bien pris en charge, avec le partage d'écran en visioconférence.":"Well supported, with screen sharing in video calls.",
+ "Simple : bloque l'entrant sans réglage.":"Simple: blocks incoming traffic without any setup.",
+ "Protège tes documents si l'ordinateur est perdu ou volé.":"Protects your documents if the computer is lost or stolen.",
+ "Xfce ne fonctionne pas encore complètement sous Wayland.":"Xfce does not yet work completely under Wayland.",
+ "Steam, jeux Windows via Proton, bonnes performances.":"Steam, Windows games through Proton, good performance.",
+ "Isolation, chiffrement, noyau durci.":"Isolation, encryption, hardened kernel.",
+ "Serveur / conteneurs":"Server / containers",
+ "Init d'openSUSE.":"openSUSE's init.",
+ "Init d'OpenWrt.":"OpenWrt's init.",
+ "Init d'AlmaLinux.":"AlmaLinux's init.",
+ "La plus ancienne distribution active. Simple, sans surcouche.":"The oldest active distribution. Simple, no extra layers.",
+ "Compatible RHEL.":"RHEL-compatible.",
+ "Scripts BSD (rc)":"BSD scripts (rc)",
+ "J'aime bricoler":"I like tinkering",
+ "Serveur d'affichage":"Display server",
+ "Choisir glibc":"Choose glibc",
+ "Les jeux Windows (Steam, Proton, Wine) demandent glibc.":"Windows games (Steam, Proton, Wine) need glibc.",
+ "Choisir pacman":"Choose pacman",
+ "Choisir Xfce (X11)":"Choose Xfce (X11)",
+ "Navigateur web":"Web browser",
+ "Navigation web":"Web browsing",
+ "Versions (Git)":"Version control (Git)",
+ "Messagerie personnelle":"Personal messaging",
+ "Dessin vectoriel":"Vector drawing",
+ "Impression 3D":"3D printing",
+ "Machines virtuelles":"Virtual machines",
+ "Choisir Sway (Wayland)":"Choose Sway (Wayland)",
+ "La souris (bureau classique)":"The mouse (classic desktop)",
+ "Choisir Xfce":"Choose Xfce",
+ "Choisir Sway":"Choose Sway",
+ "Choisir AppArmor":"Choose AppArmor",
+ "Que veux-tu faire tourner ?":"What do you want to run?",
+ "Des conteneurs (Docker, Podman)":"Containers (Docker, Podman)",
+ "Des machines virtuelles":"Virtual machines",
+ "Choisir Btrfs":"Choose Btrfs",
+ "Choisir ext4":"Choose ext4",
+ "Un peu":"A little",
+ "Familier, comme Windows (KDE Plasma)":"Familiar, like Windows (KDE Plasma)",
+ "Choisir KDE Plasma":"Choose KDE Plasma",
+ "Bureautique":"Office",
+ "Noyau":"Kernel",
+ "Bureau":"Desktop",
+ "Son":"Sound",
+ "Tableur":"Spreadsheet",
+ "Conteneurs":"Containers",
+ "Sauvegarder":"Back up",
+ "Organisation":"Organization",
+ "Virtualisation":"Virtualization",
+ "Loisirs":"Leisure",
+ "Lanceur":"Launcher",
+ "Choix manuel. ":"Manual choice. ",
+ "✅ Tutoriel complet et testé":"✅ Complete, tested tutorial",
+ "✍️ Écrit, pas encore testé":"✍️ Written, not tested yet",
+ "⏳ Pas encore couvert":"⏳ Not covered yet",
+ "NVIDIA : pilote propriétaire à installer, avec les en-têtes du noyau.":"NVIDIA: proprietary driver to install, with the kernel headers.",
+ "AMD : pilotes libres Mesa et Vulkan, plus le firmware (linux-firmware).":"AMD: open-source Mesa and Vulkan drivers, plus the firmware (linux-firmware).",
+ "Intel : pilotes libres Mesa, rien de propriétaire.":"Intel: open-source Mesa drivers, nothing proprietary.",
+ "Wi-Fi Intel : firmware iwlwifi (paquet linux-firmware).":"Intel Wi-Fi: iwlwifi firmware (linux-firmware package).",
+ "Wi-Fi Realtek : selon la puce, un pilote supplémentaire peut être nécessaire.":"Realtek Wi-Fi: depending on the chip, an extra driver may be needed.",
+ "Wi-Fi Broadcom : firmware non libre à installer, sinon pas de Wi-Fi.":"Broadcom Wi-Fi: non-free firmware to install, otherwise no Wi-Fi.",
+ "Wi-Fi MediaTek ou Atheros : en général pris en charge par le noyau et linux-firmware.":"MediaTek or Atheros Wi-Fi: usually supported by the kernel and linux-firmware.",
+ "Démarrage BIOS : utiliser GRUB ou Limine. systemd-boot est exclu.":"BIOS boot: use GRUB or Limine. systemd-boot is ruled out.",
+ "Démarrage UEFI : prévoir une partition EFI (FAT32, environ 512 Mo).":"UEFI boot: plan an EFI partition (FAT32, about 512 MB).",
+ "SSD : activer le TRIM périodique (fstrim).":"SSD: enable periodic TRIM (fstrim).",
+ "Disque dur : ext4 suffit, évite les options coûteuses.":"Hard disk: ext4 is enough, avoid costly options.",
+ "eMMC ou carte SD : limiter les écritures (journaux en mémoire).":"eMMC or SD card: limit writes (logs kept in memory).",
+ "Peu de mémoire : bureau léger conseillé, et zram (swap compressé).":"Little memory: a light desktop is advised, plus zram (compressed swap).",
+ "ARM : tous les paquets doivent exister en aarch64. Steam et beaucoup de jeux ne sont pas natifs.":"ARM: every package must exist for aarch64. Steam and many games are not native.",
+ "Quel est le processeur ?":"Which processor is it?",
+ "Intel (PC classique)":"Intel (regular PC)",
+ "AMD (PC classique)":"AMD (regular PC)",
+ "Quelle est la carte graphique ?":"Which graphics card is it?",
+ "Intel (intégrée)":"Intel (integrated)",
+ "Autre":"Other",
+ "Combien de mémoire (RAM) ?":"How much memory (RAM)?",
+ "4 Go ou moins":"4 GB or less",
+ "8 Go":"8 GB",
+ "16 Go ou plus":"16 GB or more",
+ "Comment le PC démarre-t-il ?":"How does the PC boot?",
+ "UEFI (récent)":"UEFI (recent)",
+ "BIOS (ancien)":"BIOS (old)",
+ "Quelle puce Wi-Fi ?":"Which Wi-Fi chip?",
+ "Autre (MediaTek, Atheros…)":"Other (MediaTek, Atheros…)",
+ "Quel stockage ?":"Which storage?",
+ "Disque dur (HDD)":"Hard disk (HDD)",
+ "eMMC ou carte SD":"eMMC or SD card",
+ "Processeur":"Processor",
+ "Carte graphique":"Graphics card",
+ "Démarrage":"Boot",
+ "Stockage":"Storage",
+ "Noyau + base système":"Kernel + base system",
+ "Paquets + construction":"Packages + build",
+ "Bureau / graphique":"Desktop / graphics",
+ "Logiciels courants":"Everyday software",
+ "Sécurité":"Security",
+ "Cœur du système, gère le matériel, la mémoire et les processus.":"Core of the system; manages hardware, memory and processes.",
+ "Interface entre les programmes et le noyau. Détermine la compatibilité des logiciels.":"Interface between programs and the kernel. Determines software compatibility.",
+ "Premier processus lancé par le noyau, gère les services.":"First process started by the kernel; manages services.",
+ "Charge le noyau au démarrage de la machine.":"Loads the kernel when the machine starts.",
+ "Outils de base et shell":"Base tools and shell",
+ "Commandes de base (ls, cp, grep…) et interpréteur de commandes.":"Basic commands (ls, cp, grep…) and the command interpreter.",
+ "Organisation du stockage sur disque.":"How storage is organized on disk.",
+ "Installe, met à jour et supprime les logiciels.":"Installs, updates and removes software.",
+ "Outil de build ISO":"ISO build tool",
+ "Fabrique l'image installable ou live de la distro.":"Builds the distro's installable or live image.",
+ "Modèle d'image système":"System image model",
+ "Façon dont le système est stocké et mis à jour.":"How the system is stored and updated.",
+ "Dépôts et mises à jour":"Repositories and updates",
+ "Rythme et stabilité des versions.":"Release pace and stability.",
+ "Protocole graphique entre les applications et l'écran.":"Graphics protocol between applications and the screen.",
+ "Compositeur / fenêtres":"Compositor / windows",
+ "Dessine et organise les fenêtres.":"Draws and arranges windows.",
+ "Environnement de bureau":"Desktop environment",
+ "Bureau complet avec ses outils intégrés.":"Complete desktop with its built-in tools.",
+ "Barre, lanceur, notifications":"Bar, launcher, notifications",
+ "Éléments d'interface autour du compositeur.":"Interface elements around the compositor.",
+ "Émulateur de terminal.":"Terminal emulator.",
+ "Serveur audio":"Audio server",
+ "Gère le son et le routage entre applications.":"Handles sound and routing between applications.",
+ "Gestion du réseau":"Network management",
+ "Connexion Wi-Fi, filaire, VPN.":"Wi-Fi, wired and VPN connection.",
+ "Édition de fichiers et de code.":"Editing files and code.",
+ "Éditeur de texte / code":"Text / code editor",
+ "Lecteur multimédia":"Media player",
+ "Lecture audio et vidéo.":"Audio and video playback.",
+ "Lanceur de jeux":"Game launcher",
+ "Installe et lance les jeux, y compris les jeux Windows.":"Installs and launches games, including Windows games.",
+ "Traitement de texte, tableur et présentations.":"Word processing, spreadsheets and presentations.",
+ "Messagerie et visio":"Messaging and video calls",
+ "Discuter, appeler, partager avec ses contacts ou sa communauté.":"Chat, call and share with your contacts or community.",
+ "Contrôle de version":"Version control",
+ "Suivre les modifications du code et collaborer.":"Track code changes and collaborate.",
+ "Faire tourner des applications isolées sans machine virtuelle.":"Run isolated applications without a virtual machine.",
+ "Transfert de fichiers entre appareils":"File transfer between devices",
+ "Envoyer des fichiers entre téléphone, ordinateur et tablette.":"Send files between phone, computer and tablet.",
+ "Synchronisation de dossiers":"Folder synchronization",
+ "Garder les mêmes dossiers à jour sur plusieurs appareils.":"Keep the same folders up to date on several devices.",
+ "Sauvegarde":"Backup",
+ "Garder une copie de tes données pour les retrouver après une panne.":"Keep a copy of your data to recover it after a failure.",
+ "Mots de passe":"Passwords",
+ "Stocker et générer des mots de passe uniques et solides.":"Store and generate unique, strong passwords.",
+ "Chiffrer ta connexion et accéder à un réseau privé.":"Encrypt your connection and reach a private network.",
+ "Chiffrement de fichiers":"File encryption",
+ "Protéger des fichiers ou des dossiers avec un mot de passe ou une clé.":"Protect files or folders with a password or a key.",
+ "Audit et analyse":"Audit and analysis",
+ "Vérifier l'état de sécurité de ton système et de tes fichiers.":"Check the security state of your system and files.",
+ "Prendre des notes et relier ses idées.":"Take notes and link your ideas.",
+ "Lire et écrire des e-mails, gérer son agenda et ses contacts.":"Read and write emails, manage your calendar and contacts.",
+ "Suivre ses tâches et ses échéances.":"Track your tasks and deadlines.",
+ "Lire, ranger et citer des livres et des articles.":"Read, organize and cite books and articles.",
+ "Retouche d'image et photo":"Image and photo editing",
+ "Retoucher, dessiner et développer des photos.":"Retouch, draw and develop photos.",
+ "Dessiner des logos, schémas et illustrations qui restent nets à toute taille.":"Draw logos, diagrams and illustrations that stay sharp at any size.",
+ "Couper, assembler et habiller des vidéos.":"Cut, assemble and dress up videos.",
+ "Conversion vidéo":"Video conversion",
+ "Changer le format ou réduire le poids d'une vidéo.":"Change the format or reduce the size of a video.",
+ "Capture et streaming":"Capture and streaming",
+ "Enregistrer l'écran ou diffuser en direct.":"Record the screen or broadcast live.",
+ "Éditer du son et composer de la musique.":"Edit sound and compose music.",
+ "Modéliser des objets, des pièces et des circuits.":"Model objects, parts and circuits.",
+ "Préparer des pièces pour une imprimante 3D.":"Prepare parts for a 3D printer.",
+ "Composer des documents, affiches, livres et publications.":"Compose documents, posters, books and publications.",
+ "Voir ce que fait l'ordinateur : processeur, mémoire, disques, réseau.":"See what the computer is doing: processor, memory, disks, network.",
+ "Partitionner, analyser et surveiller les disques.":"Partition, analyze and monitor disks.",
+ "Compresser et extraire des fichiers.":"Compress and extract files.",
+ "Revenir à un état précédent du système après une panne.":"Go back to a previous system state after a failure.",
+ "Choisir l'interpréteur de commandes.":"Choose the command interpreter.",
+ "Remplacer des commandes classiques par des versions plus rapides et plus agréables.":"Replace classic commands with faster, nicer versions.",
+ "Capturer l'écran et gérer le copier-coller.":"Capture the screen and manage copy-paste.",
+ "Faire tourner un autre système dans une fenêtre.":"Run another system in a window.",
+ "Faire tourner une autre distribution dans un conteneur intégré.":"Run another distribution in an integrated container.",
+ "Faire tourner des systèmes complets légers, comme de petites machines.":"Run lightweight full systems, like small machines.",
+ "Se connecter à un autre ordinateur ou à un serveur en terminal.":"Connect to another computer or a server in a terminal.",
+ "Contrôler un autre ordinateur avec son écran.":"Control another computer with its screen.",
+ "Comprendre et diagnostiquer le trafic réseau.":"Understand and diagnose network traffic.",
+ "Télécharger des fichiers et des vidéos.":"Download files and videos.",
+ "Écouter sa collection ou des services en ligne.":"Listen to your collection or online services.",
+ "Jouer à d'anciens jeux sur ordinateur.":"Play old games on a computer.",
+ "Améliorer et surveiller les performances en jeu.":"Improve and monitor in-game performance.",
+ "Regarder films, séries et TV depuis sa propre collection.":"Watch movies, series and TV from your own collection.",
+ "Suivre des sites, des blogs et des podcasts.":"Follow sites, blogs and podcasts.",
+ "Le système sur lequel s'appuie ta distribution.":"The system your distribution builds on.",
+ "Navigation dans les fichiers.":"Browsing files.",
+ "Contrôle d'accès obligatoire":"Mandatory access control",
+ "Limite ce que chaque programme peut faire, au-delà des droits Unix.":"Limits what each program can do, beyond Unix permissions.",
+ "Protège les données si l'appareil est volé.":"Protects the data if the device is stolen.",
+ "Pare-feu":"Firewall",
+ "Filtre le trafic réseau.":"Filters network traffic.",
+ "Réglages et correctifs qui réduisent la surface d'attaque.":"Settings and patches that reduce the attack surface.",
+ "Enferme les programmes pour limiter les dégâts.":"Locks programs in to limit the damage."
+};
+const FRAG_KEYS=Object.keys(FRAG).filter(k=>k.length>=8).sort((a,b)=>b.length-a.length);
+const trxCache={};
+function trx(s){
+  if(LANG!=="en"||typeof s!=="string"||!s)return s;
+  if(s in trxCache)return trxCache[s];
+  let r=s;
+  if(FRAG[s]!==undefined)r=FRAG[s];
+  else FRAG_KEYS.forEach(k=>{if(r.includes(k))r=r.split(k).join(FRAG[k])});
+  return trxCache[s]=r;
+}
+const WARNING_EN=["⚠️ Learning tool, provided without warranty.","Follow this tutorial in a virtual machine first, not on your main machine.","Never run a command you do not understand.","Back up your data before touching disks.","Only Alpine has been tested in a VM. The other bases are written but not tested yet."];
+function warning(){return LANG==="en"?WARNING_EN:WARNING}
 // Couche anglaise des données, chemins « collection/id/champ » (aide : « help/clé »). Vide au lot 0.
 const EN_DATA={};
 const L10N_FIELDS={tools:["summary","description"],cats:["name","description"],layers:["name"],objectives:["name","desc"],bases:["desc"]};
@@ -2464,11 +3275,20 @@ function l10nRef(path){
   return o&&(L10N_FIELDS[col]||[]).includes(f)&&f in o?{o,f}:null;
 }
 function applyDataLang(){
+  const one=(path,o,f)=>{if(!(path in FR0))FR0[path]=o[f];o[f]=LANG==="en"?(path in EN_DATA?EN_DATA[path]:trx(FR0[path])):FR0[path]};
+  LAYERS.forEach(l=>one("layers/"+l.id+"/name",l,"name"));
+  CATS.forEach(c=>{one("cats/"+c.id+"/name",c,"name");one("cats/"+c.id+"/description",c,"description")});
   Object.keys(EN_DATA).forEach(path=>{
-    const r=l10nRef(path);if(!r)return;
+    const r=l10nRef(path);if(!r||/^(layers|cats)\//.test(path))return;
     if(!(path in FR0))FR0[path]=r.o[r.f];
     r.o[r.f]=LANG==="en"?EN_DATA[path]:FR0[path];
   });
+}
+function applyStatic(){
+  document.querySelectorAll("[data-i]").forEach(el=>{el.textContent=tx(el.dataset.i)});
+  document.querySelectorAll("[data-ip]").forEach(el=>{el.placeholder=tx(el.dataset.ip)});
+  document.querySelectorAll("[data-ia]").forEach(el=>{el.setAttribute("aria-label",tx(el.dataset.ia))});
+  $("disclaimer").innerHTML="<b>"+esc(warning()[0])+"</b> "+warning().slice(1).map(esc).join(" ");
 }
 function setLang(l,noRefresh){
   if(!LANGS.includes(l))return;
@@ -2477,6 +3297,7 @@ function setLang(l,noRefresh){
   document.documentElement.lang=l;
   applyDataLang();
   $("langBtn").textContent=tx("lang.switch");$("langBtn").setAttribute("aria-label",tx("lang.switch_aria"));
+  applyStatic();
   if(noRefresh)return;
   if($("compare").classList.contains("hidden"))renderGuide();else render();
 }
@@ -3057,7 +3878,7 @@ function buildTutorial(){
   // ---------- rédaction ----------
   P(`# Distro ${obj.name.toLowerCase()} sur ${BD.name} : tutoriel pas à pas`);
   P("");
-  WARNING.forEach((w,i)=>P((i?"> - ":"> **")+w+(i?"":"**")));P("");
+  warning().forEach((w,i)=>P((i?"> - ":"> **")+w+(i?"":"**")));P("");
   P(`> Généré par l'Atlas distro le ${date}. Les données sont écrites à la main : relis chaque étape avant de l'exécuter, surtout celles marquées ⚠️.`);
   P("");
   const VM=DISTRO_STATUS._meta[baseId];
@@ -3189,12 +4010,12 @@ function mdScreen(){
   const text=buildTutorial();
   const lines=text.split("\n").length;
   const states=(text.match(/\*\*État :\*\*/g)||[]).length;
-  return `<h2>Ton tutoriel</h2><p class="lead">Un fichier Markdown pas à pas : installation de la pile puis construction de l'ISO. ${lines} lignes, ${states} étapes, chacune avec son état de vérification.</p>
-   <div class="warn" style="margin:0 0 12px">⚠️ Aucune étape n'a été testée dans un conteneur ou une machine virtuelle. Les étapes marquées « À vérifier » demandent ta relecture.</div>
-   <button class="big" data-mddl="1" style="margin:0 0 8px">Télécharger le fichier .md</button>
-   <button class="opt" data-mdcopy="1">Copier le texte</button>
-   <details class="grp"><summary>Aperçu du fichier <span class="cnt">${lines} lignes</span></summary><pre style="max-height:60vh;overflow:auto;font-size:11px">${esc(text)}</pre></details>
-   <button class="ghost" data-mdback="1">← Retour à la pile</button>`;
+  return `<h2>${tx("md.title")}</h2><p class="lead">${tx("md.lead",{lines,steps:states})}</p>
+   <div class="warn" style="margin:0 0 12px">${tx("md.warn")}</div>
+   <button class="big" data-mddl="1" style="margin:0 0 8px">${tx("md.dl")}</button>
+   <button class="opt" data-mdcopy="1">${tx("md.copy")}</button>
+   <details class="grp"><summary>${tx("md.preview")} <span class="cnt">${tx("md.lines",{n:lines})}</span></summary><pre style="max-height:60vh;overflow:auto;font-size:11px">${esc(text)}</pre></details>
+   <button class="ghost" data-mdback="1">${tx("md.back")}</button>`;
 }
 
 function focusQ(){const q=$("qcur");if(q)q.scrollIntoView({block:"start"})}
@@ -3223,7 +4044,7 @@ $("guide").addEventListener("click",e=>{
   if(d.scope){G.scope=d.scope;if(d.scope==="general"){Object.keys(HW).forEach(k=>delete HW[k]);G.stage=null}else{G.stage="hw";G.hwI=-1;G.hwMsg=null}renderGuide();scrollTo(0,0);return}
   if(d.hwmodel){const v=($("hwm").value||"").trim().toLowerCase().replace(/\s+/g," ");const key=Object.keys(MODELS).find(k=>v&&(v.includes(k)||(v.length>=4&&k.includes(v))));
     if(key){const m=MODELS[key];Object.keys(HW).forEach(k=>delete HW[k]);Object.assign(HW,m);HW.model=m.label;delete HW.label;G.hwI=HWQ.length;G.hwMsg=null}
-    else{HW.model=($("hwm").value||"").trim()||undefined;G.hwMsg=v?"Modèle non reconnu pour l'instant. Saisis les composants à la place.":null;G.hwI=v?0:-1}
+    else{HW.model=($("hwm").value||"").trim()||undefined;G.hwMsg=v?"hw.unknown_model":null;G.hwI=v?0:-1}
     renderGuide();scrollTo(0,0);return}
   if(d.hwskip!==undefined&&!d.hwa&&d.hwskip==="1"){G.hwI=0;G.hwMsg=null;renderGuide();scrollTo(0,0);return}
   if(d.hwa!==undefined){const q=HWQ[G.hwI];if(d.hwa)HW[q.id]=d.hwa;else delete HW[q.id];G.hwI++;renderGuide();scrollTo(0,0);return}
@@ -3251,7 +4072,7 @@ $("guide").addEventListener("click",e=>{
   if(d.md){G.stage="md";clr();renderGuide();scrollTo(0,0);return}
   if(d.mdback){G.stage=null;renderGuide();scrollTo(0,0);return}
   if(d.mddl){const t=buildTutorial();const name="tutoriel-"+G.obj+"-"+(curBase()||"distro")+".md";downloadMd(t,name);return}
-  if(d.mdcopy){const t=buildTutorial();const done=()=>{b.textContent="Copié ✓";setTimeout(()=>{b.textContent="Copier le texte"},1500)};
+  if(d.mdcopy){const t=buildTutorial();const done=()=>{b.textContent=tx("md.copied");setTimeout(()=>{b.textContent=tx("md.copy")},1500)};
     try{navigator.clipboard.writeText(t).then(done,()=>{const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done()}catch(e){}ta.remove()})}catch(e){}return}
   if(d.swback){G.stage=null;G.swTip=null;renderGuide();scrollTo(0,0);return}
   if(d.swtc){G.swTip=G.swTip===d.swtc?null:d.swtc;renderGuide();return}
@@ -3274,7 +4095,6 @@ function setMode(m){
 $("cmpBackBtn").onclick=()=>{setMode("guide");scrollTo(0,0)};
 $("tabG").onclick=()=>setMode("guide");
 $("tabC").onclick=()=>setMode("compare");
-$("disclaimer").innerHTML="<b>"+esc(WARNING[0])+"</b> "+WARNING.slice(1).map(esc).join(" ");
 $("langBtn").onclick=()=>setLang(LANG==="fr"?"en":"fr");
 setLang(initialLang(),true);
 setCat("init");
