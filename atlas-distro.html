@@ -2267,7 +2267,7 @@ const FLATPAK_ALT={
  amberol:{id:"io.bassi.Amberol",bases:["fedora"]},cmus:{id:"io.github.cmus.cmus",bases:["fedora"]},mgba:{id:"io.mgba.mGBA",bases:["fedora"]}
 };
 function fhState(id){return FLATHUB_STATUS.ids[id]==="ok"?"ok":"check"}
-function fhNote(id){const m=FLATHUB_STATUS._meta;return FLATHUB_STATUS.ids[id]==="ok"?`identifiant trouvé dans l'index Flathub le ${m.verified_on}`:"identifiant non trouvé dans l'index Flathub"}
+function fhNote(id){const m=FLATHUB_STATUS._meta;return FLATHUB_STATUS.ids[id]==="ok"?`identifiant trouvé dans l'index Flathub le ${D(m.verified_on)}`:"identifiant non trouvé dans l'index Flathub"}
 function ubuntuNames(pkgs,base){return base==="ubuntu"?pkgs.map(n=>UBUNTU_PKG[n]||n):pkgs}
 function curBase(){
   if(BN[G.base])return G.base;
@@ -2591,6 +2591,70 @@ const I18N={
  "md.preview":"Aperçu du fichier",
  "md.lines":"{n} lignes",
  "md.back":"← Retour à la pile",
+ "tuto.h1":"# Distro {obj} sur {base} : tutoriel pas à pas",
+ "tuto.gen":"> Généré par l'Atlas distro le {date}. Les données sont écrites à la main : relis chaque étape avant de l'exécuter, surtout celles marquées ⚠️.",
+ "tuto.pkgver":"> Noms de paquets vérifiés le {date} sur {label}, dans les index officiels ({src}). Les commandes n'ont pas été exécutées.",
+ "tuto.scratch":"> Parcours « distro depuis zéro » sur {base} : {status}.",
+ "tuto.legend":"Légende des états",
+ "tuto.leg.tested":"- {st} : commandes exécutées avec succès dans une machine virtuelle, à la date et sur la version indiquées",
+ "tuto.leg.ok":"- {st}",
+ "tuto.leg.check":"- {st} : nom de paquet, option ou identifiant non confirmé pour cette base",
+ "tuto.leg.manual":"- {st} : à faire à la main, avec la documentation officielle",
+ "tuto.leg.info":"- {st} : déjà fourni par la base ou par un autre composant",
+ "tuto.root":"Les commandes sont à lancer en root (ou avec `sudo` ou `doas`).",
+ "tuto.stack":"Ta pile",
+ "tuto.stack.head":"| Brique | Choix | Pourquoi |",
+ "tuto.manual":" (choix manuel)",
+ "tuto.hw":"Ton matériel",
+ "tuto.warns":"Avertissements",
+ "tuto.w.unresolved":"**Conflit non résolu** : {msg}",
+ "tuto.w.kept":"**Conflit conservé volontairement** : {msg}",
+ "tuto.w.gentoo":"**Compilation longue** : Gentoo compile chaque paquet depuis les sources. Compte plusieurs heures pour le système de base, et souvent une nuit pour un bureau complet (KDE Plasma, GNOME). Laisse la VM allumée et branchée.",
+ "tuto.w.changed":"**Objectif de départ modifié** : « {q} » est passé de « {from} » à « {to} »",
+ "tuto.nc":"Ce que ce tutoriel ne couvre pas",
+ "tuto.nc1":"Le partitionnement et l'installation de la base : étape manuelle, à faire avec la documentation officielle.",
+ "tuto.nc2":"La configuration de ton bureau (thèmes, raccourcis, gestionnaire de connexion et session).",
+ "tuto.nc3":"Les réglages internes des logiciels (profils, comptes, synchronisation).",
+ "tuto.nc4":"Les pilotes propriétaires hors dépôts (par exemple NVIDIA sur Alpine).",
+ "tuto.steps":"Étapes",
+ "tuto.id":"Identifiant : `{ref}`",
+ "tuto.state":"**État :** {st}",
+ "tuto.where":"**Où :** {w}",
+ "tuto.where.hote":"sur ta machine (hôte), dans le dossier de la VM",
+ "tuto.where.live":"dans la VM, sur le système live de l'ISO",
+ "tuto.where.chroot":"dans la VM, dans le chroot (système installé)",
+ "tuto.where.systeme":"dans la VM, sur le système installé, en root",
+ "tuto.why":"**Pourquoi :** {t}",
+ "tuto.needs":"**À prévoir :**",
+ "tuto.cmd":"**Commande :**",
+ "tuto.verify":"**Vérifier :**",
+ "tuto.pit":"**Pièges :**",
+ "tuto.docs":"**Documentation :** {t}",
+ "tuto.report":"Une erreur ici ? [Signale-la]({url})",
+ "tuto.pkglist":"Liste complète des paquets",
+ "tuto.nopkg":"Aucun paquet listé pour cette base.",
+ "tuto.iso":"Construire une ISO personnalisée",
+ "tuto.tool":"**Outil :** {t}",
+ "tuto.recap":"Récapitulatif des vérifications",
+ "tuto.recap.head":"| État | Étapes |",
+ "tuto.recap.yes":"Seules les étapes 🧪 ont été exécutées dans une machine virtuelle. Signale toute erreur pour qu'elle soit corrigée dans les données.",
+ "tuto.recap.no":"Aucune étape n'a été testée dans une machine virtuelle. Signale toute erreur pour qu'elle soit corrigée dans les données.",
+ "tuto.sig":"Signaler un problème",
+ "tuto.sig.lead":"Copie ce bloc, remplis les trois dernières lignes et colle-le dans un [nouveau signalement]({url}). N'y ajoute ni nom d'utilisateur ni chemin de ta machine.",
+ "tuto.sig.ver":"Version de l'app : {v}",
+ "tuto.sig.date":"Date de vérification des paquets : {v}",
+ "tuto.sig.nodate":"non enregistrée pour cette base",
+ "tuto.sig.base":"Base : {v}",
+ "tuto.sig.path":"Parcours : {v}",
+ "tuto.sig.choices":"Choix faits dans l'app :",
+ "tuto.sig.item":"  - {l} : {n}",
+ "tuto.sig.sw":"  - Logiciels : {v}",
+ "tuto.sig.hw":"  - Matériel : {v}",
+ "tuto.sig.step":"Étape concernée (identifiant) : ",
+ "tuto.sig.cmd":"Commande : ",
+ "tuto.sig.err":"Message d'erreur : ",
+ "tuto.tested":"🧪 Testé en VM le {date}, sur {label}",
+ "tuto.file":"tutoriel-{obj}-{base}.md",
  "lang.switch":"English",
  "lang.switch_aria":"Changer la langue : English"
 },
@@ -2738,6 +2802,70 @@ const I18N={
  "md.preview":"File preview",
  "md.lines":"{n} lines",
  "md.back":"← Back to the stack",
+ "tuto.h1":"# {obj} distro on {base}: step-by-step tutorial",
+ "tuto.gen":"> Generated by Atlas distro on {date}. The data is written by hand: read each step before running it, especially those marked ⚠️.",
+ "tuto.pkgver":"> Package names checked on {date} on {label}, in the official indexes ({src}). The commands were not run.",
+ "tuto.scratch":"> “Distro from scratch” path on {base}: {status}.",
+ "tuto.legend":"Status legend",
+ "tuto.leg.tested":"- {st}: commands run successfully in a virtual machine, on the date and version shown",
+ "tuto.leg.ok":"- {st}",
+ "tuto.leg.check":"- {st}: package name, option or identifier not confirmed for this base",
+ "tuto.leg.manual":"- {st}: to do by hand, with the official documentation",
+ "tuto.leg.info":"- {st}: already provided by the base or by another component",
+ "tuto.root":"Run the commands as root (or with `sudo` or `doas`).",
+ "tuto.stack":"Your stack",
+ "tuto.stack.head":"| Layer | Choice | Why |",
+ "tuto.manual":" (manual choice)",
+ "tuto.hw":"Your hardware",
+ "tuto.warns":"Warnings",
+ "tuto.w.unresolved":"**Unresolved conflict**: {msg}",
+ "tuto.w.kept":"**Conflict kept on purpose**: {msg}",
+ "tuto.w.gentoo":"**Long build**: Gentoo compiles every package from source. Expect several hours for the base system, and often a whole night for a full desktop (KDE Plasma, GNOME). Leave the VM running and plugged in.",
+ "tuto.w.changed":"**Starting goal changed**: “{q}” went from “{from}” to “{to}”",
+ "tuto.nc":"What this tutorial does not cover",
+ "tuto.nc1":"Partitioning and installing the base: a manual step, to do with the official documentation.",
+ "tuto.nc2":"Configuring your desktop (themes, shortcuts, login manager and session).",
+ "tuto.nc3":"Internal settings of the software (profiles, accounts, sync).",
+ "tuto.nc4":"Proprietary drivers outside the repositories (for example NVIDIA on Alpine).",
+ "tuto.steps":"Steps",
+ "tuto.id":"Identifier: `{ref}`",
+ "tuto.state":"**Status:** {st}",
+ "tuto.where":"**Where:** {w}",
+ "tuto.where.hote":"on your machine (the host), in the VM folder",
+ "tuto.where.live":"in the VM, on the ISO's live system",
+ "tuto.where.chroot":"in the VM, inside the chroot (installed system)",
+ "tuto.where.systeme":"in the VM, on the installed system, as root",
+ "tuto.why":"**Why:** {t}",
+ "tuto.needs":"**You will need:**",
+ "tuto.cmd":"**Command:**",
+ "tuto.verify":"**Check:**",
+ "tuto.pit":"**Pitfalls:**",
+ "tuto.docs":"**Documentation:** {t}",
+ "tuto.report":"Found an error here? [Report it]({url})",
+ "tuto.pkglist":"Full package list",
+ "tuto.nopkg":"No package listed for this base.",
+ "tuto.iso":"Build a custom ISO",
+ "tuto.tool":"**Tool:** {t}",
+ "tuto.recap":"Verification summary",
+ "tuto.recap.head":"| Status | Steps |",
+ "tuto.recap.yes":"Only the 🧪 steps were run in a virtual machine. Report any error so it can be fixed in the data.",
+ "tuto.recap.no":"No step has been tested in a virtual machine. Report any error so it can be fixed in the data.",
+ "tuto.sig":"Report a problem",
+ "tuto.sig.lead":"Copy this block, fill in the last three lines and paste it into a [new report]({url}). Do not add any user name or path from your machine.",
+ "tuto.sig.ver":"App version: {v}",
+ "tuto.sig.date":"Package check date: {v}",
+ "tuto.sig.nodate":"not recorded for this base",
+ "tuto.sig.base":"Base: {v}",
+ "tuto.sig.path":"Path: {v}",
+ "tuto.sig.choices":"Choices made in the app:",
+ "tuto.sig.item":"  - {l}: {n}",
+ "tuto.sig.sw":"  - Software: {v}",
+ "tuto.sig.hw":"  - Hardware: {v}",
+ "tuto.sig.step":"Affected step (identifier): ",
+ "tuto.sig.cmd":"Command: ",
+ "tuto.sig.err":"Error message: ",
+ "tuto.tested":"🧪 Tested in a VM on {date}, on {label}",
+ "tuto.file":"tutorial-{obj}-{base}.md",
  "lang.switch":"Français",
  "lang.switch_aria":"Switch language: Français"
 }
@@ -2745,6 +2873,9 @@ const I18N={
 // Textes composés ou issus des données (arbre, bases, matériel, catégories) : clé = texte français, valeur = anglais.
 // trx() remplace un texte exact, ou les fragments d'au moins 8 caractères d'un texte composé.
 const FRAG={
+ "Arch Linux (dépôts du jour)":"Arch Linux (current repositories)",
+ "Gentoo (arbre Portage du jour)":"Gentoo (current Portage tree)",
+ "Void Linux x86_64 glibc (dépôt current du jour)":"Void Linux x86_64 glibc (current repository)",
  "Bureau léger / minimaliste":"Light / minimalist desktop",
  "Peu de mémoire, vieux PC, bureau au clavier.":"Little memory, old PC, keyboard-driven desktop.",
  "Sécurisée / durcie":"Secure / hardened",
@@ -3261,6 +3392,325 @@ function trx(s){
 }
 const WARNING_EN=["⚠️ Learning tool, provided without warranty.","Follow this tutorial in a virtual machine first, not on your main machine.","Never run a command you do not understand.","Back up your data before touching disks.","Only Alpine has been tested in a VM. The other bases are written but not tested yet."];
 function warning(){return LANG==="en"?WARNING_EN:WARNING}
+
+// ---------- Textes du générateur de tutoriel (lot 4) ----------
+// Le générateur écrit en français. À la rédaction, trt() traduit chaque phrase : les passages entre accents graves
+// (commandes, paquets, chemins) et les valeurs dynamiques marquées D() deviennent des jetons ⟦n⟧ avant la recherche dans
+// TUTO_EN (clé = phrase française avec jetons, valeur = anglais avec les mêmes jetons), puis sont remis tels quels.
+// Les blocs de commandes (cmds, verify) ne passent jamais par trt. En français, D() disparaît et rien ne change.
+const D=v=>"\uE000"+v+"\uE001";
+const unD=s=>s.replace(/[\uE000-\uE003]/g,"");
+const TUTO_MISS=new Set();
+const ST_EN={ok:"🟡 Package name checked in the repository, command not tested",check:"⚠️ To check",manual:"🔧 Manual step",info:"ℹ️ Nothing to install separately",tested:"🧪 Tested in a VM"};
+const stx=k=>LANG==="en"?ST_EN[k]:ST[k];
+function trtMask(s){
+  const sp=[];
+  const m=s.replace(/\uE000([\s\S]*?)\uE001|\uE002([\s\S]*?)\uE003|`[^`\n]*`/g,(x,d,l)=>{sp.push(d!==undefined?d:l!==undefined?trx(l):x);return "⟦"+(sp.length-1)+"⟧"});
+  return {m,sp};
+}
+function trtLook(s){
+  const {m,sp}=trtMask(s),r=TUTO_EN[m];
+  return r===undefined?null:r.replace(/⟦(\d+)⟧/g,(x,i)=>sp[+i]);
+}
+function trt(s){
+  if(typeof s!=="string"||!s)return s;
+  if(LANG!=="en")return unD(s);
+  const lead=(s.match(/^\s+/)||[""])[0],body=s.slice(lead.length);
+  const one=x=>{const r=trtLook(x);if(r!==null)return r;const c=unD(x);
+    if(FRAG[c]!==undefined)return FRAG[c];
+    if(/[A-Za-zÀ-ÿ]{3}/.test(trtMask(x).m.replace(/⟦\d+⟧/g,"")))TUTO_MISS.add(trtMask(x).m);
+    return c};
+  const whole=trtLook(body);
+  if(whole!==null)return lead+whole;
+  const parts=body.split(/(?<=[.!?])\s+(?=[A-ZÉÀ«*`\uE000])/);
+  return lead+(parts.length>1?parts.map(one).join(" "):one(body));
+}
+const TUTO_EN={
+//TUTO_EN_BEGIN
+ "Préparer":"Prepare",
+ "Éviter de perdre des données et préparer l'image d'installation.":"Avoid losing data and prepare the installation image.",
+ "Télécharge ⟦0⟧ depuis ⟦1⟧ et vérifie sa somme de contrôle (⟦2⟧).":"Download ⟦0⟧ from ⟦1⟧ and check its checksum (⟦2⟧).",
+ "Plus tard, pour une vraie machine : écris l'ISO sur une clé USB (balenaEtcher, Ventoy ou ⟦0⟧ avec le bon périphérique).":"Later, for a real machine: write the ISO to a USB stick (balenaEtcher, Ventoy or ⟦0⟧ with the right device).",
+ "Créer une machine virtuelle de test":"Create a test virtual machine",
+ "Tout le parcours se fait d'abord dans une VM : une erreur de partitionnement n'y efface rien.":"The whole path is done in a VM first: a partitioning mistake erases nothing there.",
+ "**Ne suis jamais le partitionnement sur ta vraie machine avant d'avoir réussi tout le parcours dans la VM.**":"**Never follow the partitioning on your real machine before you have completed the whole path in the VM.**",
+ "Installe QEMU sur ta machine (paquet ⟦0⟧ sur Arch, ⟦1⟧ sur Debian et Ubuntu, ⟦2⟧ sur Fedora) et vérifie que ⟦3⟧ existe.":"Install QEMU on your machine (package ⟦0⟧ on Arch, ⟦1⟧ on Debian and Ubuntu, ⟦2⟧ on Fedora) and check that ⟦3⟧ exists.",
+ "Télécharge ⟦0⟧ depuis ⟦1⟧ et place-toi dans ce dossier.":"Download ⟦0⟧ from ⟦1⟧ and go to that folder.",
+ "Le firmware UEFI (OVMF) n'a pas le même chemin partout : ⟦0⟧ sur Arch, ⟦1⟧ sur Debian et Ubuntu (⟦2⟧), ⟦3⟧ sur Fedora.":"The UEFI firmware (OVMF) is not at the same path everywhere: ⟦0⟧ on Arch, ⟦1⟧ on Debian and Ubuntu (⟦2⟧), ⟦3⟧ on Fedora.",
+ "⟦0⟧ relie la console série de la VM à ton terminal : après l'installation, tu pourras y copier-coller les commandes.":"⟦0⟧ connects the VM's serial console to your terminal: after the installation, you can copy and paste the commands into it.",
+ "Alternative VirtualBox : nouvelle VM « Linux 64 bits », 2 Go de RAM, disque de 20 Go, « Activer EFI » coché en UEFI, puis l'ISO dans le lecteur optique.":"VirtualBox alternative: new “Linux 64-bit” VM, 2 GB of RAM, 20 GB disk, “Enable EFI” ticked for UEFI, then the ISO in the optical drive.",
+ "Démarrer la VM sur l'ISO":"Boot the VM from the ISO",
+ "Le système live sert d'atelier : c'est depuis lui que tu installes la base sur le disque.":"The live system is a workshop: it is from there that you install the base on the disk.",
+ "Connecte-toi en ⟦0⟧ (pas de mot de passe sur l'ISO).":"Log in as ⟦0⟧ (no password on the ISO).",
+ "⟦0⟧ active le réseau, ⟦1⟧ choisit un miroir et active le dépôt community.":"⟦0⟧ enables the network, ⟦1⟧ picks a mirror and enables the community repository.",
+ "BusyBox ne fournit pas ⟦0⟧, ⟦1⟧ complet ni ⟦2⟧ : on les installe à part.":"BusyBox does not provide ⟦0⟧, the full ⟦1⟧ or ⟦2⟧: they are installed separately.",
+ "Sans connexion, ⟦0⟧ et ⟦1⟧ échouent : l'étape suivante explique comment vérifier et réparer la connexion.":"Without a connection, ⟦0⟧ and ⟦1⟧ fail: the next step explains how to check and fix the connection.",
+ "Vérifier la connexion internet du système live":"Check the live system's internet connection",
+ "Les étapes suivantes téléchargent les paquets de la base : le système live doit être connecté avant le partitionnement.":"The following steps download the base packages: the live system must be connected before partitioning.",
+ "Dans une VM QEMU (⟦0⟧), la connexion est automatique : les deux ⟦1⟧ doivent répondre.":"In a QEMU VM (⟦0⟧), the connection is automatic: both ⟦1⟧ commands should get a reply.",
+ "Le premier ⟦0⟧ teste l'accès à Internet par une adresse IP, le second teste aussi les noms (DNS).":"The first ⟦0⟧ tests Internet access by IP address, the second also tests names (DNS).",
+ "Si seul le premier répond : ⟦0⟧ (en root).":"If only the first one replies: ⟦0⟧ (as root).",
+ "Sur une vraie machine, si rien ne répond (remplace ⟦0⟧, ⟦1⟧ ou ⟦2⟧ par le nom donné par ⟦3⟧) :":"On a real machine, if nothing replies (replace ⟦0⟧, ⟦1⟧ or ⟦2⟧ with the name given by ⟦3⟧):",
+ "- Câble : ⟦0⟧ (étape précédente) choisit DHCP par défaut.":"- Wired: ⟦0⟧ (previous step) picks DHCP by default.",
+ "Pour relancer à la main : ⟦0⟧ puis ⟦1⟧.":"To restart it by hand: ⟦0⟧ then ⟦1⟧.",
+ "- Wi-Fi : relance ⟦0⟧, choisis ⟦1⟧, puis le nom du réseau et le mot de passe (il utilise wpa_supplicant).":"- Wi-Fi: run ⟦0⟧ again, choose ⟦1⟧, then the network name and the password (it uses wpa_supplicant).",
+ "Si aucune interface ⟦0⟧ n'apparaît, le firmware manque sur l'ISO standard : prends l'ISO « extended » ou un câble.":"If no ⟦0⟧ interface appears, the firmware is missing from the standard ISO: use the “extended” ISO or a cable.",
+ "Relance ensuite ⟦0⟧ et le ⟦1⟧ de l'étape précédente.":"Then run ⟦0⟧ and the ⟦1⟧ of the previous step again.",
+ "Ce réglage ne vaut que pour le système live.":"This setting only applies to the live system.",
+ "Le réseau du système installé se règle plus loin, dans le chroot et avec la brique « Réseau ».":"The installed system's network is set up later, in the chroot and with the “Network” layer.",
+ "Partitionner le disque (UEFI)":"Partition the disk (UEFI)",
+ "Découper le disque, créer les systèmes de fichiers, puis les monter dans /mnt.":"Split the disk, create the file systems, then mount them in /mnt.",
+ "Dans la VM, le disque s'appelle ⟦0⟧.":"In the VM, the disk is called ⟦0⟧.",
+ "Sur une vraie machine, repère-le avec ⟦0⟧ (souvent ⟦1⟧ ou ⟦2⟧ ; avec NVMe, les partitions s'appellent ⟦3⟧, ⟦4⟧).":"On a real machine, find it with ⟦0⟧ (often ⟦1⟧ or ⟦2⟧; with NVMe, the partitions are called ⟦3⟧, ⟦4⟧).",
+ "Partition 1 (1 Gio, FAT32) : la partition EFI.":"Partition 1 (1 GiB, FAT32): the EFI partition.",
+ "Le firmware UEFI y lit le chargeur d'amorçage ; le noyau y est aussi, montée sur ⟦0⟧.":"The UEFI firmware reads the bootloader there; the kernel is there too, mounted on ⟦0⟧.",
+ "Partition 2 (le reste) : la racine ⟦0⟧, en ⟦1⟧.":"Partition 2 (the rest): the root ⟦0⟧, in ⟦1⟧.",
+ "Elle contient tout le système.":"It holds the whole system.",
+ "Installer la base à la main":"Install the base by hand",
+ "Installer le système minimal sur le disque, sans l'installateur officiel : tu vois chaque pièce se mettre en place.":"Install the minimal system on the disk, without the official installer: you see each piece fall into place.",
+ "⟦0⟧ crée une base de paquets neuve dans /mnt et y installe le système minimal, sans installateur.":"⟦0⟧ creates a fresh package database in /mnt and installs the minimal system there, without an installer.",
+ "Le ⟦0⟧ retire la ligne du dépôt local de l'ISO (⟦1⟧), qui n'existe plus une fois le système installé.":"The ⟦0⟧ removes the line for the ISO's local repository (⟦1⟧), which no longer exists once the system is installed.",
+ "L'étape télécharge plusieurs centaines de Mo : la VM doit avoir accès à Internet.":"This step downloads several hundred MB: the VM must have Internet access.",
+ "Configurer le système (chroot)":"Configure the system (chroot)",
+ "Donner au système son fuseau horaire, sa langue, son nom, son réseau et ses comptes.":"Give the system its time zone, language, name, network and accounts.",
+ "Les premières commandes entrent dans le système installé (⟦0⟧) : la suite s'exécute à l'intérieur, comme s'il avait démarré.":"The first commands enter the installed system (⟦0⟧): what follows runs inside it, as if it had booted.",
+ "Nom de la machine : ⟦0⟧.":"Machine name: ⟦0⟧.",
+ "Change-les si tu veux.":"Change them if you like.",
+ "⟦0⟧ demande le mot de passe deux fois : d'abord pour root, puis pour ⟦1⟧.":"⟦0⟧ asks for the password twice: first for root, then for ⟦1⟧.",
+ "La copie de ⟦0⟧ donne au chroot le DNS du système live : sans elle, les téléchargements faits dans le chroot échouent.":"Copying ⟦0⟧ gives the chroot the live system's DNS: without it, downloads made in the chroot fail.",
+ "La dernière ligne active une connexion sur la console série (⟦0⟧), utile dans la VM.":"The last line enables a login on the serial console (⟦0⟧), useful in the VM.",
+ "Installer le chargeur d'amorçage : ⟦0⟧":"Install the bootloader: ⟦0⟧",
+ "Pas encore testé en VM avec ces choix.":"Not yet tested in a VM with these choices.",
+ "Le chargeur lance le noyau au démarrage de la machine.":"The bootloader starts the kernel when the machine boots.",
+ "⟦0⟧ envoie aussi les messages sur la console série de la VM.":"⟦0⟧ also sends the messages to the VM's serial console.",
+ "Sur une vraie machine, tu peux l'enlever.":"On a real machine, you can remove it.",
+ "Quitter le chroot et éteindre":"Leave the chroot and power off",
+ "Démonter proprement le disque avant de redémarrer dessus.":"Unmount the disk cleanly before rebooting from it.",
+ "Démarrer sur le disque":"Boot from the disk",
+ "Vérifier que le système installé démarre seul, sans l'ISO.":"Check that the installed system boots on its own, without the ISO.",
+ "Relance la VM sans l'ISO, puis connecte-toi en ⟦0⟧ avec le mot de passe choisi.":"Start the VM again without the ISO, then log in as ⟦0⟧ with the password you chose.",
+ "Activer les dépôts nécessaires":"Enable the required repositories",
+ "Certains paquets de ce tutoriel ne sont pas dans les dépôts activés par défaut.":"Some packages in this tutorial are not in the repositories enabled by default.",
+ "Mettre à jour le système":"Update the system",
+ "Partir d'un système à jour avant d'ajouter des paquets.":"Start from an up-to-date system before adding packages.",
+ "Aucun paquet à installer séparément : Wayland est fourni par ton bureau ou ton compositeur.":"No package to install separately: Wayland is provided by your desktop or your compositor.",
+ "Le nom du paquet n'est pas renseigné pour ⟦0⟧ : consulte la documentation de la base.":"The package name is not recorded for ⟦0⟧: check the base's documentation.",
+ "Pilotes libres Mesa pour les cartes AMD et Intel.":"Free Mesa drivers for AMD and Intel cards.",
+ "Configurer le bureau : ⟦0⟧":"Configure the desktop: ⟦0⟧",
+ "Démarrer le bureau à l'allumage, avec un écran de connexion.":"Start the desktop at power-on, with a login screen.",
+ "Il démarre la session ⟦0⟧ après ta connexion avec ⟦1⟧.":"It starts the ⟦0⟧ session after you log in as ⟦1⟧.",
+ "⟦0⟧ remplace mdev par udev : le bureau en a besoin pour le clavier, la souris et l'écran.":"⟦0⟧ replaces mdev with udev: the desktop needs it for the keyboard, mouse and screen.",
+ "Le redémarrage applique tout d'un coup : l'écran de connexion doit apparaître.":"The reboot applies everything at once: the login screen should appear.",
+ "Reconnecte-toi ensuite en ⟦0⟧ sur la console pour la suite.":"Then log in as ⟦0⟧ on the console again for the rest.",
+ "Thème : Configuration du système → Couleurs et thèmes.":"Theme: System Settings → Colors and Themes.",
+ "Raccourcis : Configuration du système → Clavier → Raccourcis.":"Shortcuts: System Settings → Keyboard → Shortcuts.",
+ "Préparer Flatpak":"Prepare Flatpak",
+ "Sur certaines bases, il faut aussi installer un portail xdg-desktop-portal et redémarrer la session.":"On some bases you also need to install an xdg-desktop-portal portal and restart the session.",
+ "Certains logiciels ne sont pas dans les dépôts de ⟦0⟧ et passent par Flatpak.":"Some software is not in the ⟦0⟧ repositories and goes through Flatpak.",
+ "Logiciels installés avec Flatpak :":"Software installed with Flatpak:",
+ "- ⟦0⟧ : ⟦1⟧, 🟡 identifiant trouvé dans l'index Flathub le ⟦2⟧":"- ⟦0⟧: ⟦1⟧, 🟡 identifier found in the Flathub index on ⟦2⟧",
+ "Installé avec Flatpak (⟦0⟧, identifiant trouvé dans l'index Flathub le ⟦1⟧) : la commande est dans l'étape « Préparer Flatpak ».":"Installed with Flatpak (⟦0⟧, identifier found in the Flathub index on ⟦1⟧): the command is in the “Prepare Flatpak” step.",
+ "Activer les services":"Enable the services",
+ "Les noms de services peuvent varier selon la distribution.":"Service names may vary between distributions.",
+ "Les services ne démarrent pas tout seuls après l'installation.":"Services do not start on their own after the installation.",
+ "Init détectée : ⟦0⟧.":"Detected init: ⟦0⟧.",
+ "Procédure inspirée du wiki Alpine, non testée.":"Procedure based on the Alpine wiki, not tested.",
+ "Installe les outils de construction.":"Install the build tools.",
+ "Crée une clé de signature de paquets.":"Create a package signing key.",
+ "Récupère les scripts de construction.":"Get the build scripts.",
+ "Crée le profil ⟦0⟧ avec la liste des paquets de ce tutoriel.":"Create the ⟦0⟧ profile with the package list from this tutorial.",
+ "Vérifie que l'image est créée.":"Check that the image was created.",
+ "Limine est copié dans le chemin de secours ⟦0⟧ : le firmware le trouve sans entrée de démarrage.":"Limine is copied to the fallback path ⟦0⟧: the firmware finds it without a boot entry.",
+ "Certains paquets sont dans le dépôt testing d'Alpine, qui n'existe que sur edge : mélanger edge et une version stable est déconseillé.":"Some packages are in Alpine's testing repository, which only exists on edge: mixing edge with a stable release is discouraged.",
+ "Paquet dans le dépôt testing d'Alpine : active-le dans /etc/apk/repositories.":"Package in Alpine's testing repository: enable it in /etc/apk/repositories.",
+ "Gestionnaire de connexion : greetd avec tuigreet (écran de connexion en mode texte).":"Login manager: greetd with tuigreet (text-mode login screen).",
+ "Copie la configuration par défaut pour la modifier : ⟦0⟧ (en tant que ⟦1⟧).":"Copy the default configuration so you can edit it: ⟦0⟧ (as ⟦1⟧).",
+ "Raccourcis : lignes ⟦0⟧ de ce fichier (⟦1⟧ ouvre un terminal).":"Shortcuts: ⟦0⟧ lines in this file (⟦1⟧ opens a terminal).",
+ "Mode BIOS : la VM démarre sans firmware UEFI.":"BIOS mode: the VM starts without UEFI firmware.",
+ "Partitionner le disque (BIOS)":"Partition the disk (BIOS)",
+ "Partition 1 (1 Gio) : ⟦0⟧, avec le noyau.":"Partition 1 (1 GiB): ⟦0⟧, with the kernel.",
+ "Le BIOS démarre le chargeur écrit au début du disque.":"The BIOS starts the bootloader written at the beginning of the disk.",
+ "Pilotes pour ta carte graphique.":"Drivers for your graphics card.",
+ "Alpine n'a pas de pilote NVIDIA propriétaire dans ses dépôts : utilise le pilote libre nouveau (moins performant) ou une autre base.":"Alpine has no proprietary NVIDIA driver in its repositories: use the free nouveau driver (slower) or another base.",
+ "Pas encore testé en VM pour ⟦0⟧.":"Not yet tested in a VM for ⟦0⟧.",
+ "Connecte-toi d'abord au système live : session ⟦0⟧, mot de passe ⟦1⟧.":"First log in to the live system: session ⟦0⟧, password ⟦1⟧.",
+ "- Câble : normalement automatique.":"- Wired: normally automatic.",
+ "Sinon, ⟦0⟧ ou ⟦1⟧, selon l'outil présent sur l'ISO.":"Otherwise ⟦0⟧ or ⟦1⟧, depending on the tool on the ISO.",
+ "Sinon, en root : ⟦0⟧, ⟦1⟧, puis ⟦2⟧.":"Otherwise, as root: ⟦0⟧, ⟦1⟧, then ⟦2⟧.",
+ "L'ISO live « standard » peut manquer du firmware Wi-Fi : un câble est plus sûr.":"The “standard” live ISO may lack the Wi-Fi firmware: a cable is safer.",
+ "Préparer le système live":"Prepare the live system",
+ "Le système live ouvre la session ⟦0⟧ (mot de passe ⟦1⟧).":"The live system opens the ⟦0⟧ session (password ⟦1⟧).",
+ "Passe en root avec ⟦0⟧.":"Become root with ⟦0⟧.",
+ "⟦0⟧ télécharge et installe un Debian minimal dans /mnt.":"⟦0⟧ downloads and installs a minimal Debian in /mnt.",
+ "Non testé.":"Not tested.",
+ "Les firmwares et les pilotes NVIDIA demandent d'activer les composants non libres (contrib, non-free, non-free-firmware) dans les sources APT.":"Firmware and NVIDIA drivers require enabling the non-free components (contrib, non-free, non-free-firmware) in the APT sources.",
+ "Commande standard de ⟦0⟧, non testée dans ce tutoriel.":"Standard ⟦0⟧ command, not tested in this tutorial.",
+ "Procédure inspirée du manuel de live-build, non testée.":"Procedure based on the live-build manual, not tested.",
+ "Il faut la lancer depuis un système Debian.":"It must be run from a Debian system.",
+ "Installe live-build.":"Install live-build.",
+ "Crée le dossier de travail et la configuration.":"Create the working folder and the configuration.",
+ "Ajoute les paquets de ce tutoriel.":"Add the packages from this tutorial.",
+ "Paquet absent sur ⟦0⟧ : ⟦1⟧.":"Package missing on ⟦0⟧: ⟦1⟧.",
+ "Vérifie le nom exact du noyau et de l'initramfs avec ⟦0⟧.":"Check the exact name of the kernel and the initramfs with ⟦0⟧.",
+ "Pilotes pour ta carte graphique (⟦0⟧).":"Drivers for your graphics card (⟦0⟧).",
+ "L'ISO ouvre directement un shell ⟦0⟧.":"The ISO opens a ⟦0⟧ shell directly.",
+ "- Câble : automatique : systemd-networkd et le DHCP sont actifs sur l'ISO.":"- Wired: automatic: systemd-networkd and DHCP are active on the ISO.",
+ "- Wi-Fi : ⟦0⟧, ⟦1⟧, puis ⟦2⟧ (il demande le mot de passe).":"- Wi-Fi: ⟦0⟧, ⟦1⟧, then ⟦2⟧ (it asks for the password).",
+ "Si le Wi-Fi est bloqué : ⟦0⟧.":"If Wi-Fi is blocked: ⟦0⟧.",
+ "⟦0⟧ installe les paquets de base dans /mnt ; ⟦1⟧ crée un trousseau de clés neuf.":"⟦0⟧ installs the base packages in /mnt; ⟦1⟧ creates a fresh keyring.",
+ "⟦0⟧ copie tout seul ⟦1⟧ du live : le DNS marche dans le chroot.":"⟦0⟧ copies ⟦1⟧ from the live system by itself: DNS works in the chroot.",
+ "Procédure inspirée de la page archiso de l'ArchWiki, non testée.":"Procedure based on the ArchWiki archiso page, not tested.",
+ "Installe archiso.":"Install archiso.",
+ "Copie le profil de base.":"Copy the base profile.",
+ "Ajoute les paquets de ce tutoriel à ⟦0⟧.":"Add the packages from this tutorial to ⟦0⟧.",
+ "Choisis d'abord « Essayer Fedora » et ouvre un terminal.":"First choose “Try Fedora” and open a terminal.",
+ "- Câble : automatique (NetworkManager).":"- Wired: automatic (NetworkManager).",
+ "- Wi-Fi : menu en haut à droite du bureau, ou ⟦0⟧.":"- Wi-Fi: menu at the top right of the desktop, or ⟦0⟧.",
+ "Choisis « Essayer Fedora », ouvre un terminal, puis passe en root avec ⟦0⟧.":"Choose “Try Fedora”, open a terminal, then become root with ⟦0⟧.",
+ "⟦0⟧ installe le groupe ⟦1⟧ de Fedora dans /mnt.":"⟦0⟧ installs Fedora's ⟦1⟧ group in /mnt.",
+ "⟦0⟧ demande à SELinux de réétiqueter les fichiers au premier démarrage (il redémarre une fois tout seul).":"⟦0⟧ tells SELinux to relabel the files on first boot (it reboots once by itself).",
+ "Sur Fedora, GRUB en UEFI est fourni déjà signé (⟦0⟧) : pas de ⟦1⟧.":"On Fedora, GRUB in UEFI comes already signed (⟦0⟧): no ⟦1⟧.",
+ "Steam vient du dépôt RPM Fusion : active-le depuis rpmfusion.org avant d'installer.":"Steam comes from the RPM Fusion repository: enable it from rpmfusion.org before installing.",
+ "Dépôt tiers requis : ⟦0⟧ (⟦1⟧).":"Third-party repository required: ⟦0⟧ (⟦1⟧).",
+ "Procédure non générée : choisir entre KIWI NG et livemedia-creator.":"Procedure not generated: choose between KIWI NG and livemedia-creator.",
+ "KIWI NG ou livemedia-creator":"KIWI NG or livemedia-creator",
+ "Choisis un outil, puis ajoute à sa description la liste complète des paquets ci-dessus.":"Choose a tool, then add the full package list above to its description.",
+ "Construis l'image en suivant la documentation officielle, puis teste-la dans une machine virtuelle.":"Build the image following the official documentation, then test it in a virtual machine.",
+ "Le pilote NVIDIA vient du dépôt RPM Fusion (paquet akmod-nvidia) : active-le d'abord.":"The NVIDIA driver comes from the RPM Fusion repository (package akmod-nvidia): enable it first.",
+ "La connexion se règle dans l'installateur, à l'écran « Network configuration », avant d'ouvrir le shell.":"The connection is set up in the installer, on the “Network configuration” screen, before opening the shell.",
+ "- Câble : automatique (DHCP) dans l'écran « Network configuration ».":"- Wired: automatic (DHCP) on the “Network configuration” screen.",
+ "- Wi-Fi : dans le même écran, choisis l'interface Wi-Fi, puis le réseau et le mot de passe.":"- Wi-Fi: on the same screen, choose the Wi-Fi interface, then the network and the password.",
+ "La connexion reste active dans le shell.":"The connection stays active in the shell.",
+ "Dans l'installateur, ouvre le menu « Aide » puis « Entrer dans un shell » : tu es root.":"In the installer, open the “Help” menu then “Enter shell”: you are root.",
+ "⟦0⟧ télécharge et installe un Ubuntu minimal dans /mnt.":"⟦0⟧ downloads and installs a minimal Ubuntu in /mnt.",
+ "Pilote NVIDIA propriétaire pour ta carte graphique.":"Proprietary NVIDIA driver for your graphics card.",
+ "Sur Ubuntu, le paquet du pilote dépend de la carte (nvidia-driver-XXX) : laisse ubuntu-drivers choisir la bonne version.":"On Ubuntu, the driver package depends on the card (nvidia-driver-XXX): let ubuntu-drivers pick the right version.",
+ "Redémarre après l'installation.":"Reboot after the installation.",
+ "- Câble : automatique (service dhcpcd de l'ISO).":"- Wired: automatic (the ISO's dhcpcd service).",
+ "Sinon : ⟦0⟧.":"Otherwise: ⟦0⟧.",
+ "- Wi-Fi : ⟦0⟧, ⟦1⟧, puis ⟦2⟧.":"- Wi-Fi: ⟦0⟧, ⟦1⟧, then ⟦2⟧.",
+ "Le réseau filaire est configuré tout seul (DHCP).":"The wired network is set up by itself (DHCP).",
+ "La première commande met à jour ⟦0⟧ lui-même : il refuse d'installer des paquets s'il n'est pas à jour.":"The first command updates ⟦0⟧ itself: it refuses to install packages if it is not up to date.",
+ "⟦0⟧ installe le méta-paquet ⟦1⟧ (noyau, outils de base, runit) dans /mnt.":"⟦0⟧ installs the ⟦1⟧ meta-package (kernel, base tools, runit) in /mnt.",
+ "Les clés copiées permettent de vérifier la signature du dépôt.":"The copied keys let it verify the repository signature.",
+ "Variante : décompresser l'archive ⟦0⟧ (même dossier que l'ISO) dans /mnt, puis lancer ⟦1⟧ dans le chroot.":"Variant: unpack the archive ⟦0⟧ (same folder as the ISO) into /mnt, then run ⟦1⟧ in the chroot.",
+ "⟦0⟧ installe le noyau ⟦1⟧ : l'étape suivante le remplace par ⟦2⟧.":"⟦0⟧ installs the ⟦1⟧ kernel: the next step replaces it with ⟦2⟧.",
+ "Void utilise runit : un service s'active avec un lien de ⟦0⟧ vers ⟦1⟧ (dans le chroot) ou ⟦2⟧ (sur le système démarré).":"Void uses runit: a service is enabled with a link from ⟦0⟧ to ⟦1⟧ (in the chroot) or ⟦2⟧ (on the running system).",
+ "⟦0⟧ ouvre une connexion sur la console série de la VM.":"⟦0⟧ opens a login on the VM's serial console.",
+ "⟦0⟧ termine la configuration de tous les paquets et recrée l'initramfs du noyau (dracut).":"⟦0⟧ finishes configuring all the packages and rebuilds the kernel's initramfs (dracut).",
+ "⟦0⟧ empêche ⟦1⟧ de réinstaller le noyau par défaut ; ⟦2⟧ le retire et garde ⟦3⟧.":"⟦0⟧ stops ⟦1⟧ from reinstalling the default kernel; ⟦2⟧ removes it and keeps ⟦3⟧.",
+ "Void relance ⟦0⟧ tout seul à chaque mise à jour du noyau.":"Void runs ⟦0⟧ by itself on every kernel update.",
+ "Paquets des dépôts officiels nonfree ou multilib de Void, désactivés par défaut : ⟦0⟧.":"Packages from Void's official nonfree or multilib repositories, disabled by default: ⟦0⟧.",
+ "Dépôt officiel à activer (nonfree ou multilib) : ⟦0⟧.":"Official repository to enable (nonfree or multilib): ⟦0⟧.",
+ "Sur Void, un lien dans ⟦0⟧ active le service et le démarre tout de suite (runit).":"On Void, a link in ⟦0⟧ enables the service and starts it right away (runit).",
+ "Procédure non générée : suis la documentation de void-mklive.":"Procedure not generated: follow the void-mklive documentation.",
+ "Récupère void-mklive.":"Get void-mklive.",
+ "Passe la liste complète des paquets ci-dessus à ⟦0⟧ (option ⟦1⟧), puis teste l'image dans une machine virtuelle.":"Pass the full package list above to ⟦0⟧ (option ⟦1⟧), then test the image in a virtual machine.",
+ "⟦0⟧ et ⟦1⟧ reçoivent le nom exact du noyau et de l'initramfs installés dans /boot.":"⟦0⟧ and ⟦1⟧ receive the exact name of the kernel and the initramfs installed in /boot.",
+ "Après une mise à jour du noyau, relance ces deux lignes et le ⟦0⟧ pour mettre ⟦1⟧ à jour.":"After a kernel update, run these two lines and the ⟦0⟧ again to update ⟦1⟧.",
+ "Son nom change chaque semaine : prends la plus récente.":"Its name changes every week: take the most recent one.",
+ "L'ISO minimale ouvre directement un shell ⟦0⟧.":"The minimal ISO opens a ⟦0⟧ shell directly.",
+ "- Câble : automatique (dhcpcd).":"- Wired: automatic (dhcpcd).",
+ "- Wi-Fi : ⟦0⟧ (assistant de l'ISO, il demande le réseau et le mot de passe), ou à la main : ⟦1⟧, ⟦2⟧, puis ⟦3⟧.":"- Wi-Fi: ⟦0⟧ (the ISO's wizard, it asks for the network and the password), or by hand: ⟦1⟧, ⟦2⟧, then ⟦3⟧.",
+ "Elle contient déjà les outils de partitionnement, de formatage et ⟦0⟧.":"It already contains the partitioning and formatting tools, and ⟦0⟧.",
+ "⟦0⟧ met l'horloge à l'heure : une date fausse fait échouer la vérification de l'archive.":"⟦0⟧ sets the clock: a wrong date makes the archive check fail.",
+ "Le stage3 est un Gentoo minimal déjà compilé (environ ⟦0⟧ Mo) : on le décompresse dans /mnt.":"The stage3 is a minimal, already compiled Gentoo (about ⟦0⟧ MB): it is unpacked into /mnt.",
+ "Ici, la variante ⟦0⟧ (OpenRC, profil bureau).":"Here, the ⟦0⟧ variant (OpenRC, desktop profile).",
+ "Son nom change chaque semaine : la deuxième commande lit le nom du dernier stage3 publié.":"Its name changes every week: the second command reads the name of the latest published stage3.",
+ "⟦0⟧ doit afficher « Good signature ».":"⟦0⟧ must show “Good signature”.",
+ "Sinon, n'utilise pas l'archive.":"Otherwise, do not use the archive.",
+ "Le noyau et le chargeur s'installent plus loin, dans le chroot, avec Portage.":"The kernel and the bootloader are installed later, in the chroot, with Portage.",
+ "Configurer Portage, compiler le système, installer le noyau, puis donner au système son fuseau horaire, sa langue, son nom, son réseau et ses comptes.":"Configure Portage, build the system, install the kernel, then give the system its time zone, language, name, network and accounts.",
+ "**⏳ Compilation : compte plusieurs heures.** Gentoo compile chaque paquet depuis les sources.":"**⏳ Compilation: expect several hours.** Gentoo compiles every package from source.",
+ "⟦0⟧ et les paquets suivants peuvent prendre de une à plusieurs heures dans la VM, selon le processeur.":"⟦0⟧ and the following packages can take from one to several hours in the VM, depending on the processor.",
+ "⟦0⟧ télécharge l'arbre Portage (la liste de tous les paquets).":"⟦0⟧ downloads the Portage tree (the list of all packages).",
+ "⟦0⟧ choisit le profil : il fixe les options de compilation par défaut (USE), ici celles d'un bureau.":"⟦0⟧ chooses the profile: it sets the default build options (USE), here those of a desktop.",
+ "⟦0⟧ : ⟦1⟧ compile avec 2 cœurs (mets le nombre de cœurs de ta machine), ⟦2⟧ accepte les licences libres et les firmwares redistribuables, ⟦3⟧ choisit la version de GRUB à compiler.":"⟦0⟧: ⟦1⟧ builds with 2 cores (set the number of cores of your machine), ⟦2⟧ accepts free licenses and redistributable firmware, ⟦3⟧ chooses the GRUB version to build.",
+ "Noyau : ⟦0⟧ est un noyau Gentoo déjà compilé, installé comme un paquet.":"Kernel: ⟦0⟧ is a Gentoo kernel that is already compiled, installed like a package.",
+ "⟦0⟧ avec l'option ⟦1⟧ crée l'initramfs et copie le tout dans /boot.":"⟦0⟧ with the ⟦1⟧ option creates the initramfs and copies everything into /boot.",
+ "Compilation manuelle du noyau (pour aller plus loin) : ⟦0⟧, puis ⟦1⟧.":"Manual kernel build (to go further): ⟦0⟧, then ⟦1⟧.",
+ "Compte encore une à deux heures.":"Expect another one to two hours.",
+ "Voir le chapitre « Configurer le noyau » du manuel Gentoo.":"See the “Configuring the kernel” chapter of the Gentoo handbook.",
+ "Pour gagner du temps, Gentoo propose aussi des paquets binaires : ajoute ⟦0⟧ à make.conf (voir « Gentoo Binary Host Quickstart » sur le wiki).":"To save time, Gentoo also offers binary packages: add ⟦0⟧ to make.conf (see “Gentoo Binary Host Quickstart” on the wiki).",
+ "La ligne ⟦0⟧ de ⟦1⟧ ouvre une connexion sur la console série de la VM.":"The ⟦0⟧ line of ⟦1⟧ opens a login on the VM's serial console.",
+ "GRUB est déjà compilé (option ⟦0⟧ d'installkernel, avec ⟦1⟧ de make.conf) : ⟦2⟧ évite de le recompiler. installkernel relance ⟦3⟧ à chaque nouveau noyau.":"GRUB is already compiled (option ⟦0⟧ of installkernel, with ⟦1⟧ from make.conf): ⟦2⟧ avoids rebuilding it. installkernel runs ⟦3⟧ again on every new kernel.",
+ "Steam n'est pas dans l'arbre officiel de Gentoo : il vient de l'overlay steam-overlay (⟦0⟧).":"Steam is not in Gentoo's official tree: it comes from the steam-overlay overlay (⟦0⟧).",
+ "Sur Gentoo, les pilotes compilés dépendent de ⟦0⟧ dans ⟦1⟧ (par exemple ⟦2⟧, ⟦3⟧ ou ⟦4⟧) : règle-le avant d'installer.":"On Gentoo, compiled drivers depend on ⟦0⟧ in ⟦1⟧ (for example ⟦2⟧, ⟦3⟧ or ⟦4⟧): set it before installing.",
+ "**⏳ Compilation : compte plusieurs heures, souvent une nuit, pour ⟦0⟧.** Le profil bureau choisi à l'étape « Configurer le système » règle déjà les options (USE) du bureau.":"**⏳ Compilation: expect several hours, often a whole night, for ⟦0⟧.** The desktop profile chosen in the “Configure the system” step already sets the desktop's options (USE).",
+ "Sur Gentoo avec OpenRC, le service ⟦0⟧ lance le gestionnaire de connexion nommé dans ⟦1⟧.":"On Gentoo with OpenRC, the ⟦0⟧ service starts the login manager named in ⟦1⟧.",
+ "Procédure non générée : Catalyst demande sa propre configuration (specs).":"Procedure not generated: Catalyst needs its own configuration (specs).",
+ "Installe Catalyst (⟦0⟧) et suis le guide du wiki Gentoo pour construire un stage puis une ISO.":"Install Catalyst (⟦0⟧) and follow the Gentoo wiki guide to build a stage, then an ISO.",
+ "Ajoute à la spec de l'ISO la liste complète des paquets ci-dessus.":"Add the full package list above to the ISO's spec.",
+ "La construction compile tout : compte plusieurs heures.":"The build compiles everything: expect several hours.",
+ "⟦0⟧ : ⟦1⟧ compile avec 2 cœurs (mets le nombre de cœurs de ta machine), ⟦2⟧ accepte les licences libres et les firmwares redistribuables.":"⟦0⟧: ⟦1⟧ builds with 2 cores (set the number of cores of your machine), ⟦2⟧ accepts free licenses and redistributable firmware.",
+ "**⏳ Compilation : compte une à plusieurs heures.** Le profil bureau choisi à l'étape « Configurer le système » règle déjà les options (USE) du bureau.":"**⏳ Compilation: expect one to several hours.** The desktop profile chosen in the “Configure the system” step already sets the desktop's options (USE).",
+ "Éviter de perdre des données et préparer le support d'installation.":"Avoid losing data and prepare the installation media.",
+ "Télécharge l'image d'installation de ⟦0⟧ depuis le site officiel et vérifie sa somme de contrôle.":"Download the ⟦0⟧ installation image from the official website and check its checksum.",
+ "Prépare une clé USB avec un outil adapté à ton système (balenaEtcher, Ventoy ou ⟦0⟧ avec le bon périphérique).":"Prepare a USB stick with a tool suited to your system (balenaEtcher, Ventoy or ⟦0⟧ with the right device).",
+ "Installer la base ⟦0⟧":"Install the ⟦0⟧ base",
+ "La base impose ⟦0⟧, la bibliothèque ⟦1⟧ et l'init ⟦2⟧.":"The base requires ⟦0⟧, the ⟦1⟧ library and the ⟦2⟧ init.",
+ "Suis le guide officiel pour l'installation du système minimal.":"Follow the official guide to install the minimal system.",
+ "Choix à appliquer pendant l'installation :":"Choices to apply during the installation:",
+ "Aucune procédure générée pour cette base.":"No procedure generated for this base.",
+ "mkosi (multi-distributions) ou l'outil de la base":"mkosi (multi-distribution) or the base's own tool",
+ "Utilise l'outil de construction de ta base, ou mkosi, avec la liste complète des paquets ci-dessus.":"Use your base's build tool, or mkosi, with the full package list above.",
+ "Teste l'image dans une machine virtuelle avant de la graver.":"Test the image in a virtual machine before burning it.",
+ "- Mode de démarrage de ta machine : ⟦0⟧":"- Boot mode of your machine: ⟦0⟧",
+ "Commandes d'installation du chargeur non testées : adapte le disque et le point de montage de la partition EFI.":"Bootloader installation commands not tested: adapt the disk and the mount point of the EFI partition.",
+ "Aucun paquet à installer séparément : déjà fourni par la base.":"No package to install separately: already provided by the base.",
+ "⟦0⟧ : ⟦1⟧":"⟦0⟧: ⟦1⟧",
+ "Cette brique configure le réseau du système installé, après son démarrage sur le disque.":"This layer sets up the installed system's network, after it has booted from the disk.",
+ "Elle ne sert pas au système live de l'ISO (voir l'étape « Vérifier la connexion internet du système live »).":"It is not for the ISO's live system (see the “Check the live system's internet connection” step).",
+ "Thème : Paramètres → Apparence (style et icônes) et Gestionnaire de fenêtres (bordures).":"Theme: Settings → Appearance (style and icons) and Window Manager (borders).",
+ "Raccourcis : Paramètres → Clavier → Raccourcis d'application.":"Shortcuts: Settings → Keyboard → Application Shortcuts.",
+ "Le paquet ⟦0⟧ lance ⟦1⟧ et crée l'entrée du noyau tout seul, avec la ligne de commande de ⟦2⟧.":"The ⟦0⟧ package runs ⟦1⟧ and creates the kernel entry by itself, using the command line from ⟦2⟧.",
+ "Nom virtuel, à revérifier : ⟦0⟧.":"Virtual name, to re-check: ⟦0⟧.",
+ "⟦0⟧ copie le noyau sur la partition EFI et crée son entrée.":"⟦0⟧ copies the kernel to the EFI partition and creates its entry.",
+ "Cette base n'a pas de gestionnaire de paquets : compile depuis les sources.":"This base has no package manager: build from source.",
+ "Partition 2 (le reste) : la racine ⟦0⟧, en ⟦1⟧, chiffrée avec LUKS.":"Partition 2 (the rest): the root ⟦0⟧, in ⟦1⟧, encrypted with LUKS.",
+ "⟦0⟧ demande de taper ⟦1⟧ en majuscules, puis la phrase de passe deux fois.":"⟦0⟧ asks you to type ⟦1⟧ in capitals, then the passphrase twice.",
+ "Sans elle, les données sont perdues.":"Without it, the data is lost.",
+ "Au démarrage, tape la phrase de passe LUKS.":"At boot, type the LUKS passphrase.",
+ "Thème : application « Ajustements » (⟦0⟧) ou Paramètres → Apparence.":"Theme: the “Tweaks” application (⟦0⟧) or Settings → Appearance.",
+ "Raccourcis : Paramètres → Clavier → Raccourcis clavier.":"Shortcuts: Settings → Keyboard → Keyboard Shortcuts.",
+ "Ici, la variante ⟦0⟧ (OpenRC).":"Here, the ⟦0⟧ variant (OpenRC).",
+ "⟦0⟧ choisit le profil : il fixe les options de compilation par défaut (USE).":"⟦0⟧ chooses the profile: it sets the default build options (USE).",
+ "Thème : ⟦0⟧.":"Theme: ⟦0⟧.",
+ "Au premier lancement, i3 propose de créer ⟦0⟧.":"On first launch, i3 offers to create ⟦0⟧.",
+ "Raccourcis : lignes ⟦0⟧ de ce fichier.":"Shortcuts: ⟦0⟧ lines in this file.",
+ "Raccourcis : ⟦0⟧.":"Shortcuts: ⟦0⟧.",
+ "⟦0⟧ écrit le code de démarrage au début du disque.":"⟦0⟧ writes the boot code at the beginning of the disk.",
+ "systemd-boot ne fonctionne qu'en UEFI : en BIOS, choisis GRUB ou Limine dans l'app.":"systemd-boot only works in UEFI: in BIOS, choose GRUB or Limine in the app.",
+ "systemd-boot ne fonctionne qu'en UEFI.":"systemd-boot only works in UEFI.",
+ "Configuration : ⟦0⟧, créée au premier lancement.":"Configuration: ⟦0⟧, created on first launch.",
+ "Configuration : ⟦0⟧.":"Configuration: ⟦0⟧.",
+ "systemd-boot n'est pas proposé ici avec OpenRC sur Gentoo : choisis GRUB ou Limine dans l'app, ou suis la page « systemd-boot » du wiki Gentoo.":"systemd-boot is not offered here with OpenRC on Gentoo: choose GRUB or Limine in the app, or follow the “systemd-boot” page of the Gentoo wiki.",
+ "Ce bloc utilise ext4 : ⟦0⟧ demande une procédure à part.":"This block uses ext4: ⟦0⟧ needs a separate procedure.",
+ "Fais d'abord un essai réussi en ext4.":"First get a working run with ext4.",
+ "Sauvegarde tes données importantes avant tout essai sur une vraie machine.":"Back up your important data before any attempt on a real machine.",
+ "Sauvegarde tes données importantes : une installation peut effacer le disque.":"Back up your important data: an installation can erase the disk.",
+ "Fuseau horaire : ⟦0⟧.":"Time zone: ⟦0⟧.",
+ "Langue : ⟦0⟧.":"Language: ⟦0⟧.",
+ "Utilisateur : ⟦0⟧.":"User: ⟦0⟧.",
+ "Pilotes graphiques":"Graphics drivers",
+ "Gestionnaire de connexion : ⟦0⟧.":"Login manager: ⟦0⟧.",
+ "mkimage (aports)":"mkimage (aports)",
+ "Construis l'image.":"Build the image.",
+ "- Wi-Fi : si ⟦0⟧ existe : ⟦1⟧.":"- Wi-Fi: if ⟦0⟧ exists: ⟦1⟧.",
+ "live-build":"live-build",
+ "archiso":"archiso",
+ "Connecte-toi d'abord en ⟦0⟧, mot de passe ⟦1⟧.":"First log in as ⟦0⟧, password ⟦1⟧.",
+ "Connecte-toi en ⟦0⟧, mot de passe ⟦1⟧.":"Log in as ⟦0⟧, password ⟦1⟧.",
+ "void-mklive":"void-mklive",
+ "L'ISO minimale de Gentoo fait environ 1 Go.":"Gentoo's minimal ISO is about 1 GB.",
+ "Catalyst":"Catalyst",
+ "- Chargeur d'amorçage : ⟦0⟧":"- Bootloader: ⟦0⟧",
+ "- Système de fichiers : ⟦0⟧":"- File system: ⟦0⟧",
+ "- Chiffrement du disque : ⟦0⟧":"- Disk encryption: ⟦0⟧",
+//TUTO_EN_END
+};
+// texte venu des données (arbre, fiches, matériel) : couche FRAG seulement, jamais signalé comme manquant
+const trd=s=>typeof s==="string"?(LANG==="en"?trx(unD(s)):unD(s)):s;
 // Couche anglaise des données, chemins « collection/id/champ » (aide : « help/clé »). Vide au lot 0.
 const EN_DATA={};
 const L10N_FIELDS={tools:["summary","description"],cats:["name","description"],layers:["name"],objectives:["name","desc"],bases:["desc"]};
@@ -3313,7 +3763,7 @@ const REPO_URL="https://github.com/tanguyernest/atlas-distro";
 function urlPart(s){return encodeURIComponent(s).replace(/[()!'*]/g,c=>"%"+c.charCodeAt(0).toString(16).toUpperCase())}
 // formulaire .github/ISSUE_TEMPLATE/<template> : chaque clé de fields est l'id d'un champ du formulaire
 function issueUrl(template,title,fields){return REPO_URL+"/issues/new?template="+template+"&title="+urlPart(title)+Object.keys(fields).map(k=>"&"+k+"="+urlPart(fields[k])).join("")}
-function stLabel(s){return s.state==="tested"&&s.tested?`🧪 Testé en VM le ${s.tested.date}, sur ${s.tested.label}`:(ST[s.state]||ST.check)}
+function stLabel(s){return s.state==="tested"&&s.tested?tx("tuto.tested",{date:s.tested.date,label:trd(s.tested.label)}):(stx(s.state)||stx("check"))}
 function famOf(base){return FAMILY[base]||"none"}
 function sysPkgs(tid,base){
   if(!(tid in SYSPKG))return undefined;
@@ -3375,12 +3825,12 @@ function pkgNote(base,pkgs){
   const S=DISTRO_STATUS[base];if(!S)return undefined;
   const of=k=>pkgs.filter(p=>(S[p]||"").startsWith(k)),tp=of("thirdparty"),ab=of("absent"),vi=of("virtual");
   const n=[];
-  if(tp.length)n.push("Dépôt tiers requis : "+[...new Set(tp.map(p=>DISTRO_STATUS._thirdparty[base][p]))].join(", ")+" ("+tp.join(", ")+").");
-  if(ab.length)n.push("Paquet absent sur "+((BASEDEF[base]||{}).name||base)+" : "+ab.join(", ")+".");
-  if(vi.length)n.push("Nom virtuel, à revérifier : "+vi.join(", ")+".");
+  if(tp.length)n.push("Dépôt tiers requis : "+D([...new Set(tp.map(p=>DISTRO_STATUS._thirdparty[base][p]))].join(", "))+" ("+D(tp.join(", "))+").");
+  if(ab.length)n.push("Paquet absent sur "+D((BASEDEF[base]||{}).name||base)+" : "+D(ab.join(", "))+".");
+  if(vi.length)n.push("Nom virtuel, à revérifier : "+D(vi.join(", "))+".");
   const op=of("optrepo"),am=of("ambiguous");
-  if(op.length)n.push("Dépôt officiel à activer (nonfree ou multilib) : "+op.join(", ")+".");
-  if(am.length)n.push("Nom présent dans plusieurs catégories de Gentoo, à préciser (catégorie/paquet) : "+am.join(", ")+".");
+  if(op.length)n.push("Dépôt officiel à activer (nonfree ou multilib) : "+D(op.join(", "))+".");
+  if(am.length)n.push("Nom présent dans plusieurs catégories de Gentoo, à préciser (catégorie/paquet) : "+D(am.join(", "))+".");
   return n.length?n.join(" "):undefined;
 }
 function mdEscape(s){return String(s).replace(/\|/g,"\\|")}
@@ -3415,7 +3865,7 @@ function scratchSteps(baseId,BD,stack){
   const bl=sv("Chargeur d'amorçage").tool||"grub";
   let fs=sv("Système de fichiers").tool||"ext4";
   const fsNotes=[];
-  if(!["ext4","btrfs","xfs","f2fs"].includes(fs)){fsNotes.push(`Ce bloc utilise ext4 : ${byId(fs)?byId(fs).name:fs} demande une procédure à part. Fais d'abord un essai réussi en ext4.`);fs="ext4"}
+  if(!["ext4","btrfs","xfs","f2fs"].includes(fs)){fsNotes.push(`Ce bloc utilise ext4 : ${D(byId(fs)?byId(fs).name:fs)} demande une procédure à part. Fais d'abord un essai réussi en ext4.`);fs="ext4"}
   const luks=sv("Chiffrement du disque").tool==="luks";
   const deId=(stack.find(x=>DE_IDS.includes(x.tool))||{}).tool;
   const kernelId=sv("Noyau").tool||"linux-lts";
@@ -3432,7 +3882,7 @@ function scratchSteps(baseId,BD,stack){
     why:"Tout le parcours se fait d'abord dans une VM : une erreur de partitionnement n'y efface rien.",
     notes:["**Ne suis jamais le partitionnement sur ta vraie machine avant d'avoir réussi tout le parcours dans la VM.**",
       "Installe QEMU sur ta machine (paquet `qemu-full` sur Arch, `qemu-system-x86` sur Debian et Ubuntu, `qemu-kvm` sur Fedora) et vérifie que `/dev/kvm` existe.",
-      `Télécharge \`${iso.file}\` depuis ${iso.url} et place-toi dans ce dossier.`,
+      `Télécharge \`${iso.file}\` depuis ${D(iso.url)} et place-toi dans ce dossier.`,
       GEN?"L'ISO minimale de Gentoo fait environ 1 Go. Son nom change chaque semaine : prends la plus récente.":"",
       uefi?"Le firmware UEFI (OVMF) n'a pas le même chemin partout : `/usr/share/edk2/x64/` sur Arch, `/usr/share/OVMF/` sur Debian et Ubuntu (`OVMF_CODE_4M.fd`), `/usr/share/edk2/ovmf/` sur Fedora.":"Mode BIOS : la VM démarre sans firmware UEFI.",
       "`-serial mon:stdio` relie la console série de la VM à ton terminal : après l'installation, tu pourras y copier-coller les commandes.",
@@ -3503,7 +3953,7 @@ function scratchSteps(baseId,BD,stack){
     :["sfdisk \"$DISK\" <<'FIN'","label: dos",`size=1GiB, type=${bootFs==="vfat"?"c":"83"}, bootable`,"type=83","FIN"].join("\n");
   const pnotes=[`Dans la VM, le disque s'appelle \`${VM_DISK}\`. Sur une vraie machine, repère-le avec \`lsblk\` (souvent \`/dev/sda\` ou \`/dev/nvme0n1\` ; avec NVMe, les partitions s'appellent \`nvme0n1p1\`, \`nvme0n1p2\`).`,
     uefi?"Partition 1 (1 Gio, FAT32) : la partition EFI. Le firmware UEFI y lit le chargeur d'amorçage ; le noyau y est aussi, montée sur `/boot`.":"Partition 1 (1 Gio) : `/boot`, avec le noyau. Le BIOS démarre le chargeur écrit au début du disque.",
-    `Partition 2 (le reste) : la racine \`/\`, en ${fs}${luks?", chiffrée avec LUKS":""}. Elle contient tout le système.`].concat(fsNotes);
+    `Partition 2 (le reste) : la racine \`/\`, en ${D(fs)}${luks?", chiffrée avec LUKS":""}. Elle contient tout le système.`].concat(fsNotes);
   if(!uefi&&bl==="systemd-boot")pnotes.push("systemd-boot ne fonctionne qu'en UEFI : en BIOS, choisis GRUB ou Limine dans l'app.");
   if(luks)pnotes.push("`cryptsetup luksFormat` demande de taper `YES` en majuscules, puis la phrase de passe deux fois. Sans elle, les données sont perdues.");
   S({key:"part",where:"live",title:uefi?"Partitionner le disque (UEFI)":"Partitionner le disque (BIOS)",why:"Découper le disque, créer les systèmes de fichiers, puis les monter dans /mnt.",
@@ -3535,7 +3985,7 @@ function scratchSteps(baseId,BD,stack){
     gentoo:{cmds:["cd /mnt",`STAGE3=$(wget -qO- ${G3}/latest-${stage3}.txt | awk '/^[0-9]+T[0-9]+Z\// {print $1}')`,`wget "${G3}/$STAGE3" "${G3}/$STAGE3.asc"`,
         "gpg --import /usr/share/openpgp-keys/gentoo-release.asc",'gpg --verify "$(basename "$STAGE3").asc"',
         "tar xpf stage3-*.tar.xz --xattrs-include='*.*' --numeric-owner -C /mnt","rm stage3-*.tar.xz*","cd /"],
-      notes:[`Le stage3 est un Gentoo minimal déjà compilé (environ ${deId?"750":"270"} Mo) : on le décompresse dans /mnt. Ici, la variante \`${stage3}\` (OpenRC${deId?", profil bureau":""}).`,
+      notes:[`Le stage3 est un Gentoo minimal déjà compilé (environ ${D(deId?"750":"270")} Mo) : on le décompresse dans /mnt. Ici, la variante \`${stage3}\` (OpenRC${deId?", profil bureau":""}).`,
         "Son nom change chaque semaine : la deuxième commande lit le nom du dernier stage3 publié.","`gpg --verify` doit afficher « Good signature ». Sinon, n'utilise pas l'archive.",
         "Le noyau et le chargeur s'installent plus loin, dans le chroot, avec Portage."],pkgs:[]}
   }[baseId];
@@ -3647,7 +4097,7 @@ function scratchSteps(baseId,BD,stack){
     if(!GEN)bverify=["bootctl status","ls /boot/loader/entries"];
     if(!uefi)bnotes.push("systemd-boot ne fonctionne qu'en UEFI.");
   }else{bnotes.push("Ce chargeur n'a pas encore de commandes dans l'app : suis sa documentation.")}
-  withPkgs(S({key:"boot",where:"chroot",title:"Installer le chargeur d'amorçage : "+((byId(bl)||{}).name||bl),why:"Le chargeur lance le noyau au démarrage de la machine.",
+  withPkgs(S({key:"boot",where:"chroot",title:"Installer le chargeur d'amorçage : "+D((byId(bl)||{}).name||bl),why:"Le chargeur lance le noyau au démarrage de la machine.",
     notes:bnotes,cmds:bcmds,verify:bverify}),bpkgs);
 
   // 7. sortir et redémarrer sur le disque
@@ -3691,10 +4141,10 @@ function desktopStep(baseId,deId){
   cmds.push(A?`rc-update add ${svc} default`:VOID?`ln -s /etc/sv/${svc} /var/service/`:GEN?"rc-update add display-manager default":`systemctl enable ${svc}`);
   cmds.push("reboot");
   verify=[A?`rc-service ${svc} status`:VOID?`sv status ${svc}`:GEN?"rc-service display-manager status":`systemctl is-active ${svc}`];
-  notes.push(`Gestionnaire de connexion : ${dm==="greetd"?"greetd avec tuigreet (écran de connexion en mode texte)":dm.toUpperCase()}. Il démarre la session ${de.name} après ta connexion avec \`moi\`.`);
+  notes.push(`Gestionnaire de connexion : ${dm==="greetd"?"greetd avec tuigreet (écran de connexion en mode texte)":D(dm.toUpperCase())}. Il démarre la session ${D(de.name)} après ta connexion avec \`moi\`.`);
   if(A)notes.push("`setup-devd udev` remplace mdev par udev : le bureau en a besoin pour le clavier, la souris et l'écran.");
   if(VOID)notes.push("Sur Void, un lien dans `/var/service/` active le service et le démarre tout de suite (runit).");
-  if(GEN)notes.push(`**⏳ Compilation : ${["kde-plasma","gnome"].includes(deId)?"compte plusieurs heures, souvent une nuit, pour "+de.name:"compte une à plusieurs heures"}.** Le profil bureau choisi à l'étape « Configurer le système » règle déjà les options (USE) du bureau.`,
+  if(GEN)notes.push(`**⏳ Compilation : ${["kde-plasma","gnome"].includes(deId)?"compte plusieurs heures, souvent une nuit, pour "+D(de.name):"compte une à plusieurs heures"}.** Le profil bureau choisi à l'étape « Configurer le système » règle déjà les options (USE) du bureau.`,
     "Sur Gentoo avec OpenRC, le service `display-manager` lance le gestionnaire de connexion nommé dans `/etc/conf.d/display-manager`.");
   notes.push("Le redémarrage applique tout d'un coup : l'écran de connexion doit apparaître. Reconnecte-toi ensuite en `root` sur la console pour la suite.");
   const look={
@@ -3708,7 +4158,7 @@ function desktopStep(baseId,deId){
     mangowc:["Configuration : `~/.config/mango/config.conf`."]
   }[deId]||[];
   notes=notes.concat(look);
-  return {id:"scratch-desktop",sid:SCR_SLUG.desktop,where:"systeme",title:"Configurer le bureau : "+de.name,why:"Démarrer le bureau à l'allumage, avec un écran de connexion.",notes,cmds,verify,pkgs};
+  return {id:"scratch-desktop",sid:SCR_SLUG.desktop,where:"systeme",title:"Configurer le bureau : "+D(de.name),why:"Démarrer le bureau à l'allumage, avec un écran de connexion.",notes,cmds,verify,pkgs};
 }
 function buildTutorial(){
   const tree=TREES[G.obj];if(!tree)return "";
@@ -3736,43 +4186,44 @@ function buildTutorial(){
   // ---------- étapes ----------
   const SCR=SCRATCH_BASES.includes(baseId)?scratchSteps(baseId,BD,stack):null;
   if(SCR)steps.push({sid:"prepare",title:"Préparer",state:"manual",why:"Éviter de perdre des données et préparer l'image d'installation.",
-    notes:["Sauvegarde tes données importantes avant tout essai sur une vraie machine.",`Télécharge \`${SCRATCH_ISO[baseId].file}\` depuis ${SCRATCH_ISO[baseId].url} et vérifie sa somme de contrôle (\`sha256sum\`).`,"Plus tard, pour une vraie machine : écris l'ISO sur une clé USB (balenaEtcher, Ventoy ou `dd` avec le bon périphérique)."],
+    notes:["Sauvegarde tes données importantes avant tout essai sur une vraie machine.",`Télécharge \`${SCRATCH_ISO[baseId].file}\` depuis ${D(SCRATCH_ISO[baseId].url)} et vérifie sa somme de contrôle (\`sha256sum\`).`,"Plus tard, pour une vraie machine : écris l'ISO sur une clé USB (balenaEtcher, Ventoy ou `dd` avec le bon périphérique)."],
     verify:["sha256sum "+SCRATCH_ISO[baseId].file]});
   else steps.push({sid:"prepare",title:"Préparer",state:"manual",why:"Éviter de perdre des données et préparer le support d'installation.",
-    notes:["Sauvegarde tes données importantes : une installation peut effacer le disque.","Télécharge l'image d'installation de "+BD.name+" depuis le site officiel et vérifie sa somme de contrôle.","Prépare une clé USB avec un outil adapté à ton système (balenaEtcher, Ventoy ou `dd` avec le bon périphérique)."],
+    notes:["Sauvegarde tes données importantes : une installation peut effacer le disque.","Télécharge l'image d'installation de "+D(BD.name)+" depuis le site officiel et vérifie sa somme de contrôle.","Prépare une clé USB avec un outil adapté à ton système (balenaEtcher, Ventoy ou `dd` avec le bon périphérique)."],
     verify:["lsblk  # identifie bien la clé USB avant de l'écrire"]});
   const doc=INSTALL_DOC[baseId];
   const choices=[];
   const sv=l=>(stack.find(x=>x.label===l)||{});
-  if(sv("Chargeur d'amorçage").name)choices.push("Chargeur d'amorçage : "+sv("Chargeur d'amorçage").name);
-  if(sv("Système de fichiers").name)choices.push("Système de fichiers : "+sv("Système de fichiers").name);
-  if(sv("Chiffrement du disque").name)choices.push("Chiffrement du disque : "+sv("Chiffrement du disque").name);
-  if(HW.boot)choices.push("Mode de démarrage de ta machine : "+hwLabel("boot",HW.boot));
+  if(sv("Chargeur d'amorçage").name)choices.push("Chargeur d'amorçage : "+D(sv("Chargeur d'amorçage").name));
+  if(sv("Système de fichiers").name)choices.push("Système de fichiers : "+D(sv("Système de fichiers").name));
+  if(sv("Chiffrement du disque").name)choices.push("Chiffrement du disque : "+D(sv("Chiffrement du disque").name));
+  if(HW.boot)choices.push("Mode de démarrage de ta machine : "+D(trx(hwLabel("boot",HW.boot))));
   if(SCR)SCR.steps.forEach(x=>{if(x.pkgs)addPkgs(x.pkgs);steps.push(x)});
-  else steps.push({sid:"base-install",title:"Installer la base "+BD.name,state:"manual",why:"La base impose "+BD.pm[1]+", la bibliothèque "+BD.libc+" et l'init "+BD.init[1]+".",
+  else steps.push({sid:"base-install",title:"Installer la base "+D(BD.name),state:"manual",why:"La base impose "+D(BD.pm[1])+", la bibliothèque "+D(BD.libc)+" et l'init "+D(BD.init[1])+".",
     notes:["Suis le guide officiel pour l'installation du système minimal."].concat(choices.length?["Choix à appliquer pendant l'installation :"].concat(choices.map(c=>"  - "+c)):[]),
     docs:doc?[doc]:[],
     verify:["cat /etc/os-release","uname -r"]});
   // mise à jour initiale
   const UPD={apk:["apk update","apk upgrade"],apt:["apt update","apt upgrade -y"],pacman:["pacman -Syu"],dnf:["dnf upgrade -y"],zypper:["zypper refresh","zypper update -y"],xbps:["xbps-install -Su"],emerge:["emerge --sync","emerge --ask --update --deep @world"],nix:["nix-channel --update"]};
-  if(UPD[fam])steps.push({sid:"system-update",title:"Mettre à jour le système",state:"check",why:"Partir d'un système à jour avant d'ajouter des paquets.",cmds:UPD[fam],verify:["echo $?  # doit afficher 0"],stateNote:"Commande standard de "+BD.pm[1]+", non testée dans ce tutoriel."});
+  if(UPD[fam])steps.push({sid:"system-update",title:"Mettre à jour le système",state:"check",why:"Partir d'un système à jour avant d'ajouter des paquets.",cmds:UPD[fam],verify:["echo $?  # doit afficher 0"],stateNote:"Commande standard de "+D(BD.pm[1])+", non testée dans ce tutoriel."});
 
   // briques de la pile
   const SKIP=new Set(["Distribution de base","Bibliothèque C","Système d'init","Gestionnaire de paquets","Mises à jour","Modèle d'image"].concat(SCR?["Noyau","Chargeur d'amorçage","Système de fichiers","Chiffrement du disque"]:[]));
+  const ttl=(l,n)=>"\uE002"+l+"\uE003 : "+D(n);  // libellé français traduit à la rédaction : l'identifiant « etape: » reste le même dans les deux langues
   const netTitles=[];
   stack.forEach(x=>{
     if(SKIP.has(x.label)||!x.tool)return;
     const t=byId(x.tool);if(!t)return;
     const r=toolPkgs(t,baseId);
-    if(t.category==="network")netTitles.push(x.label+" : "+x.name);
+    if(t.category==="network")netTitles.push(ttl(x.label,x.name));
     if(r.nothing){
       const pc=postCmds(t.id,baseId);
-      if(pc.length){steps.push({sid:"brick-"+t.id,title:x.label+" : "+x.name,state:"check",why:x.why,notes:["Déjà fourni par la base : il reste à l'installer sur le disque."],cmds:pc,verify:POSTVERIFY[t.id]||[],stateNote:"Commandes non testées : adapte le disque et le point de montage de la partition EFI."});return}
-      steps.push({sid:"brick-"+t.id,title:x.label+" : "+x.name,state:"info",why:x.why,notes:["Aucun paquet à installer séparément : "+(t.id==="wayland"?"Wayland est fourni par ton bureau ou ton compositeur.":"déjà fourni par la base.")]});return}
-    if(r.unknownFam){steps.push({sid:"brick-"+t.id,title:x.label+" : "+x.name,state:"check",why:x.why,notes:["Le nom du paquet n'est pas renseigné pour "+BD.name+" : consulte la documentation de la base."],docs:(t.docs||[]).slice(0,1).map(d=>[d.label,d.url])});return}
+      if(pc.length){steps.push({sid:"brick-"+t.id,title:ttl(x.label,x.name),state:"check",why:x.why,dataWhy:true,notes:["Déjà fourni par la base : il reste à l'installer sur le disque."],cmds:pc,verify:POSTVERIFY[t.id]||[],stateNote:"Commandes non testées : adapte le disque et le point de montage de la partition EFI."});return}
+      steps.push({sid:"brick-"+t.id,title:ttl(x.label,x.name),state:"info",why:x.why,dataWhy:true,notes:[t.id==="wayland"?"Aucun paquet à installer séparément : Wayland est fourni par ton bureau ou ton compositeur.":"Aucun paquet à installer séparément : déjà fourni par la base."]});return}
+    if(r.unknownFam){steps.push({sid:"brick-"+t.id,title:ttl(x.label,x.name),state:"check",why:x.why,dataWhy:true,notes:["Le nom du paquet n'est pas renseigné pour "+D(BD.name)+" : consulte la documentation de la base."],docs:(t.docs||[]).slice(0,1).map(d=>[d.label,d.url])});return}
     if(r.none)return;
     const sysPath=sysPkgs(t.id,baseId)!==undefined;
-    const st={sid:"brick-"+t.id,title:x.label+" : "+x.name,why:x.why,cmds:[],verify:[],pitfalls:sysPath?[]:(t.pitfalls||[]).slice(0,2),docs:(t.docs||[]).slice(0,1).map(d=>[d.label,d.url]),needs:needsForBase(t,baseId)};
+    const st={sid:"brick-"+t.id,title:ttl(x.label,x.name),why:x.why,dataWhy:true,cmds:[],verify:[],pitfalls:sysPath?[]:(t.pitfalls||[]).slice(0,2),docs:(t.docs||[]).slice(0,1).map(d=>[d.label,d.url]),needs:needsForBase(t,baseId)};
     if(r.pkgs.length){st.cmds=st.cmds.concat(instCmd(baseId,r.pkgs));st.verify=st.verify.concat(verifyCmds(baseId,r.pkgs));addPkgs(r.pkgs);st.state=pkgState(baseId,r.pkgs);st.stateNote=pkgNote(baseId,r.pkgs);const pc=postCmds(t.id,baseId);if(pc.length){st.cmds=st.cmds.concat(pc);st.verify=st.verify.concat(POSTVERIFY[t.id]||[]);st.state="check";st.stateNote="Commandes d'installation du chargeur non testées : adapte le disque et le point de montage de la partition EFI."}}
     if(r.flatpak)addFlatpak(st,t,r.flatpak);
     if(r.compile){st.cmds=st.cmds.concat(r.compile);st.state="check";st.stateNote="Compilation depuis les sources : étapes à suivre dans le dépôt du projet."}
@@ -3797,7 +4248,7 @@ function buildTutorial(){
   if(baseId==="fedora"&&wantsSteam)repoNotes.push("Steam vient du dépôt RPM Fusion : active-le depuis rpmfusion.org avant d'installer.");
   if(baseId==="rocky"||baseId==="almalinux")repoCmds.push("dnf install -y epel-release");
   if(baseId==="void"&&DISTRO_STATUS.void){const opt=allPkgs.filter(p=>DISTRO_STATUS.void[p]==="optrepo");
-    if(opt.length){repoCmds.push("xbps-install -Sy void-repo-nonfree void-repo-multilib void-repo-multilib-nonfree","xbps-install -S");repoNotes.push("Paquets des dépôts officiels nonfree ou multilib de Void, désactivés par défaut : "+opt.join(", ")+".")}}
+    if(opt.length){repoCmds.push("xbps-install -Sy void-repo-nonfree void-repo-multilib void-repo-multilib-nonfree","xbps-install -S");repoNotes.push("Paquets des dépôts officiels nonfree ou multilib de Void, désactivés par défaut : "+D(opt.join(", "))+".")}}
   if(baseId==="gentoo"&&wantsSteam)repoNotes.push("Steam n'est pas dans l'arbre officiel de Gentoo : il vient de l'overlay steam-overlay (`eselect repository enable steam-overlay`).");
   if(["debian","ubuntu","devuan","raspios"].includes(baseId)&&(wantsSteam||HW.gpu==="nvidia"||HW.gpu==="amd"))repoNotes.push("Les firmwares et les pilotes NVIDIA demandent d'activer les composants non libres (contrib, non-free, non-free-firmware) dans les sources APT.");
   if(repoCmds.length||repoNotes.length){
@@ -3817,7 +4268,7 @@ function buildTutorial(){
     }else if(MESA[f]){const m=MESA[f];dp=m.base.concat(m[g==="amd"?"amd":g==="intel"?"intel":"none"]||[])}
     if(dp)dp=ubuntuNames(dp,baseId);
     if(dp&&f==="emerge")dn.push("Sur Gentoo, les pilotes compilés dépendent de `VIDEO_CARDS` dans `/etc/portage/make.conf` (par exemple `amdgpu radeonsi`, `intel` ou `nvidia`) : règle-le avant d'installer.");
-    if(dp&&dp.length){addPkgs(dp);steps.push({sid:"gpu-drivers",title:"Pilotes graphiques",state:pkgState(baseId,dp),stateNote:pkgNote(baseId,dp),why:g?"Pilotes pour ta carte graphique ("+hwLabel("gpu",g)+").":"Pilotes libres Mesa pour les cartes AMD et Intel.",cmds:instCmd(baseId,dp),verify:verifyCmds(baseId,dp),notes:dn});}
+    if(dp&&dp.length){addPkgs(dp);steps.push({sid:"gpu-drivers",title:"Pilotes graphiques",state:pkgState(baseId,dp),stateNote:pkgNote(baseId,dp),why:g?"Pilotes pour ta carte graphique ("+D(trx(hwLabel("gpu",g)))+").":"Pilotes libres Mesa pour les cartes AMD et Intel.",cmds:instCmd(baseId,dp),verify:verifyCmds(baseId,dp),notes:dn});}
     else if(nvManual)steps.push({sid:"gpu-drivers",title:"Pilotes graphiques",state:"manual",why:"Pilote NVIDIA propriétaire pour ta carte graphique.",
       notes:["Sur Ubuntu, le paquet du pilote dépend de la carte (nvidia-driver-XXX) : laisse ubuntu-drivers choisir la bonne version.","Redémarre après l'installation."],
       cmds:["apt install ubuntu-drivers-common","ubuntu-drivers list","ubuntu-drivers install"],verify:["nvidia-smi"]});
@@ -3834,8 +4285,8 @@ function buildTutorial(){
       const t=byId(tid);if(!t)return;
       if(stack.some(x=>x.tool===tid))return;
       const r=toolPkgs(t,baseId);
-      if(r.unknownFam){groupsMd.push({sid:"soft-"+t.id,title:f.label+" : "+t.name,state:"check",why:t.summary,notes:["Le nom du paquet n'est pas renseigné pour "+BD.name+" : consulte la documentation du projet."]});return}
-      const st={sid:"soft-"+t.id,title:f.label+" : "+t.name,why:t.summary,cmds:[],verify:[],pitfalls:(t.pitfalls||[]).slice(0,2),docs:(t.docs||[]).slice(0,1).map(d=>[d.label,d.url]),needs:needsForBase(t,baseId)};
+      if(r.unknownFam){groupsMd.push({sid:"soft-"+t.id,title:ttl(f.label,t.name),state:"check",why:t.summary,dataWhy:"fiche",notes:["Le nom du paquet n'est pas renseigné pour "+D(BD.name)+" : consulte la documentation du projet."]});return}
+      const st={sid:"soft-"+t.id,title:ttl(f.label,t.name),why:t.summary,dataWhy:"fiche",cmds:[],verify:[],pitfalls:(t.pitfalls||[]).slice(0,2),docs:(t.docs||[]).slice(0,1).map(d=>[d.label,d.url]),needs:needsForBase(t,baseId)};
       if(r.pkgs.length){st.cmds=st.cmds.concat(instCmd(baseId,r.pkgs));st.verify=st.verify.concat(verifyCmds(baseId,r.pkgs));addPkgs(r.pkgs);st.state=pkgState(baseId,r.pkgs);st.stateNote=pkgNote(baseId,r.pkgs)}
       if(r.flatpak)addFlatpak(st,t,r.flatpak);
       if(r.compile){st.cmds=st.cmds.concat(r.compile);st.state="check";st.stateNote="Compilation depuis les sources."}
@@ -3847,8 +4298,8 @@ function buildTutorial(){
   }));
   if(fpApps.length){
     const fpOk=pkgState(baseId,fpPkg(baseId))==="ok"&&fpApps.every(a=>fhState(a.id)==="ok");
-    steps.push({sid:"flatpak-setup",title:"Préparer Flatpak",state:fpOk?"ok":"check",why:"Certains logiciels ne sont pas dans les dépôts de "+BD.name+" et passent par Flatpak.",
-    notes:["Logiciels installés avec Flatpak :"].concat(fpApps.map(a=>`  - ${a.name} : \`${a.id}\`, ${fhState(a.id)==="ok"?"🟡":"⚠️"} ${fhNote(a.id)}`)),
+    steps.push({sid:"flatpak-setup",title:"Préparer Flatpak",state:fpOk?"ok":"check",why:"Certains logiciels ne sont pas dans les dépôts de "+D(BD.name)+" et passent par Flatpak.",
+    notes:["Logiciels installés avec Flatpak :"].concat(fpApps.map(a=>`  - ${D(a.name)} : \`${a.id}\`, ${fhState(a.id)==="ok"?"🟡":"⚠️"} ${fhNote(a.id)}`)),
     cmds:instCmd(baseId,fpPkg(baseId)).concat(["flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo"],fpApps.map(a=>`flatpak install -y flathub ${a.id}`)),
     verify:["flatpak remotes"].concat(fpApps.map(a=>`flatpak info ${a.id}`)),stateNote:"Sur certaines bases, il faut aussi installer un portail xdg-desktop-portal et redémarrer la session.",docs:[["Configurer Flatpak","https://flatpak.org/setup/"]]});
   }
@@ -3859,7 +4310,7 @@ function buildTutorial(){
   const uniq=[...new Set(chosenTools)];
   uniq.forEach(tid=>{const s=SERVICE[tid];if(!s)return;const f=INIT_ENABLE[initId];if(!f)return;const t=byId(tid);svcLines.push({name:t?t.name:tid,cmds:f(s)})});
   if(svcLines.length)steps.push({sid:"services",title:"Activer les services",state:"check",why:"Les services ne démarrent pas tout seuls après l'installation.",
-    notes:["Init détectée : "+((byId(initId)||{}).name||BD.init[1])+"."],
+    notes:["Init détectée : "+D((byId(initId)||{}).name||BD.init[1])+"."],
     cmds:svcLines.flatMap(s=>["# "+s.name].concat(s.cmds)),
     verify:["# vérifier chaque service avec la commande de ton init (rc-status, systemctl status, sv status)"],
     stateNote:"Les noms de services peuvent varier selon la distribution."});
@@ -3867,9 +4318,9 @@ function buildTutorial(){
   steps.forEach(s=>{
     if(s.id&&s.id.startsWith("scratch-")){
       if(s.pkgs&&s.pkgs.length)pkgState(baseId,s.pkgs);
-      s.state="check";s.stateNote=[VM_TESTS[baseId]?"Pas encore testé en VM avec ces choix.":"Pas encore testé en VM pour "+BD.name+".",s.pkgs&&s.pkgs.length?pkgNote(baseId,s.pkgs):""].filter(Boolean).join(" ");
+      s.state="check";s.stateNote=[VM_TESTS[baseId]?"Pas encore testé en VM avec ces choix.":"Pas encore testé en VM pour "+D(BD.name)+".",s.pkgs&&s.pkgs.length?pkgNote(baseId,s.pkgs):""].filter(Boolean).join(" ");
     }
-    s.id=s.id||"etape:"+s.title;
+    s.id=s.id||"etape:"+unD(s.title);
     const tv=vmTested(baseId,s);if(tv){s.state="tested";s.tested=tv;s.stateNote=undefined}
   });
 
@@ -3877,91 +4328,90 @@ function buildTutorial(){
   const BUILD=buildIso(baseId,allPkgs);
 
   // ---------- rédaction ----------
-  P(`# Distro ${obj.name.toLowerCase()} sur ${BD.name} : tutoriel pas à pas`);
+  // Les commandes (cmds, verify) sont écrites telles quelles, dans les deux langues. Seul le texte autour passe par tx(), trt() ou trd().
+  const dl=l=>(LANG==="en"&&trtLook(l))||l;  // libellés des fiches : français jusqu'au lot 6
+  const objName=trd(obj.name);
+  P(tx("tuto.h1",{obj:objName.toLowerCase(),base:BD.name}));
   P("");
   warning().forEach((w,i)=>P((i?"> - ":"> **")+w+(i?"":"**")));P("");
-  P(`> Généré par l'Atlas distro le ${date}. Les données sont écrites à la main : relis chaque étape avant de l'exécuter, surtout celles marquées ⚠️.`);
+  P(tx("tuto.gen",{date}));
   P("");
   const VM=DISTRO_STATUS._meta[baseId];
-  if(VM){P(`> Noms de paquets vérifiés le ${VM.verified_on} sur ${VM.label}, dans les index officiels (${VM.sources}). Les commandes n'ont pas été exécutées.`);P("")}
-  P(`> Parcours « distro depuis zéro » sur ${BD.name} : ${BASE_STATUS[baseStatus(baseId)]}.`);P("");
-  P("## Légende des états");
+  if(VM){P(tx("tuto.pkgver",{date:VM.verified_on,label:trd(VM.label),src:VM.sources}));P("")}
+  P(tx("tuto.scratch",{base:BD.name,status:trx(BASE_STATUS[baseStatus(baseId)])}));P("");
+  P("## "+tx("tuto.legend"));
   P("");
-  P(`- ${ST.tested} : commandes exécutées avec succès dans une machine virtuelle, à la date et sur la version indiquées`);
-  P(`- ${ST.ok}`);
-  P(`- ${ST.check} : nom de paquet, option ou identifiant non confirmé pour cette base`);
-  P(`- ${ST.manual} : à faire à la main, avec la documentation officielle`);
-  P(`- ${ST.info} : déjà fourni par la base ou par un autre composant`);
+  P(tx("tuto.leg.tested",{st:stx("tested")}));P(tx("tuto.leg.ok",{st:stx("ok")}));P(tx("tuto.leg.check",{st:stx("check")}));P(tx("tuto.leg.manual",{st:stx("manual")}));P(tx("tuto.leg.info",{st:stx("info")}));
   P("");
-  P("Les commandes sont à lancer en root (ou avec `sudo` ou `doas`).");
+  P(tx("tuto.root"));
   P("");
-  P("## Ta pile");
+  P("## "+tx("tuto.stack"));
   P("");
-  P("| Brique | Choix | Pourquoi |");
+  P(tx("tuto.stack.head"));
   P("|---|---|---|");
-  stack.forEach(x=>P(`| ${mdEscape(x.label)} | ${mdEscape(x.name)}${x.manual?" (choix manuel)":""} | ${mdEscape((x.why||"").replace(/ \(Choix par défaut[^)]*\)/,""))} |`));
+  stack.forEach(x=>P(`| ${mdEscape(trd(x.label))} | ${mdEscape(x.name)}${x.manual?tx("tuto.manual"):""} | ${mdEscape(trd((x.why||"").replace(/ \(Choix par défaut[^)]*\)/,"")))} |`));
   P("");
   if(G.scope==="precise"){
-    P("## Ton matériel");P("");P("- "+hwSummary());hwNotes().forEach(n=>P("- "+n));P("");
+    P("## "+tx("tuto.hw"));P("");P("- "+hwSummary(true));hwNotes().forEach(n=>P("- "+trd(n)));P("");
   }
   const warns=[];
-  issues.forEach(i=>warns.push("**Conflit non résolu** : "+i.msg));
-  keptIssues.forEach(i=>warns.push("**Conflit conservé volontairement** : "+i.msg));
-  if(baseId==="gentoo")warns.push("**Compilation longue** : Gentoo compile chaque paquet depuis les sources. Compte plusieurs heures pour le système de base, et souvent une nuit pour un bureau complet (KDE Plasma, GNOME). Laisse la VM allumée et branchée.");
-  G.changed.forEach(c=>warns.push(`**Objectif de départ modifié** : « ${tree.questions[c.i].t} » est passé de « ${tree.questions[c.i].o[c.from]} » à « ${tree.questions[c.i].o[c.to]} »`));
-  if(warns.length){P("## Avertissements");P("");warns.forEach(w=>P("- "+w));P("")}
-  P("## Ce que ce tutoriel ne couvre pas");P("");
-  (SCR?[]:["Le partitionnement et l'installation de la base : étape manuelle, à faire avec la documentation officielle.","La configuration de ton bureau (thèmes, raccourcis, gestionnaire de connexion et session)."]).concat(["Les réglages internes des logiciels (profils, comptes, synchronisation).","Les pilotes propriétaires hors dépôts (par exemple NVIDIA sur Alpine)."]).forEach(x=>P("- "+x));P("");
-  P("## Étapes");P("");
+  issues.forEach(i=>warns.push(tx("tuto.w.unresolved",{msg:trd(i.msg)})));
+  keptIssues.forEach(i=>warns.push(tx("tuto.w.kept",{msg:trd(i.msg)})));
+  if(baseId==="gentoo")warns.push(tx("tuto.w.gentoo"));
+  G.changed.forEach(c=>warns.push(tx("tuto.w.changed",{q:trd(tree.questions[c.i].t),from:trd(tree.questions[c.i].o[c.from]),to:trd(tree.questions[c.i].o[c.to])})));
+  if(warns.length){P("## "+tx("tuto.warns"));P("");warns.forEach(w=>P("- "+w));P("")}
+  P("## "+tx("tuto.nc"));P("");
+  (SCR?[]:[tx("tuto.nc1"),tx("tuto.nc2")]).concat([tx("tuto.nc3"),tx("tuto.nc4")]).forEach(x=>P("- "+x));P("");
+  P("## "+tx("tuto.steps"));P("");
   steps.forEach((s,i)=>{
-    const ref=`${baseId}-${G.obj}-${s.sid}`;
-    P(`### ${i+1}. ${s.title}`);P("");
-    P(`Identifiant : \`${ref}\``);P("");
-    P(`**État :** ${stLabel(s)}${s.stateNote?" — "+s.stateNote:""}`);P("");
-    if(s.where){P(`**Où :** ${{hote:"sur ta machine (hôte), dans le dossier de la VM",live:"dans la VM, sur le système live de l'ISO",chroot:"dans la VM, dans le chroot (système installé)",systeme:"dans la VM, sur le système installé, en root"}[s.where]}`);P("")}
-    if(s.why){P(`**Pourquoi :** ${s.why}`);P("")}
-    if(s.needs&&s.needs.length){P("**À prévoir :**");s.needs.forEach(n=>P("- "+n));P("")}
-    if(s.notes&&s.notes.length){s.notes.forEach(n=>P(n.startsWith("  ")?n:"- "+n));P("")}
-    if(s.cmds&&s.cmds.length){P("**Commande :**");P("");P("```bash");s.cmds.forEach(c=>P(c));P("```");P("")}
-    if(s.verify&&s.verify.length){P("**Vérifier :**");P("");P("```bash");s.verify.forEach(c=>P(c));P("```");P("")}
-    if(s.pitfalls&&s.pitfalls.length){P("**Pièges :**");s.pitfalls.forEach(n=>P("- "+n));P("")}
-    if(s.docs&&s.docs.length){P("**Documentation :** "+s.docs.map(d=>`[${d[0]}](${d[1]})`).join(", "));P("")}
-    P(`Une erreur ici ? [Signale-la](${issueUrl("commande-qui-echoue.yml",`[${ref}] ${s.title}`,{base:BD.name,parcours:obj.name,etape:`${ref} (${s.title})`,version:APP_VERSION})})`);P("");
+    const ref=`${baseId}-${G.obj}-${s.sid}`,title=trt(s.title);
+    P(`### ${i+1}. ${title}`);P("");
+    P(tx("tuto.id",{ref}));P("");
+    P(tx("tuto.state",{st:stLabel(s)})+(s.stateNote?" — "+trt(s.stateNote):""));P("");
+    if(s.where){P(tx("tuto.where",{w:{hote:tx("tuto.where.hote"),live:tx("tuto.where.live"),chroot:tx("tuto.where.chroot"),systeme:tx("tuto.where.systeme")}[s.where]}));P("")}
+    if(s.why){P(tx("tuto.why",{t:s.dataWhy==="fiche"?s.why:s.dataWhy?trd(s.why):trt(s.why)}));P("")}
+    if(s.needs&&s.needs.length){P(tx("tuto.needs"));s.needs.forEach(n=>P("- "+unD(n)));P("")}
+    if(s.notes&&s.notes.length){s.notes.forEach(n=>{const t=trt(n);P(n.startsWith("  ")?t:"- "+t)});P("")}
+    if(s.cmds&&s.cmds.length){P(tx("tuto.cmd"));P("");P("```bash");s.cmds.forEach(c=>P(c));P("```");P("")}
+    if(s.verify&&s.verify.length){P(tx("tuto.verify"));P("");P("```bash");s.verify.forEach(c=>P(c));P("```");P("")}
+    if(s.pitfalls&&s.pitfalls.length){P(tx("tuto.pit"));s.pitfalls.forEach(n=>P("- "+unD(n)));P("")}
+    if(s.docs&&s.docs.length){P(tx("tuto.docs",{t:s.docs.map(d=>`[${dl(d[0])}](${d[1]})`).join(", ")}));P("")}
+    P(tx("tuto.report",{url:issueUrl("commande-qui-echoue.yml",`[${ref}] ${title}`,{base:BD.name,parcours:objName,etape:`${ref} (${title})`,version:APP_VERSION})}));P("");
   });
-  P("## Liste complète des paquets");P("");
-  if(allPkgs.length){P("```text");P(allPkgs.join("\n"));P("```")}else P("Aucun paquet listé pour cette base.");
+  P("## "+tx("tuto.pkglist"));P("");
+  if(allPkgs.length){P("```text");P(allPkgs.join("\n"));P("```")}else P(tx("tuto.nopkg"));
   P("");
-  P("## Construire une ISO personnalisée");P("");
-  P(`**État :** ${ST[BUILD.state]}${BUILD.stateNote?" — "+BUILD.stateNote:""}`);P("");
-  P(`**Outil :** ${BUILD.tool}`);P("");
-  BUILD.steps.forEach((s,i)=>{P(`${i+1}. ${s.text}`);if(s.cmds&&s.cmds.length){P("");P("   ```bash");s.cmds.forEach(c=>P("   "+c));P("   ```")}});
+  P("## "+tx("tuto.iso"));P("");
+  P(tx("tuto.state",{st:stx(BUILD.state)})+(BUILD.stateNote?" — "+trt(BUILD.stateNote):""));P("");
+  P(tx("tuto.tool",{t:trt(BUILD.tool)}));P("");
+  BUILD.steps.forEach((s,i)=>{P(`${i+1}. ${trt(s.text)}`);if(s.cmds&&s.cmds.length){P("");P("   ```bash");s.cmds.forEach(c=>P("   "+c));P("   ```")}});
   P("");
-  if(BUILD.docs)P("**Documentation :** "+BUILD.docs.map(d=>`[${d[0]}](${d[1]})`).join(", "));
+  if(BUILD.docs)P(tx("tuto.docs",{t:BUILD.docs.map(d=>`[${dl(d[0])}](${d[1]})`).join(", ")}));
   P("");
   const cnt={tested:0,ok:0,check:0,manual:0,info:0};steps.forEach(s=>cnt[s.state||"check"]++);
-  P("## Récapitulatif des vérifications");P("");
-  P("| État | Étapes |");P("|---|---|");
-  P(`| ${ST.tested} | ${cnt.tested} |`);P(`| ${ST.ok} | ${cnt.ok} |`);P(`| ${ST.check} | ${cnt.check} |`);P(`| ${ST.manual} | ${cnt.manual} |`);P(`| ${ST.info} | ${cnt.info} |`);
+  P("## "+tx("tuto.recap"));P("");
+  P(tx("tuto.recap.head"));P("|---|---|");
+  ["tested","ok","check","manual","info"].forEach(k=>P(`| ${stx(k)} | ${cnt[k]} |`));
   P("");
-  P(cnt.tested?"Seules les étapes 🧪 ont été exécutées dans une machine virtuelle. Signale toute erreur pour qu'elle soit corrigée dans les données.":"Aucune étape n'a été testée dans une machine virtuelle. Signale toute erreur pour qu'elle soit corrigée dans les données.");
+  P(tx(cnt.tested?"tuto.recap.yes":"tuto.recap.no"));
   P("");
   // bloc à copier : choix faits dans l'app seulement (pas le modèle de machine saisi, ni nom ni chemin local)
   const swNames=[...new Set(Object.values(sel).flat())].filter(id=>!stack.some(x=>x.tool===id)).map(id=>(byId(id)||{}).name).filter(Boolean);
-  const hwParts=HWQ.filter(q=>HW[q.id]).map(q=>hwLabel(q.id,HW[q.id]));
-  P("## Signaler un problème");P("");
-  P(`Copie ce bloc, remplis les trois dernières lignes et colle-le dans un [nouveau signalement](${REPO_URL}/issues/new/choose). N'y ajoute ni nom d'utilisateur ni chemin de ta machine.`);P("");
+  const hwParts=HWQ.filter(q=>HW[q.id]).map(q=>trd(hwLabel(q.id,HW[q.id])));
+  P("## "+tx("tuto.sig"));P("");
+  P(tx("tuto.sig.lead",{url:REPO_URL+"/issues/new/choose"}));P("");
   P("```text");
-  P(`Version de l'app : ${APP_VERSION}`);
-  P(`Date de vérification des paquets : ${VM?VM.verified_on:"non enregistrée pour cette base"}`);
-  P(`Base : ${BD.name}`);
-  P(`Parcours : ${obj.name}`);
-  P("Choix faits dans l'app :");
-  stack.forEach(x=>P(`  - ${x.label} : ${x.name}${x.manual?" (choix manuel)":""}`));
-  if(swNames.length)P(`  - Logiciels : ${swNames.join(", ")}`);
-  if(hwParts.length)P(`  - Matériel : ${hwParts.join(" · ")}`);
-  P("Étape concernée (identifiant) : ");
-  P("Commande : ");
-  P("Message d'erreur : ");
+  P(tx("tuto.sig.ver",{v:APP_VERSION}));
+  P(tx("tuto.sig.date",{v:VM?VM.verified_on:tx("tuto.sig.nodate")}));
+  P(tx("tuto.sig.base",{v:BD.name}));
+  P(tx("tuto.sig.path",{v:objName}));
+  P(tx("tuto.sig.choices"));
+  stack.forEach(x=>P(tx("tuto.sig.item",{l:trd(x.label),n:x.name+(x.manual?tx("tuto.manual"):"")})));
+  if(swNames.length)P(tx("tuto.sig.sw",{v:swNames.join(", ")}));
+  if(hwParts.length)P(tx("tuto.sig.hw",{v:hwParts.join(" · ")}));
+  P(tx("tuto.sig.step"));
+  P(tx("tuto.sig.cmd"));
+  P(tx("tuto.sig.err"));
   P("```");
   return L.join("\n")+"\n";
 }
@@ -4072,7 +4522,7 @@ $("guide").addEventListener("click",e=>{
   if(d.sw){G.stage="sw";clr();renderGuide();scrollTo(0,0);return}
   if(d.md){G.stage="md";clr();renderGuide();scrollTo(0,0);return}
   if(d.mdback){G.stage=null;renderGuide();scrollTo(0,0);return}
-  if(d.mddl){const t=buildTutorial();const name="tutoriel-"+G.obj+"-"+(curBase()||"distro")+".md";downloadMd(t,name);return}
+  if(d.mddl){const t=buildTutorial();const name=tx("tuto.file",{obj:G.obj,base:curBase()||"distro"});downloadMd(t,name);return}
   if(d.mdcopy){const t=buildTutorial();const done=()=>{b.textContent=tx("md.copied");setTimeout(()=>{b.textContent=tx("md.copy")},1500)};
     try{navigator.clipboard.writeText(t).then(done,()=>{const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done()}catch(e){}ta.remove()})}catch(e){}return}
   if(d.swback){G.stage=null;G.swTip=null;renderGuide();scrollTo(0,0);return}

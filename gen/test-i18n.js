@@ -27,6 +27,9 @@ const r=await p.evaluate(()=>{
   if(!e||e==='""')bad.push('traduction vide: '+path);
   if(sig(a)!==sig(e))bad.push('commandes/variables modifiées: '+path);
  });
+ // 3b. dictionnaire du tutoriel : valeur non vide, mêmes jetons ⟦n⟧ et mêmes passages entre accents graves que la clé
+ Object.keys(TUTO_EN).forEach(k=>{const v=TUTO_EN[k],tk=x=>(String(x).match(/⟦\d+⟧|`[^`]*`/g)||[]).sort().join('|');
+  if(!String(v).trim())bad.push('TUTO_EN vide: '+k.slice(0,50));else if(tk(k)!==tk(v))bad.push('TUTO_EN jetons/commandes différents: '+k.slice(0,60))});
  // 4. basculer la langue ne laisse rien d'altéré : fr → en → fr redonne les données d'origine
  const snap=()=>JSON.stringify([TOOLS,CATS,LAYERS,OBJECTIVES,HELP,BASEDEF]);
  const start=LANG;setLang('fr',true);const s0=snap();setLang('en',true);setLang('fr',true);
@@ -66,17 +69,26 @@ const r=await p.evaluate(()=>{
   G.manual={};setLang('fr',true);reset()}
  // 5. tutoriels fr/en : commandes et identifiants identiques, identifiants valides et uniques
  const objs=OBJECTIVES.filter(o=>o.ready).map(o=>o.id),bases=Object.keys(BASEDEF).concat(['undecided']);
- const grab=md=>{const ids=[...md.matchAll(/^Identifiant : `([^`]+)`/gm)].map(m=>m[1]);
-  const code=[...md.matchAll(/```[a-z]*\n([\s\S]*?)```/g)].map(m=>m[1]);return {ids,code}};
+ const grab=md=>{const ids=[...md.matchAll(/^(?:Identifiant :|Identifier:) `([^`]+)`/gm)].map(m=>m[1]);
+  // le bloc « Signaler un problème » est du texte à copier, traduit : il n'est pas une commande
+  const code=[...md.matchAll(/```[a-z]*\n([\s\S]*?)```/g)].map(m=>m[1]).filter(c=>!/^(Version de l'app|App version)/.test(c));return {ids,code}};
  const run=(lang,obj,base,mix)=>{setLang(lang,true);Object.keys(HW).forEach(k=>delete HW[k]);
   G.obj=obj;G.base=base;G.manual={};G.keep={};G.changed=[];G.hwAuto={};G.stage=null;G.scope=mix?'precise':'general';
   if(mix)Object.assign(HW,{model:'PC de test',gpu:'amd',boot:'uefi',ram:'8',arch:'x86-amd',wifi:'intel',disk:'nvme'});
-  const tr=TREES[obj];G.ans=tr.questions.map(()=>0);G.i=tr.questions.length;G.sw={};return grab(buildTutorial())};
+  const tr=TREES[obj];G.ans=tr.questions.map(()=>0);G.i=tr.questions.length;G.sw={};
+  // empreintes des commandes étape par étape (appelées pour chaque étape par vmTested) : les 🧪 ne doivent pas bouger d'une langue à l'autre
+  const hashes=[],orig=window.cmdHash;window.cmdHash=s=>{const h=orig(s);hashes.push((s.id||'?')+':'+h);return h};
+  let md;try{md=buildTutorial()}finally{window.cmdHash=orig}
+  const tested=md.split(/^### /m).slice(1).filter(x=>/^\*\*(?:État :|Status:)\*\* 🧪/m.test(x)).map(x=>x.split('\n')[0].replace(/^\d+\. /,'')+'|'+(x.match(/(?:Identifiant :|Identifier:) `([^`]+)`/)||[])[1]);
+  return Object.assign(grab(md),{hashes,tested})};
  for(const obj of objs)for(const base of bases)for(const mix of [0,1]){
   const f=run('fr',obj,base,mix),e=run('en',obj,base,mix);out.n++;
   const tag=obj+' '+base+' '+mix;
   if(JSON.stringify(f.ids)!==JSON.stringify(e.ids))bad.push('identifiants fr≠en: '+tag);
   if(JSON.stringify(f.code)!==JSON.stringify(e.code))bad.push('commandes fr≠en: '+tag);
+  if(JSON.stringify(f.hashes)!==JSON.stringify(e.hashes))bad.push('cmdHash fr≠en: '+tag);
+  if(f.tested.map(x=>x.split('|')[1]).join()!==e.tested.map(x=>x.split('|')[1]).join())bad.push('étapes 🧪 fr≠en: '+tag);
+  if(base==='alpine'&&!f.tested.length)bad.push('aucune étape 🧪 sur Alpine: '+tag);
   // base « undecided » : le tutoriel choisit lui-même une base, le préfixe n'est donc pas imposé
   const pre=base==='undecided'?/^[a-z0-9]+-/:new RegExp('^'+base+'-');
   f.ids.forEach(id=>{const m=pre.exec(id);const rest=m?id.slice(m[0].length):'';
