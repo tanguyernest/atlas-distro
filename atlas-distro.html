@@ -2435,6 +2435,12 @@ const ST={
  info:"ℹ️ Rien à installer séparément",
  tested:"🧪 Testé en VM"
 };
+// ---------- Signalement d'erreurs ----------
+const APP_VERSION="0.1.0";  // version provisoire
+const REPO_URL="https://github.com/A-REMPLACER/atlas-distro";  // provisoire : remplacer par l'URL réelle du dépôt
+// encodeURIComponent laisse ( ) ! ' * : les parenthèses casseraient un lien Markdown
+function urlPart(s){return encodeURIComponent(s).replace(/[()!'*]/g,c=>"%"+c.charCodeAt(0).toString(16).toUpperCase())}
+function issueUrl(title,body){return REPO_URL+"/issues/new?title="+urlPart(title)+"&body="+urlPart(body)}
 function stLabel(s){return s.state==="tested"&&s.tested?`🧪 Testé en VM le ${s.tested.date}, sur ${s.tested.label}`:(ST[s.state]||ST.check)}
 function famOf(base){return FAMILY[base]||"none"}
 function sysPkgs(tid,base){
@@ -3033,7 +3039,9 @@ function buildTutorial(){
   (SCR?[]:["Le partitionnement et l'installation de la base : étape manuelle, à faire avec la documentation officielle.","La configuration de ton bureau (thèmes, raccourcis, gestionnaire de connexion et session)."]).concat(["Les réglages internes des logiciels (profils, comptes, synchronisation).","Les pilotes propriétaires hors dépôts (par exemple NVIDIA sur Alpine)."]).forEach(x=>P("- "+x));P("");
   P("## Étapes");P("");
   steps.forEach((s,i)=>{
+    const ref=`${baseId}-${G.obj}-${String(i+1).padStart(2,"0")}`;
     P(`### ${i+1}. ${s.title}`);P("");
+    P(`Identifiant : \`${ref}\``);P("");
     P(`**État :** ${stLabel(s)}${s.stateNote?" — "+s.stateNote:""}`);P("");
     if(s.where){P(`**Où :** ${{hote:"sur ta machine (hôte), dans le dossier de la VM",live:"dans la VM, sur le système live de l'ISO",chroot:"dans la VM, dans le chroot (système installé)",systeme:"dans la VM, sur le système installé, en root"}[s.where]}`);P("")}
     if(s.why){P(`**Pourquoi :** ${s.why}`);P("")}
@@ -3043,6 +3051,9 @@ function buildTutorial(){
     if(s.verify&&s.verify.length){P("**Vérifier :**");P("");P("```bash");s.verify.forEach(c=>P(c));P("```");P("")}
     if(s.pitfalls&&s.pitfalls.length){P("**Pièges :**");s.pitfalls.forEach(n=>P("- "+n));P("")}
     if(s.docs&&s.docs.length){P("**Documentation :** "+s.docs.map(d=>`[${d[0]}](${d[1]})`).join(", "));P("")}
+    const body=["**Commande qui échoue :**","(colle ici la commande)","","**Message d'erreur :**","(colle ici le message)","",
+      `- Base : ${BD.name}`,`- Parcours : ${obj.name}`,`- Étape : ${ref} (${s.title})`,`- Version de l'app : ${APP_VERSION}`].join("\n");
+    P(`Une erreur ici ? [Signale-la](${issueUrl(`[${ref}] ${s.title}`,body)})`);P("");
   });
   P("## Liste complète des paquets");P("");
   if(allPkgs.length){P("```text");P(allPkgs.join("\n"));P("```")}else P("Aucun paquet listé pour cette base.");
@@ -3060,6 +3071,25 @@ function buildTutorial(){
   P(`| ${ST.tested} | ${cnt.tested} |`);P(`| ${ST.ok} | ${cnt.ok} |`);P(`| ${ST.check} | ${cnt.check} |`);P(`| ${ST.manual} | ${cnt.manual} |`);P(`| ${ST.info} | ${cnt.info} |`);
   P("");
   P(cnt.tested?"Seules les étapes 🧪 ont été exécutées dans une machine virtuelle. Signale toute erreur pour qu'elle soit corrigée dans les données.":"Aucune étape n'a été testée dans une machine virtuelle. Signale toute erreur pour qu'elle soit corrigée dans les données.");
+  P("");
+  // bloc à copier : choix faits dans l'app seulement (pas le modèle de machine saisi, ni nom ni chemin local)
+  const swNames=[...new Set(Object.values(sel).flat())].filter(id=>!stack.some(x=>x.tool===id)).map(id=>(byId(id)||{}).name).filter(Boolean);
+  const hwParts=HWQ.filter(q=>HW[q.id]).map(q=>hwLabel(q.id,HW[q.id]));
+  P("## Signaler un problème");P("");
+  P(`Copie ce bloc, remplis les trois dernières lignes et colle-le dans un [nouveau signalement](${REPO_URL}/issues/new). N'y ajoute ni nom d'utilisateur ni chemin de ta machine.`);P("");
+  P("```text");
+  P(`Version de l'app : ${APP_VERSION}`);
+  P(`Date de vérification des paquets : ${VM?VM.verified_on:"non enregistrée pour cette base"}`);
+  P(`Base : ${BD.name}`);
+  P(`Parcours : ${obj.name}`);
+  P("Choix faits dans l'app :");
+  stack.forEach(x=>P(`  - ${x.label} : ${x.name}${x.manual?" (choix manuel)":""}`));
+  if(swNames.length)P(`  - Logiciels : ${swNames.join(", ")}`);
+  if(hwParts.length)P(`  - Matériel : ${hwParts.join(" · ")}`);
+  P("Étape concernée (identifiant) : ");
+  P("Commande : ");
+  P("Message d'erreur : ");
+  P("```");
   return L.join("\n")+"\n";
 }
 function needsForBase(t,base){

@@ -11,7 +11,7 @@ const res=await p.evaluate(()=>{
    for(const mix of [0,1,2]){
     Object.keys(HW).forEach(k=>delete HW[k]);
     G.obj=obj;G.base=base;G.manual={};G.keep={};G.changed=[];G.hwAuto={};G.stage=null;G.scope=mix===2?'precise':'general';
-    if(mix===2)Object.assign(HW,{gpu:'amd',boot:'uefi',ram:'8',arch:'x86-amd',wifi:'intel',disk:'nvme'});
+    if(mix===2)Object.assign(HW,{model:'PC de test',gpu:'amd',boot:'uefi',ram:'8',arch:'x86-amd',wifi:'intel',disk:'nvme'});
     G.ans=tr.questions.map((q,k)=>mix===1?Math.min(1,q.o.length-1):0);G.i=tr.questions.length;G.sw={};
     let md;try{md=buildTutorial()}catch(err){out.bad.push('EXCEPTION '+obj+' '+base+' '+mix+': '+err.message);continue}
     out.n++;
@@ -29,7 +29,8 @@ const res=await p.evaluate(()=>{
       // la connexion du live est vérifiée avant le partitionnement (après setup-interfaces sur Alpine)
       const T=['Créer une machine virtuelle de test'].concat(base==='alpine'?["Démarrer la VM sur l'ISO",'Vérifier la connexion internet du système live']:['Vérifier la connexion internet du système live','Préparer le système live'],['Partitionner le disque','Installer la base à la main','Configurer le système (chroot)',"Installer le chargeur d'amorçage",'Quitter le chroot et éteindre','Démarrer sur le disque','Mettre à jour le système']);
       {const sec=md.split(/^### /m).find(x=>/^\d+\. Vérifier la connexion internet du système live/.test(x))||'';
-       if(!/^\*\*État :\*\* ⚠️/m.test(sec))out.bad.push('étape connexion pas ⚠️: '+obj+' '+base);
+       // 🧪 possible sur Alpine (testée le 31/10), ⚠️ ailleurs
+       if(!(base==='alpine'?/^\*\*État :\*\* (⚠️|🧪)/m:/^\*\*État :\*\* ⚠️/m).test(sec))out.bad.push('étape connexion pas ⚠️: '+obj+' '+base);
        if(!/Câble :/.test(sec)||!/Wi-Fi :/.test(sec)||!/connexion est automatique/.test(sec))out.bad.push('étape connexion incomplète: '+obj+' '+base)}
       {const sec=md.split(/^### /m).find(x=>/^\d+\. Configurer le système \(chroot\)/.test(x))||'';
        if(!/resolv\.conf/.test(sec))out.bad.push('resolv.conf absent du chroot: '+obj+' '+base)}
@@ -69,6 +70,31 @@ const res=await p.evaluate(()=>{
       if((f==='xbps'||f==='emerge')&&/\b(apk add|apt install|pacman -S|dnf install)\b/.test(md))out.bad.push('commande étrangère sur '+base+' ('+obj+')');
       if(f==='xbps'&&/\bemerge\b/.test(md)||f==='emerge'&&/\bxbps-install\b/.test(md))out.bad.push('commande étrangère sur '+base+' ('+obj+')');
     }
+    // signalement : identifiant unique sous chaque titre d'étape, lien GitHub Issues bien formé
+    {const body=md.slice(md.indexOf('\n## Étapes\n'),md.indexOf('\n## Liste complète des paquets'));
+     const secs=body.split(/^### /m).slice(1);const ids=[];
+     secs.forEach(x=>{const head=x.split('\n')[0];
+      const m=x.match(/^\d+\. [^\n]*\n\nIdentifiant : `([^`]+)`\n/);
+      if(!m){out.bad.push('identifiant absent sous le titre: '+head+' ('+obj+' '+base+')');return}
+      const id=m[1];ids.push(id);
+      // base « undecided » : l'arbre choisit la base, qui préfixe alors l'identifiant
+      const bid=BASEDEF[base]?base:id.split('-')[0];
+      if(!BASEDEF[bid]||!new RegExp('^'+bid+'-'+obj+'-\\d{2}$').test(id))out.bad.push('identifiant mal formé: '+id);
+      const links=x.match(/^Une erreur ici \? \[Signale-la\]\(([^)\s]*)\)$/gm)||[];
+      if(links.length!==1){out.bad.push('lien de signalement absent ou en double: '+id);return}
+      const url=links[0].slice(links[0].indexOf('](')+2,-1);let u;
+      try{u=new URL(url)}catch(err){out.bad.push('lien invalide: '+id);return}
+      if(!url.startsWith(REPO_URL+'/issues/new?'))out.bad.push('lien hors REPO_URL: '+id);
+      const t=u.searchParams.get('title')||'',bd=u.searchParams.get('body')||'';
+      if(!t.includes(id)||!bd.includes('Étape : '+id))out.bad.push('identifiant absent du lien: '+id);
+      ['Commande qui échoue','Base : '+(BASEDEF[bid]||{}).name,'Parcours : ','Version de l\'app : '+APP_VERSION].forEach(k=>{if(!bd.includes(k))out.bad.push('champ « '+k+' » absent du lien: '+id)});
+      if(url.length>8000)out.bad.push('lien trop long: '+id)});
+     if(new Set(ids).size!==ids.length)out.bad.push('identifiants en double: '+obj+' '+base)}
+    {const i=md.indexOf('\n## Signaler un problème\n');const sec=i<0?'':md.slice(i);
+     if(!sec)out.bad.push('section « Signaler un problème » absente: '+obj+' '+base);
+     ["Version de l'app : "+APP_VERSION,'Date de vérification des paquets : ','Base : ','Parcours : ',"Choix faits dans l'app :",'Étape concernée','Commande : ',"Message d'erreur : "].forEach(k=>{if(sec&&!sec.includes(k))out.bad.push('champ « '+k+' » absent du bloc: '+obj+' '+base)});
+     if(/\/home\/|\/Users\/|[A-Z]:\\|\/root\//.test(sec))out.bad.push('chemin local dans le bloc: '+obj+' '+base);
+     if(HW.model&&sec.includes(HW.model))out.bad.push('modèle de machine dans le bloc: '+obj+' '+base)}
     if(mix===0&&['gaming:alpine','light:debian','server:fedora','secure:arch','office:ubuntu'].includes(obj+':'+base))out.samples[obj+'-'+base]=md;
    }
   }
