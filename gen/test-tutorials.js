@@ -1,7 +1,7 @@
 const {chromium}=require('playwright');const fs=require('fs');
 (async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844}});
 const e=[];p.on('pageerror',x=>e.push(x.message));
-await p.goto('file://'+require('path').resolve(__dirname,'../atlas-distro.html'));
+await p.goto('file://'+require('path').resolve(__dirname,'../atlas-distro.html')+(process.env.ATLAS_LANG?'?lang='+process.env.ATLAS_LANG:''));
 const res=await p.evaluate(()=>{
  const out={n:0,bad:[],samples:{}};
  const objs=OBJECTIVES.filter(o=>o.ready).map(o=>o.id);
@@ -79,7 +79,7 @@ const res=await p.evaluate(()=>{
       const id=m[1];ids.push(id);
       // base « undecided » : l'arbre choisit la base, qui préfixe alors l'identifiant
       const bid=BASEDEF[base]?base:id.split('-')[0];
-      if(!BASEDEF[bid]||!new RegExp('^'+bid+'-'+obj+'-\\d{2}$').test(id))out.bad.push('identifiant mal formé: '+id);
+      if(!BASEDEF[bid]||!new RegExp('^'+bid+'-'+obj+'-[a-z0-9]+(-[a-z0-9]+)*$').test(id))out.bad.push('identifiant mal formé: '+id);
       const links=x.match(/^Une erreur ici \? \[Signale-la\]\(([^)\s]*)\)$/gm)||[];
       if(links.length!==1){out.bad.push('lien de signalement absent ou en double: '+id);return}
       const url=links[0].slice(links[0].indexOf('](')+2,-1);let u;

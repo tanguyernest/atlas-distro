@@ -29,7 +29,7 @@ body:
     id: etape
     attributes:
       label: Identifiant d'étape
-      description: Indiqué sous le titre de l'étape, de la forme base-parcours-NN.
+      description: Indiqué sous le titre de l'étape, de la forme base-parcours-étape (par exemple debian-light-base-chroot).
       placeholder: alpine-light-07 (Partitionner le disque)
     validations:
       required: true

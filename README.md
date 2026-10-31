@@ -43,7 +43,7 @@ Dans le tutoriel, chaque étape porte un état :
 
 ## Signaler une erreur
 
-Chaque étape du tutoriel a un identifiant (`<base>-<parcours>-<NN>`, par exemple `alpine-light-07`) et un lien **« Signale-la »**. Il ouvre un ticket GitHub déjà rempli : base, parcours, étape, version de l'app. Il te reste à coller la commande et le message d'erreur.
+Chaque étape du tutoriel a un identifiant (`<base>-<parcours>-<étape>`, par exemple `debian-light-base-chroot`) et un lien **« Signale-la »**. Il ouvre un ticket GitHub déjà rempli : base, parcours, étape, version de l'app. Il te reste à coller la commande et le message d'erreur.
 
 Tu peux aussi ouvrir un ticket directement, avec l'un des deux modèles :
 
@@ -57,7 +57,7 @@ La fin de chaque tutoriel contient un bloc « Signaler un problème » à copier
 - Seul le parcours Alpine (UEFI, limine, Xfce) a été exécuté en VM. Les autres bases, ainsi que LUKS, le mode BIOS et les autres chargeurs, sont écrits mais pas testés.
 - Un nom de paquet vérifié ne garantit pas que la commande marche : les dépôts changent, les noms aussi.
 - Les paquets de dépôts tiers (COPR, AUR, PPA…) restent marqués ⚠️.
-- Les identifiants d'étape sont des numéros d'ordre : ils changent si une étape est ajoutée avant.
+- Les identifiants d'étape ne dépendent ni de la langue ni de l'ordre : ajouter une étape ou traduire l'app ne les change pas.
 - Les pilotes propriétaires hors dépôts (par exemple NVIDIA sur Alpine) et les réglages internes des logiciels ne sont pas couverts.
 - Gentoo : compilation longue (plusieurs heures pour la base).
 - L'alternative VirtualBox est décrite, pas testée.

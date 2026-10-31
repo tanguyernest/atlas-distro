@@ -9,7 +9,8 @@
 @media(prefers-color-scheme:dark){:root{--bg:#161715;--card:#1f2120;--ink:#ecebe6;--mute:#9a998f;--line:#33352f;--acc:#6fcf9b;--accbg:#22362b;--warn:#f0b35a;--warnbg:#3a2e17;--code:#2a2c28}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-header{padding:14px 14px 4px}
+header{padding:14px 14px 4px;position:relative}
+#langBtn{position:absolute;top:6px;right:8px;margin:0;font-size:12px;padding:8px 10px;min-height:32px}
 h1{font-size:20px;margin:0 0 2px}
 .sub{color:var(--mute);font-size:13px}
 .bar{padding:8px 14px;display:grid;gap:8px}
@@ -156,6 +157,7 @@ details.grp[open]>summary::before{content:"▾ "}
 <body>
 <header>
   <h1>Atlas distro</h1>
+  <button class="ghost" id="langBtn" type="button"></button>
   <div class="sub">Comparer les briques d'une distribution Linux</div>
   <div class="warn" id="disclaimer"></div>
 </header>
@@ -2440,6 +2442,50 @@ const ST={
 const WARNING=["⚠️ Outil d'apprentissage, fourni sans garantie.","Suis ce tutoriel d'abord dans une machine virtuelle, pas sur ta machine principale.","Ne lance jamais une commande que tu ne comprends pas.","Sauvegarde tes données avant de toucher aux disques.","Seul Alpine a été testé en VM. Les autres bases sont écrites mais pas encore testées."];
 // ---------- Signalement d'erreurs ----------
 const APP_VERSION="0.1.0";  // version provisoire
+/* ============ I18N ============ */
+// tx(clé, {variables}) : texte de l'interface dans la langue courante (repli sur fr, puis sur la clé).
+// Nommé tx et non t : t désigne partout un outil dans ce fichier.
+// Les commandes (cmds, verify), noms de paquets, identifiants et noms d'outils ne sont jamais dans ces tables.
+const I18N={
+ fr:{"lang.switch":"English","lang.switch_aria":"Changer la langue : English"},
+ en:{"lang.switch":"Français","lang.switch_aria":"Switch language: Français"}
+};
+// Couche anglaise des données, chemins « collection/id/champ » (aide : « help/clé »). Vide au lot 0.
+const EN_DATA={};
+const L10N_FIELDS={tools:["summary","description"],cats:["name","description"],layers:["name"],objectives:["name","desc"],bases:["desc"]};
+const LANGS=["fr","en"];
+let LANG="fr";
+const FR0={};
+function tx(k,v){let s=(I18N[LANG]||{})[k];if(s==null)s=I18N.fr[k];if(s==null)return k;return v?s.replace(/\{(\w+)\}/g,(m,n)=>n in v?v[n]:m):s}
+function l10nRef(path){
+  const [col,id,f]=path.split("/");
+  if(col==="help")return id&&HELP[id]?{o:HELP,f:id}:null;
+  const o=col==="bases"?BASEDEF[id]:({tools:TOOLS,cats:CATS,layers:LAYERS,objectives:OBJECTIVES}[col]||[]).find(x=>x.id===id);
+  return o&&(L10N_FIELDS[col]||[]).includes(f)&&f in o?{o,f}:null;
+}
+function applyDataLang(){
+  Object.keys(EN_DATA).forEach(path=>{
+    const r=l10nRef(path);if(!r)return;
+    if(!(path in FR0))FR0[path]=r.o[r.f];
+    r.o[r.f]=LANG==="en"?EN_DATA[path]:FR0[path];
+  });
+}
+function setLang(l,noRefresh){
+  if(!LANGS.includes(l))return;
+  LANG=l;
+  try{localStorage.setItem("atlas-lang",l)}catch(e){}
+  document.documentElement.lang=l;
+  applyDataLang();
+  $("langBtn").textContent=tx("lang.switch");$("langBtn").setAttribute("aria-label",tx("lang.switch_aria"));
+  if(noRefresh)return;
+  if($("compare").classList.contains("hidden"))renderGuide();else render();
+}
+function initialLang(){
+  const q=new URLSearchParams(location.search).get("lang");if(LANGS.includes(q))return q;
+  try{const m=localStorage.getItem("atlas-lang");if(LANGS.includes(m))return m}catch(e){}
+  return "fr"; // pas de détection du navigateur tant que l'interface anglaise n'est pas traduite
+}
+
 const REPO_URL="https://github.com/tanguyernest/atlas-distro";
 // encodeURIComponent laisse ( ) ! ' * : les parenthèses casseraient un lien Markdown
 function urlPart(s){return encodeURIComponent(s).replace(/[()!'*]/g,c=>"%"+c.charCodeAt(0).toString(16).toUpperCase())}
@@ -2538,6 +2584,8 @@ const DE_IDS=["kde-plasma","gnome","xfce","sway","hyprland","mangowc","i3","open
 function cmdHash(s){const t=JSON.stringify([s.cmds||[],s.verify||[]]);let h=0x811c9dc5;for(let i=0;i<t.length;i++){h^=t.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0}return h.toString(16).padStart(8,"0")}
 function vmTested(base,s){const b=VM_TESTS[base];if(!b||!s.id)return null;const t=b.tests[s.id+":"+cmdHash(s)];return t?{date:t.date,label:t.label||b.label}:null}
 
+// Identifiants d'étape stables (indépendants de la langue et de l'ordre) : ne jamais renommer un slug publié.
+const SCR_SLUG={vm:"vm-create",net:"live-network",live:"live-prepare",part:"disk-partition",base:"base-chroot",config:"chroot-config",boot:"bootloader",poweroff:"chroot-exit",diskboot:"disk-boot",desktop:"desktop-config"};
 function scratchSteps(baseId,BD,stack){
   const sv=l=>(stack.find(x=>x.label===l)||{});
   const pk=(tid)=>{const t=byId(tid);return t?toolPkgs(t,baseId).pkgs:[]};
@@ -2552,7 +2600,7 @@ function scratchSteps(baseId,BD,stack){
   const iso=SCRATCH_ISO[baseId];
   const A=baseId==="alpine",ARCH=baseId==="arch",FED=baseId==="fedora",DEB=baseId==="debian"||baseId==="ubuntu",VOID=baseId==="void",GEN=baseId==="gentoo";
   const steps=[];
-  const S=(o)=>{o.id="scratch-"+o.key;delete o.key;steps.push(o);return o};
+  const S=(o)=>{o.id="scratch-"+o.key;o.sid=SCR_SLUG[o.key];delete o.key;steps.push(o);return o};
   const withPkgs=(o,pkgs)=>{o.pkgs=pkgs.filter(Boolean);return o};
 
   // 1. VM
@@ -2838,7 +2886,7 @@ function desktopStep(baseId,deId){
     mangowc:["Configuration : `~/.config/mango/config.conf`."]
   }[deId]||[];
   notes=notes.concat(look);
-  return {id:"scratch-desktop",where:"systeme",title:"Configurer le bureau : "+de.name,why:"Démarrer le bureau à l'allumage, avec un écran de connexion.",notes,cmds,verify,pkgs};
+  return {id:"scratch-desktop",sid:SCR_SLUG.desktop,where:"systeme",title:"Configurer le bureau : "+de.name,why:"Démarrer le bureau à l'allumage, avec un écran de connexion.",notes,cmds,verify,pkgs};
 }
 function buildTutorial(){
   const tree=TREES[G.obj];if(!tree)return "";
@@ -2865,10 +2913,10 @@ function buildTutorial(){
 
   // ---------- étapes ----------
   const SCR=SCRATCH_BASES.includes(baseId)?scratchSteps(baseId,BD,stack):null;
-  if(SCR)steps.push({title:"Préparer",state:"manual",why:"Éviter de perdre des données et préparer l'image d'installation.",
+  if(SCR)steps.push({sid:"prepare",title:"Préparer",state:"manual",why:"Éviter de perdre des données et préparer l'image d'installation.",
     notes:["Sauvegarde tes données importantes avant tout essai sur une vraie machine.",`Télécharge \`${SCRATCH_ISO[baseId].file}\` depuis ${SCRATCH_ISO[baseId].url} et vérifie sa somme de contrôle (\`sha256sum\`).`,"Plus tard, pour une vraie machine : écris l'ISO sur une clé USB (balenaEtcher, Ventoy ou `dd` avec le bon périphérique)."],
     verify:["sha256sum "+SCRATCH_ISO[baseId].file]});
-  else steps.push({title:"Préparer",state:"manual",why:"Éviter de perdre des données et préparer le support d'installation.",
+  else steps.push({sid:"prepare",title:"Préparer",state:"manual",why:"Éviter de perdre des données et préparer le support d'installation.",
     notes:["Sauvegarde tes données importantes : une installation peut effacer le disque.","Télécharge l'image d'installation de "+BD.name+" depuis le site officiel et vérifie sa somme de contrôle.","Prépare une clé USB avec un outil adapté à ton système (balenaEtcher, Ventoy ou `dd` avec le bon périphérique)."],
     verify:["lsblk  # identifie bien la clé USB avant de l'écrire"]});
   const doc=INSTALL_DOC[baseId];
@@ -2879,13 +2927,13 @@ function buildTutorial(){
   if(sv("Chiffrement du disque").name)choices.push("Chiffrement du disque : "+sv("Chiffrement du disque").name);
   if(HW.boot)choices.push("Mode de démarrage de ta machine : "+hwLabel("boot",HW.boot));
   if(SCR)SCR.steps.forEach(x=>{if(x.pkgs)addPkgs(x.pkgs);steps.push(x)});
-  else steps.push({title:"Installer la base "+BD.name,state:"manual",why:"La base impose "+BD.pm[1]+", la bibliothèque "+BD.libc+" et l'init "+BD.init[1]+".",
+  else steps.push({sid:"base-install",title:"Installer la base "+BD.name,state:"manual",why:"La base impose "+BD.pm[1]+", la bibliothèque "+BD.libc+" et l'init "+BD.init[1]+".",
     notes:["Suis le guide officiel pour l'installation du système minimal."].concat(choices.length?["Choix à appliquer pendant l'installation :"].concat(choices.map(c=>"  - "+c)):[]),
     docs:doc?[doc]:[],
     verify:["cat /etc/os-release","uname -r"]});
   // mise à jour initiale
   const UPD={apk:["apk update","apk upgrade"],apt:["apt update","apt upgrade -y"],pacman:["pacman -Syu"],dnf:["dnf upgrade -y"],zypper:["zypper refresh","zypper update -y"],xbps:["xbps-install -Su"],emerge:["emerge --sync","emerge --ask --update --deep @world"],nix:["nix-channel --update"]};
-  if(UPD[fam])steps.push({title:"Mettre à jour le système",state:"check",why:"Partir d'un système à jour avant d'ajouter des paquets.",cmds:UPD[fam],verify:["echo $?  # doit afficher 0"],stateNote:"Commande standard de "+BD.pm[1]+", non testée dans ce tutoriel."});
+  if(UPD[fam])steps.push({sid:"system-update",title:"Mettre à jour le système",state:"check",why:"Partir d'un système à jour avant d'ajouter des paquets.",cmds:UPD[fam],verify:["echo $?  # doit afficher 0"],stateNote:"Commande standard de "+BD.pm[1]+", non testée dans ce tutoriel."});
 
   // briques de la pile
   const SKIP=new Set(["Distribution de base","Bibliothèque C","Système d'init","Gestionnaire de paquets","Mises à jour","Modèle d'image"].concat(SCR?["Noyau","Chargeur d'amorçage","Système de fichiers","Chiffrement du disque"]:[]));
@@ -2897,12 +2945,12 @@ function buildTutorial(){
     if(t.category==="network")netTitles.push(x.label+" : "+x.name);
     if(r.nothing){
       const pc=postCmds(t.id,baseId);
-      if(pc.length){steps.push({title:x.label+" : "+x.name,state:"check",why:x.why,notes:["Déjà fourni par la base : il reste à l'installer sur le disque."],cmds:pc,verify:POSTVERIFY[t.id]||[],stateNote:"Commandes non testées : adapte le disque et le point de montage de la partition EFI."});return}
-      steps.push({title:x.label+" : "+x.name,state:"info",why:x.why,notes:["Aucun paquet à installer séparément : "+(t.id==="wayland"?"Wayland est fourni par ton bureau ou ton compositeur.":"déjà fourni par la base.")]});return}
-    if(r.unknownFam){steps.push({title:x.label+" : "+x.name,state:"check",why:x.why,notes:["Le nom du paquet n'est pas renseigné pour "+BD.name+" : consulte la documentation de la base."],docs:(t.docs||[]).slice(0,1).map(d=>[d.label,d.url])});return}
+      if(pc.length){steps.push({sid:"brick-"+t.id,title:x.label+" : "+x.name,state:"check",why:x.why,notes:["Déjà fourni par la base : il reste à l'installer sur le disque."],cmds:pc,verify:POSTVERIFY[t.id]||[],stateNote:"Commandes non testées : adapte le disque et le point de montage de la partition EFI."});return}
+      steps.push({sid:"brick-"+t.id,title:x.label+" : "+x.name,state:"info",why:x.why,notes:["Aucun paquet à installer séparément : "+(t.id==="wayland"?"Wayland est fourni par ton bureau ou ton compositeur.":"déjà fourni par la base.")]});return}
+    if(r.unknownFam){steps.push({sid:"brick-"+t.id,title:x.label+" : "+x.name,state:"check",why:x.why,notes:["Le nom du paquet n'est pas renseigné pour "+BD.name+" : consulte la documentation de la base."],docs:(t.docs||[]).slice(0,1).map(d=>[d.label,d.url])});return}
     if(r.none)return;
     const sysPath=sysPkgs(t.id,baseId)!==undefined;
-    const st={title:x.label+" : "+x.name,why:x.why,cmds:[],verify:[],pitfalls:sysPath?[]:(t.pitfalls||[]).slice(0,2),docs:(t.docs||[]).slice(0,1).map(d=>[d.label,d.url]),needs:needsForBase(t,baseId)};
+    const st={sid:"brick-"+t.id,title:x.label+" : "+x.name,why:x.why,cmds:[],verify:[],pitfalls:sysPath?[]:(t.pitfalls||[]).slice(0,2),docs:(t.docs||[]).slice(0,1).map(d=>[d.label,d.url]),needs:needsForBase(t,baseId)};
     if(r.pkgs.length){st.cmds=st.cmds.concat(instCmd(baseId,r.pkgs));st.verify=st.verify.concat(verifyCmds(baseId,r.pkgs));addPkgs(r.pkgs);st.state=pkgState(baseId,r.pkgs);st.stateNote=pkgNote(baseId,r.pkgs);const pc=postCmds(t.id,baseId);if(pc.length){st.cmds=st.cmds.concat(pc);st.verify=st.verify.concat(POSTVERIFY[t.id]||[]);st.state="check";st.stateNote="Commandes d'installation du chargeur non testées : adapte le disque et le point de montage de la partition EFI."}}
     if(r.flatpak)addFlatpak(st,t,r.flatpak);
     if(r.compile){st.cmds=st.cmds.concat(r.compile);st.state="check";st.stateNote="Compilation depuis les sources : étapes à suivre dans le dépôt du projet."}
@@ -2932,7 +2980,7 @@ function buildTutorial(){
   if(["debian","ubuntu","devuan","raspios"].includes(baseId)&&(wantsSteam||HW.gpu==="nvidia"||HW.gpu==="amd"))repoNotes.push("Les firmwares et les pilotes NVIDIA demandent d'activer les composants non libres (contrib, non-free, non-free-firmware) dans les sources APT.");
   if(repoCmds.length||repoNotes.length){
     const at=steps.findIndex(x=>x.title==="Mettre à jour le système");
-    steps.splice(at>=0?at:steps.length,0,{title:"Activer les dépôts nécessaires",state:"check",why:"Certains paquets de ce tutoriel ne sont pas dans les dépôts activés par défaut.",cmds:repoCmds,notes:repoNotes,verify:baseId==="alpine"?["grep community /etc/apk/repositories"]:baseId==="arch"?["grep -A1 '^\\[multilib\\]' /etc/pacman.conf"]:baseId==="void"?["xbps-query -L"]:[],stateNote:"Non testé."});
+    steps.splice(at>=0?at:steps.length,0,{sid:"repos-enable",title:"Activer les dépôts nécessaires",state:"check",why:"Certains paquets de ce tutoriel ne sont pas dans les dépôts activés par défaut.",cmds:repoCmds,notes:repoNotes,verify:baseId==="alpine"?["grep community /etc/apk/repositories"]:baseId==="arch"?["grep -A1 '^\\[multilib\\]' /etc/pacman.conf"]:baseId==="void"?["xbps-query -L"]:[],stateNote:"Non testé."});
   }
   // pilotes graphiques
   if(stack.some(x=>x.label==="Serveur d'affichage")){
@@ -2947,11 +2995,11 @@ function buildTutorial(){
     }else if(MESA[f]){const m=MESA[f];dp=m.base.concat(m[g==="amd"?"amd":g==="intel"?"intel":"none"]||[])}
     if(dp)dp=ubuntuNames(dp,baseId);
     if(dp&&f==="emerge")dn.push("Sur Gentoo, les pilotes compilés dépendent de `VIDEO_CARDS` dans `/etc/portage/make.conf` (par exemple `amdgpu radeonsi`, `intel` ou `nvidia`) : règle-le avant d'installer.");
-    if(dp&&dp.length){addPkgs(dp);steps.push({title:"Pilotes graphiques",state:pkgState(baseId,dp),stateNote:pkgNote(baseId,dp),why:g?"Pilotes pour ta carte graphique ("+hwLabel("gpu",g)+").":"Pilotes libres Mesa pour les cartes AMD et Intel.",cmds:instCmd(baseId,dp),verify:verifyCmds(baseId,dp),notes:dn});}
-    else if(nvManual)steps.push({title:"Pilotes graphiques",state:"manual",why:"Pilote NVIDIA propriétaire pour ta carte graphique.",
+    if(dp&&dp.length){addPkgs(dp);steps.push({sid:"gpu-drivers",title:"Pilotes graphiques",state:pkgState(baseId,dp),stateNote:pkgNote(baseId,dp),why:g?"Pilotes pour ta carte graphique ("+hwLabel("gpu",g)+").":"Pilotes libres Mesa pour les cartes AMD et Intel.",cmds:instCmd(baseId,dp),verify:verifyCmds(baseId,dp),notes:dn});}
+    else if(nvManual)steps.push({sid:"gpu-drivers",title:"Pilotes graphiques",state:"manual",why:"Pilote NVIDIA propriétaire pour ta carte graphique.",
       notes:["Sur Ubuntu, le paquet du pilote dépend de la carte (nvidia-driver-XXX) : laisse ubuntu-drivers choisir la bonne version.","Redémarre après l'installation."],
       cmds:["apt install ubuntu-drivers-common","ubuntu-drivers list","ubuntu-drivers install"],verify:["nvidia-smi"]});
-    else if(dn.length)steps.push({title:"Pilotes graphiques",state:"check",why:"Pilotes pour ta carte graphique.",notes:dn});
+    else if(dn.length)steps.push({sid:"gpu-drivers",title:"Pilotes graphiques",state:"check",why:"Pilotes pour ta carte graphique.",notes:dn});
   }
   // bureau : après l'installation des paquets du bureau, avant les logiciels
   const DS=SCR&&desktopStep(baseId,SCR.deId);
@@ -2964,8 +3012,8 @@ function buildTutorial(){
       const t=byId(tid);if(!t)return;
       if(stack.some(x=>x.tool===tid))return;
       const r=toolPkgs(t,baseId);
-      if(r.unknownFam){groupsMd.push({title:f.label+" : "+t.name,state:"check",why:t.summary,notes:["Le nom du paquet n'est pas renseigné pour "+BD.name+" : consulte la documentation du projet."]});return}
-      const st={title:f.label+" : "+t.name,why:t.summary,cmds:[],verify:[],pitfalls:(t.pitfalls||[]).slice(0,2),docs:(t.docs||[]).slice(0,1).map(d=>[d.label,d.url]),needs:needsForBase(t,baseId)};
+      if(r.unknownFam){groupsMd.push({sid:"soft-"+t.id,title:f.label+" : "+t.name,state:"check",why:t.summary,notes:["Le nom du paquet n'est pas renseigné pour "+BD.name+" : consulte la documentation du projet."]});return}
+      const st={sid:"soft-"+t.id,title:f.label+" : "+t.name,why:t.summary,cmds:[],verify:[],pitfalls:(t.pitfalls||[]).slice(0,2),docs:(t.docs||[]).slice(0,1).map(d=>[d.label,d.url]),needs:needsForBase(t,baseId)};
       if(r.pkgs.length){st.cmds=st.cmds.concat(instCmd(baseId,r.pkgs));st.verify=st.verify.concat(verifyCmds(baseId,r.pkgs));addPkgs(r.pkgs);st.state=pkgState(baseId,r.pkgs);st.stateNote=pkgNote(baseId,r.pkgs)}
       if(r.flatpak)addFlatpak(st,t,r.flatpak);
       if(r.compile){st.cmds=st.cmds.concat(r.compile);st.state="check";st.stateNote="Compilation depuis les sources."}
@@ -2977,7 +3025,7 @@ function buildTutorial(){
   }));
   if(fpApps.length){
     const fpOk=pkgState(baseId,fpPkg(baseId))==="ok"&&fpApps.every(a=>fhState(a.id)==="ok");
-    steps.push({title:"Préparer Flatpak",state:fpOk?"ok":"check",why:"Certains logiciels ne sont pas dans les dépôts de "+BD.name+" et passent par Flatpak.",
+    steps.push({sid:"flatpak-setup",title:"Préparer Flatpak",state:fpOk?"ok":"check",why:"Certains logiciels ne sont pas dans les dépôts de "+BD.name+" et passent par Flatpak.",
     notes:["Logiciels installés avec Flatpak :"].concat(fpApps.map(a=>`  - ${a.name} : \`${a.id}\`, ${fhState(a.id)==="ok"?"🟡":"⚠️"} ${fhNote(a.id)}`)),
     cmds:instCmd(baseId,fpPkg(baseId)).concat(["flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo"],fpApps.map(a=>`flatpak install -y flathub ${a.id}`)),
     verify:["flatpak remotes"].concat(fpApps.map(a=>`flatpak info ${a.id}`)),stateNote:"Sur certaines bases, il faut aussi installer un portail xdg-desktop-portal et redémarrer la session.",docs:[["Configurer Flatpak","https://flatpak.org/setup/"]]});
@@ -2988,7 +3036,7 @@ function buildTutorial(){
   const chosenTools=[...stack.map(x=>x.tool),...Object.values(sel).flat()].filter(Boolean);
   const uniq=[...new Set(chosenTools)];
   uniq.forEach(tid=>{const s=SERVICE[tid];if(!s)return;const f=INIT_ENABLE[initId];if(!f)return;const t=byId(tid);svcLines.push({name:t?t.name:tid,cmds:f(s)})});
-  if(svcLines.length)steps.push({title:"Activer les services",state:"check",why:"Les services ne démarrent pas tout seuls après l'installation.",
+  if(svcLines.length)steps.push({sid:"services",title:"Activer les services",state:"check",why:"Les services ne démarrent pas tout seuls après l'installation.",
     notes:["Init détectée : "+((byId(initId)||{}).name||BD.init[1])+"."],
     cmds:svcLines.flatMap(s=>["# "+s.name].concat(s.cmds)),
     verify:["# vérifier chaque service avec la commande de ton init (rc-status, systemctl status, sv status)"],
@@ -3044,7 +3092,7 @@ function buildTutorial(){
   (SCR?[]:["Le partitionnement et l'installation de la base : étape manuelle, à faire avec la documentation officielle.","La configuration de ton bureau (thèmes, raccourcis, gestionnaire de connexion et session)."]).concat(["Les réglages internes des logiciels (profils, comptes, synchronisation).","Les pilotes propriétaires hors dépôts (par exemple NVIDIA sur Alpine)."]).forEach(x=>P("- "+x));P("");
   P("## Étapes");P("");
   steps.forEach((s,i)=>{
-    const ref=`${baseId}-${G.obj}-${String(i+1).padStart(2,"0")}`;
+    const ref=`${baseId}-${G.obj}-${s.sid}`;
     P(`### ${i+1}. ${s.title}`);P("");
     P(`Identifiant : \`${ref}\``);P("");
     P(`**État :** ${stLabel(s)}${s.stateNote?" — "+s.stateNote:""}`);P("");
@@ -3227,6 +3275,8 @@ $("cmpBackBtn").onclick=()=>{setMode("guide");scrollTo(0,0)};
 $("tabG").onclick=()=>setMode("guide");
 $("tabC").onclick=()=>setMode("compare");
 $("disclaimer").innerHTML="<b>"+esc(WARNING[0])+"</b> "+WARNING.slice(1).map(esc).join(" ");
+$("langBtn").onclick=()=>setLang(LANG==="fr"?"en":"fr");
+setLang(initialLang(),true);
 setCat("init");
 setMode("guide");
 </script>

@@ -9,7 +9,7 @@ const ratio=(a,b)=>{const x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min
     for(const w of [320,390,768]){
       const ctx=await b.newContext({viewport:{width:w,height:800},colorScheme:scheme});
       const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
-      await p.goto('file://'+require('path').resolve(__dirname,'../atlas-distro.html'));
+      await p.goto('file://'+require('path').resolve(__dirname,'../atlas-distro.html')+(process.env.ATLAS_LANG?'?lang='+process.env.ATLAS_LANG:''));
       const shots=[];
       const check=async(name)=>{
         const r=await p.evaluate(()=>{
