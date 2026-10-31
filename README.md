@@ -14,7 +14,8 @@ C'est une page web unique, en français, qui marche **hors ligne** : aucun serve
 
 ## Utiliser l'app
 
-- En ligne : <https://A-REMPLACER.github.io/atlas-distro/> *(adresse provisoire, à remplacer à la publication)*
+- En ligne : <https://tanguyernest.github.io/atlas-distro/>
+- Dépôt : <https://github.com/tanguyernest/atlas-distro>
 - Hors ligne : télécharge `atlas-distro.html` et ouvre-le dans un navigateur. Aucune installation.
 
 ## Statut par base
@@ -66,7 +67,7 @@ La fin de chaque tutoriel contient un bloc « Signaler un problème » à copier
 
 - `atlas-distro.html` : l'app complète (code et données). C'est la source de référence.
 - `index.html` : redirige vers l'app, pour GitHub Pages.
-- `gen/` : vérification des noms de paquets dans les index officiels, tests du générateur, audits, banc de test VM (`gen/vm/`).
+- `gen/` : vérification des noms de paquets dans les index officiels, tests du générateur, audits, banc de test VM (`gen/vm/`). Le mot de passe écrit dans `gen/vm/run_vm.py` sert seulement aux VM de test jetables : il est sans valeur, ne le réutilise nulle part.
 - `.github/ISSUE_TEMPLATE/` : modèles de ticket.
 
 Tests (Node + Playwright) : `node gen/test-tutorials.js`, `node gen/audit.js`, `node gen/audit2.js`, `node gen/audit3.js`.

@@ -15,3 +15,11 @@ captures/
 screenshots/
 *.ppm
 ecran-*.png
+*.pyc
+*.fd
+*.sock
+steps.json
+.claude/
+
+# notes de travail internes
+HANDOFF.md
