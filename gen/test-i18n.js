@@ -53,6 +53,19 @@ const r=await p.evaluate(()=>{
  return out;
 });
 if(errs.length)r.bad.push('pageerror: '+errs[0]);
+// fichiers hors page : formulaires de ticket (id inchangés) et README fr/en
+{const fs=require('fs'),path=require('path'),root=path.resolve(__dirname,'..');
+ const ids=f=>[...fs.readFileSync(path.join(root,'.github/ISSUE_TEMPLATE',f),'utf8').matchAll(/^    id: (\w+)/gm)].map(m=>m[1]).join(',');
+ if(ids('commande-qui-echoue.yml')!=='base,parcours,etape,commande,erreur,version,contexte')r.bad.push('id du formulaire commande-qui-echoue modifiés');
+ if(ids('paquet-introuvable.yml')!=='base,parcours,etape,paquet,commande,erreur,verification,remplacement,version')r.bad.push('id du formulaire paquet-introuvable modifiés');
+ const spans=f=>new Set([...fs.readFileSync(path.join(root,f),'utf8').matchAll(/`([^`\n]+)`/g)].map(m=>m[1]));
+ const fr=spans('README.md'),en=spans('README.en.md');
+ const SKIP=new Set(['<base>-<parcours>-<étape>','<base>-<path>-<step>']);
+ [...fr].filter(x=>!en.has(x)&&!SKIP.has(x)).forEach(x=>r.bad.push('README.en sans le code `'+x+'`'));
+ [...en].filter(x=>!fr.has(x)&&!SKIP.has(x)).forEach(x=>r.bad.push('README.md sans le code `'+x+'`'));
+ const urls=f=>[...new Set(fs.readFileSync(path.join(root,f),'utf8').match(/https:\/\/[^\s>)]+/g)||[])].sort().join(' ');
+ if(urls('README.md')!==urls('README.en.md'))r.bad.push('URL différentes entre README.md et README.en.md');
+}
 console.log('combinaisons comparées fr/en:',r.n);
 console.log(r.bad.length?'PROBLÈMES ('+r.bad.length+'):\n'+r.bad.slice(0,40).join('\n'):'0 problème');
 await b.close();process.exit(r.bad.length?1:0);

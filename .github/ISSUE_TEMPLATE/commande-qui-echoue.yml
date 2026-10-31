@@ -1,6 +1,6 @@
-name: Commande qui échoue
-description: Une commande du tutoriel renvoie une erreur ou ne fait pas ce qui est annoncé.
-title: "[identifiant] Titre de l'étape"
+name: Commande qui échoue / Failing command
+description: Une commande du tutoriel renvoie une erreur ou ne fait pas ce qui est annoncé. / A tutorial command returns an error or does not do what it says.
+title: "[identifiant / id] Titre de l'étape / Step title"
 labels: ["bug"]
 # Les id base, parcours, etape et version sont remplis par le lien « Signale-la » du tutoriel :
 # ne les renomme pas sans changer issueUrl() dans atlas-distro.html.
@@ -10,52 +10,55 @@ body:
       value: |
         Merci ! Le lien « Signale-la » du tutoriel remplit déjà la base, le parcours, l'étape et la version.
         N'ajoute ni nom d'utilisateur, ni chemin de ta machine, ni mot de passe.
+
+        Thanks! The tutorial's « Report it » link already fills in the base, path, step and version.
+        Do not add a user name, a local path or a password. You can write in French or English.
   - type: input
     id: base
     attributes:
       label: Base
-      description: Distribution de départ (Alpine, Debian, Ubuntu, Arch, Fedora, Void, Gentoo…).
+      description: Distribution de départ / Starting distribution (Alpine, Debian, Ubuntu, Arch, Fedora, Void, Gentoo…).
       placeholder: Alpine
     validations:
       required: true
   - type: input
     id: parcours
     attributes:
-      label: Parcours
-      placeholder: Léger
+      label: Parcours / Path
+      placeholder: Léger / Light
     validations:
       required: true
   - type: input
     id: etape
     attributes:
-      label: Identifiant d'étape
-      description: Indiqué sous le titre de l'étape, de la forme base-parcours-étape (par exemple debian-light-base-chroot).
-      placeholder: alpine-light-07 (Partitionner le disque)
+      label: Identifiant d'étape / Step identifier
+      description: Indiqué sous le titre de l'étape, de la forme base-parcours-étape (par exemple debian-light-base-chroot). / Shown under the step title, shaped like base-path-step (for example debian-light-base-chroot).
+      placeholder: alpine-light-disk-partition
     validations:
       required: true
   - type: textarea
     id: commande
     attributes:
-      label: Commande
-      description: La commande exacte que tu as lancée.
+      label: Commande / Command
+      description: La commande exacte que tu as lancée. / The exact command you ran.
       render: bash
     validations:
       required: true
   - type: textarea
     id: erreur
     attributes:
-      label: Message d'erreur
-      description: Le message complet, copié tel quel.
+      label: Message d'erreur / Error message
+      description: Le message complet, copié tel quel. / The full message, copied as is.
       render: text
     validations:
       required: true
   - type: input
     id: version
     attributes:
-      label: Version de l'app
+      label: Version de l'app / App version
       placeholder: 0.1.0
   - type: textarea
     id: contexte
     attributes:
-      label: Contexte (facultatif)
-      description: VM ou machine réelle, UEFI ou BIOS, version de l'ISO, choix faits dans l'app (bloc « Signaler un problème » en fin de tutoriel).
+      label: Contexte (facultatif) / Context (optional)
+      description: VM ou machine réelle, UEFI ou BIOS, version de l'ISO, choix faits dans l'app (bloc « Signaler un problème » en fin de tutoriel). / VM or real machine, UEFI or BIOS, ISO version, choices made in the app (the « Report a problem » block at the end of the tutorial).

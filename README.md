@@ -1,5 +1,7 @@
 # Atlas distro
 
+🇫🇷 Français · [🇬🇧 English](README.en.md)
+
 > **⚠️ Outil d'apprentissage, fourni sans garantie.**
 > - Suis ce tutoriel d'abord dans une machine virtuelle, pas sur ta machine principale.
 > - Ne lance jamais une commande que tu ne comprends pas.
@@ -8,7 +10,7 @@
 
 Atlas distro aide à **comprendre et choisir les briques d'une distribution Linux** : base, noyau, libc, init, chargeur d'amorçage, gestionnaire de paquets, bureau, sécurité, logiciels. Il compare les options, signale les conflits entre choix, puis génère un **tutoriel `.md` pas à pas** : création d'une VM de test, partitionnement, installation de la base dans un chroot, chargeur d'amorçage, bureau, puis ISO personnalisée.
 
-C'est une page web unique, en français, qui marche **hors ligne** : aucun serveur, aucun compte, rien n'est envoyé.
+C'est une page web unique, **en français et en anglais**, qui marche **hors ligne** : aucun serveur, aucun compte, rien n'est envoyé.
 
 **État : bêta publique (version 0.1.0).**
 
@@ -61,7 +63,7 @@ La fin de chaque tutoriel contient un bloc « Signaler un problème » à copier
 - Les pilotes propriétaires hors dépôts (par exemple NVIDIA sur Alpine) et les réglages internes des logiciels ne sont pas couverts.
 - Gentoo : compilation longue (plusieurs heures pour la base).
 - L'alternative VirtualBox est décrite, pas testée.
-- Interface en français uniquement pour l'instant.
+- Traduction anglaise en cours : l'interface, les questions et les bases d'abord ; les fiches, l'aide « ? » et le tutoriel généré restent en français pour l'instant.
 
 ## Contenu du dépôt
 
@@ -70,7 +72,7 @@ La fin de chaque tutoriel contient un bloc « Signaler un problème » à copier
 - `gen/` : vérification des noms de paquets dans les index officiels, tests du générateur, audits, banc de test VM (`gen/vm/`). Le mot de passe écrit dans `gen/vm/run_vm.py` sert seulement aux VM de test jetables : il est sans valeur, ne le réutilise nulle part.
 - `.github/ISSUE_TEMPLATE/` : modèles de ticket.
 
-Tests (Node + Playwright) : `node gen/test-tutorials.js`, `node gen/audit.js`, `node gen/audit2.js`, `node gen/audit3.js`.
+Tests (Node + Playwright) : `node gen/test-i18n.js`, `node gen/test-tutorials.js`, `node gen/audit.js`, `node gen/audit2.js`, `node gen/audit3.js`. Avec `ATLAS_LANG=en`, ils chargent l'interface anglaise.
 
 ## Licences
 

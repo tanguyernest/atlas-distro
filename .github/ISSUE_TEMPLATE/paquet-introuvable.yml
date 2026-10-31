@@ -1,6 +1,6 @@
-name: Paquet introuvable
-description: Un paquet cité par le tutoriel n'existe pas (ou plus) dans les dépôts de la base.
-title: "[paquet] nom-du-paquet sur Base"
+name: Paquet introuvable / Package not found
+description: Un paquet cité par le tutoriel n'existe pas (ou plus) dans les dépôts de la base. / A package named in the tutorial does not (or no longer) exist in the base's repositories.
+title: "[paquet / package] package-name on Base"
 labels: ["bug"]
 # Mêmes id que commande-qui-echoue.yml pour les champs communs.
 body:
@@ -9,56 +9,59 @@ body:
       value: |
         Les noms de paquets sont vérifiés dans les index officiels à la date indiquée en tête du tutoriel. Ils peuvent avoir changé depuis.
         N'ajoute ni nom d'utilisateur, ni chemin de ta machine, ni mot de passe.
+
+        Package names are checked against the official indexes on the date shown at the top of the tutorial. They may have changed since.
+        Do not add a user name, a local path or a password. You can write in French or English.
   - type: input
     id: base
     attributes:
       label: Base
-      description: Distribution et version (par exemple Debian 13, Fedora 44).
+      description: Distribution et version / Distribution and version (for example Debian 13, Fedora 44).
       placeholder: Debian 13
     validations:
       required: true
   - type: input
     id: parcours
     attributes:
-      label: Parcours
-      placeholder: Léger
+      label: Parcours / Path
+      placeholder: Léger / Light
   - type: input
     id: etape
     attributes:
-      label: Identifiant d'étape
-      description: Indiqué sous le titre de l'étape, de la forme base-parcours-étape (par exemple debian-light-base-chroot).
-      placeholder: debian-light-12 (Installer le bureau)
+      label: Identifiant d'étape / Step identifier
+      description: Indiqué sous le titre de l'étape, de la forme base-parcours-étape (par exemple debian-light-base-chroot). / Shown under the step title, shaped like base-path-step (for example debian-light-base-chroot).
+      placeholder: debian-light-base-chroot
   - type: input
     id: paquet
     attributes:
-      label: Paquet introuvable
-      placeholder: nom-du-paquet
+      label: Paquet introuvable / Package not found
+      placeholder: package-name
     validations:
       required: true
   - type: textarea
     id: commande
     attributes:
-      label: Commande
-      description: La commande d'installation lancée.
+      label: Commande / Command
+      description: La commande d'installation lancée. / The install command you ran.
       render: bash
   - type: textarea
     id: erreur
     attributes:
-      label: Message d'erreur
+      label: Message d'erreur / Error message
       render: text
     validations:
       required: true
   - type: input
     id: verification
     attributes:
-      label: Date de vérification des paquets
-      description: Indiquée en tête du tutoriel (« Noms de paquets vérifiés le … »).
+      label: Date de vérification des paquets / Package check date
+      description: Indiquée en tête du tutoriel (« Noms de paquets vérifiés le … »). / Shown at the top of the tutorial (« Package names verified on … »).
   - type: input
     id: remplacement
     attributes:
-      label: Nom correct, si tu le connais
+      label: Nom correct, si tu le connais / Correct name, if you know it
   - type: input
     id: version
     attributes:
-      label: Version de l'app
+      label: Version de l'app / App version
       placeholder: 0.1.0
