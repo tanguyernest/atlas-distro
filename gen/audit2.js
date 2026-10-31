@@ -3,7 +3,7 @@ const {chromium}=require('playwright');
 (async()=>{
   const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844}});
   const errors=[];p.on('pageerror',e=>errors.push(e.message));
-  await p.goto('file://'+require('path').resolve(__dirname,'../atlas-distro.html')+(process.env.ATLAS_LANG?'?lang='+process.env.ATLAS_LANG:''));
+  await p.goto('file://'+require('path').resolve(__dirname,'../atlas-distro.html')+'?lang='+(process.env.ATLAS_LANG||'fr'));
   const res=await p.evaluate(()=>{
     const out=[],stats={cases:0,issues:0,fixes:0};
     const snap=()=>JSON.stringify({base:G.base,manual:G.manual,ans:G.ans,i:G.i,obj:G.obj,sw:G.sw,changed:G.changed,keep:G.keep});

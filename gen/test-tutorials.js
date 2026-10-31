@@ -1,7 +1,7 @@
 const {chromium}=require('playwright');const fs=require('fs');
 (async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844}});
 const e=[];p.on('pageerror',x=>e.push(x.message));
-await p.goto('file://'+require('path').resolve(__dirname,'../atlas-distro.html')+(process.env.ATLAS_LANG?'?lang='+process.env.ATLAS_LANG:''));
+await p.goto('file://'+require('path').resolve(__dirname,'../atlas-distro.html')+'?lang='+(process.env.ATLAS_LANG||'fr'));
 const res=await p.evaluate(()=>{
  const out={n:0,bad:[],samples:{}};
  const objs=OBJECTIVES.filter(o=>o.ready).map(o=>o.id);
@@ -106,7 +106,7 @@ const res=await p.evaluate(()=>{
  const want={alpine:'tested',debian:'written',ubuntu:'written',arch:'written',fedora:'written',void:'written',gentoo:'written'};
  Object.keys(BASEDEF).forEach(b=>{const e=want[b]||'none';if(baseStatus(b)!==e)out.bad.push('statut '+b+' : '+baseStatus(b)+' au lieu de '+e)});
  G.base=null;G.obj='gaming';const scr=baseScreen();
- Object.keys(BASEDEF).forEach(b=>{const m=scr.match(new RegExp('data-base="'+b+'">.*?</button>'));if(!m||!m[0].includes(BASE_STATUS[want[b]||'none']))out.bad.push('statut absent de la carte '+b)});
+ Object.keys(BASEDEF).forEach(b=>{const m=scr.match(new RegExp('data-base="'+b+'">.*?</button>'));if(!m||!m[0].includes(trx(BASE_STATUS[want[b]||'none'])))out.bad.push('statut absent de la carte '+b)});
  return out;
 });
 // modèles de ticket : les champs remplis par le lien existent, et les champs demandés sont là

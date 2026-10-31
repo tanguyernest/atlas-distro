@@ -14,7 +14,7 @@ It is a single web page, **in French and English**, that works **offline**: no s
 
 **Status: public beta (version 0.1.0).**
 
-> **Translation in progress.** The interface, the question tree and the bases are available in English. The tool sheets, the « ? » help and the generated tutorial are still in French for now. Commands, package names, identifiers and tool names are never translated.
+> **Translation in progress.** The interface, the question tree, the goals, the bases and the hardware questions are available in English. The tool sheets, the « ? » help and the generated tutorial are still in French for now. The language follows your browser (French if it is neither French nor English); the button at the top right switches it. Commands, package names, identifiers and tool names are never translated.
 
 ## Using the app
 

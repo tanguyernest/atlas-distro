@@ -7,7 +7,7 @@ const KEEP=new Set(['Alpine Linux','Arch Linux','Void Linux','Gentoo Linux','Lin
 (async()=>{
 const b=await chromium.launch();const p=await b.newPage({viewport:{width:390,height:844}});
 const errs=[];p.on('pageerror',x=>errs.push(x.message));
-await p.goto('file://'+require('path').resolve(__dirname,'../atlas-distro.html')+(process.env.ATLAS_LANG?'?lang='+process.env.ATLAS_LANG:''));
+await p.goto('file://'+require('path').resolve(__dirname,'../atlas-distro.html')+'?lang='+(process.env.ATLAS_LANG||'fr'));
 const r=await p.evaluate(()=>{
  const bad=[];const out={n:0,bad};
  // 1. parité des clés
@@ -137,6 +137,18 @@ if(errs.length)r.bad.push('pageerror: '+errs[0]);
  const urls=f=>[...new Set(fs.readFileSync(path.join(root,f),'utf8').match(/https:\/\/[^\s>)]+/g)||[])].sort().join(' ');
  if(urls('README.md')!==urls('README.en.md'))r.bad.push('URL différentes entre README.md et README.en.md');
 }
+// détection de la langue du navigateur : en → en ; fr, autre langue → fr ; le choix du bouton prime
+{const file='file://'+require('path').resolve(__dirname,'../atlas-distro.html');
+ for(const [locale,want] of [['en-GB','en'],['en-US','en'],['fr-FR','fr'],['fr-CA','fr'],['de-DE','fr'],['ja-JP','fr']]){
+  const c=await b.newContext({locale});const q=await c.newPage();await q.goto(file);
+  const got=await q.evaluate(()=>LANG);if(got!==want)r.bad.push('langue détectée '+locale+' : '+got+' au lieu de '+want);
+  if(locale==='de-DE'){ // le bouton enregistre le choix, qui l'emporte ensuite sur la détection
+   await q.click('#langBtn');if(await q.evaluate(()=>LANG)!=='en')r.bad.push('le bouton ne passe pas en anglais');
+   await q.reload();if(await q.evaluate(()=>LANG)!=='en')r.bad.push('choix du bouton non conservé');
+   const h=await q.evaluate(()=>document.documentElement.lang+'|'+document.getElementById('tabG').textContent);if(h!=='en|Guide me')r.bad.push('titre/onglet non traduits: '+h)}
+  if(locale==='en-GB'){const q2=await c.newPage();await q2.goto(file+'?lang=fr');if(await q2.evaluate(()=>LANG)!=='fr')r.bad.push('?lang=fr ignoré');
+   await q2.goto(file);if(await q2.evaluate(()=>LANG)!=='en')r.bad.push('?lang a été enregistré par erreur')}
+  await c.close()}}
 console.log('combinaisons comparées fr/en:',r.n);
 console.log(r.bad.length?'PROBLÈMES ('+r.bad.length+'):\n'+r.bad.slice(0,40).join('\n'):'0 problème');
 await b.close();process.exit(r.bad.length?1:0);

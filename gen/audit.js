@@ -1,6 +1,6 @@
 // Audit approfondi de atlas-distro.html : données + parcours aléatoires + mise en page
 const {chromium}=require('playwright');
-const FILE='file://'+require('path').resolve(__dirname,'../atlas-distro.html')+(process.env.ATLAS_LANG?'?lang='+process.env.ATLAS_LANG:'');
+const FILE='file://'+require('path').resolve(__dirname,'../atlas-distro.html')+'?lang='+(process.env.ATLAS_LANG||'fr');
 (async()=>{
   const b=await chromium.launch();
   const ctx=await b.newContext({viewport:{width:390,height:844}});

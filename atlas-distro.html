@@ -3290,10 +3290,10 @@ function applyStatic(){
   document.querySelectorAll("[data-ia]").forEach(el=>{el.setAttribute("aria-label",tx(el.dataset.ia))});
   $("disclaimer").innerHTML="<b>"+esc(warning()[0])+"</b> "+warning().slice(1).map(esc).join(" ");
 }
-function setLang(l,noRefresh){
+function setLang(l,noRefresh,persist){
   if(!LANGS.includes(l))return;
   LANG=l;
-  try{localStorage.setItem("atlas-lang",l)}catch(e){}
+  if(persist){try{localStorage.setItem("atlas-lang",l)}catch(e){}}
   document.documentElement.lang=l;
   applyDataLang();
   $("langBtn").textContent=tx("lang.switch");$("langBtn").setAttribute("aria-label",tx("lang.switch_aria"));
@@ -3304,7 +3304,8 @@ function setLang(l,noRefresh){
 function initialLang(){
   const q=new URLSearchParams(location.search).get("lang");if(LANGS.includes(q))return q;
   try{const m=localStorage.getItem("atlas-lang");if(LANGS.includes(m))return m}catch(e){}
-  return "fr"; // pas de détection du navigateur tant que l'interface anglaise n'est pas traduite
+  const nav=((navigator.languages&&navigator.languages[0])||navigator.language||"fr").slice(0,2).toLowerCase();
+  return nav==="en"?"en":"fr"; // fr par défaut si la langue du navigateur n'est ni fr ni en
 }
 
 const REPO_URL="https://github.com/tanguyernest/atlas-distro";
@@ -4095,7 +4096,7 @@ function setMode(m){
 $("cmpBackBtn").onclick=()=>{setMode("guide");scrollTo(0,0)};
 $("tabG").onclick=()=>setMode("guide");
 $("tabC").onclick=()=>setMode("compare");
-$("langBtn").onclick=()=>setLang(LANG==="fr"?"en":"fr");
+$("langBtn").onclick=()=>setLang(LANG==="fr"?"en":"fr",false,true);
 setLang(initialLang(),true);
 setCat("init");
 setMode("guide");

@@ -63,7 +63,7 @@ La fin de chaque tutoriel contient un bloc « Signaler un problème » à copier
 - Les pilotes propriétaires hors dépôts (par exemple NVIDIA sur Alpine) et les réglages internes des logiciels ne sont pas couverts.
 - Gentoo : compilation longue (plusieurs heures pour la base).
 - L'alternative VirtualBox est décrite, pas testée.
-- Traduction anglaise en cours : l'interface, les questions et les bases d'abord ; les fiches, l'aide « ? » et le tutoriel généré restent en français pour l'instant.
+- Traduction anglaise en cours : l'interface, les questions, les objectifs, les bases et le matériel sont traduits ; les fiches, l'aide « ? » et le tutoriel généré restent en français pour l'instant. La langue suit celle du navigateur (français si ce n'est ni le français ni l'anglais) ; le bouton en haut à droite la change.
 
 ## Contenu du dépôt
 
