@@ -197,6 +197,13 @@
     "obj": "light",
     "boot": "uefi",
     "title": "Activer les services"
+   },
+   "scratch-net:442add03": {
+    "date": "2026-10-31",
+    "label": "Alpine 3.24.3",
+    "obj": "light",
+    "boot": "uefi",
+    "title": "Vérifier la connexion internet du système live"
    }
   }
  }
