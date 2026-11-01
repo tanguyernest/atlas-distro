@@ -58,6 +58,62 @@ const r=await p.evaluate(()=>{
   setLang('fr',true);openHelp('cat:kernel','Noyau');if(!a.href.startsWith('https://fr.wikipedia.org/'))bad.push('lien aide fr: '+a.href);
   if(document.getElementById('sh-p').textContent!==HELP['cat:kernel'][0])bad.push('texte aide fr');
   closeHelp();setLang(L0,true)}
+ // 4b3. fiches (lot 6) : chemins valides, même nombre d'éléments, noms et commandes conservés, logique inchangée
+ {const FRV=/[éèàùçêâîôûœ]|\b(le|la|les|une|des|pour|avec|sans|est|sur|ou|et|du|de|plus|très|peu|oui)\b|\bnon\b(?!-)/i;
+  const AR=['pros','cons','pitfalls','needs'],PROSE=x=>!/^[\w.+-]+$/.test(x);
+  setLang('fr',true);
+  const frT=Object.fromEntries(TOOLS.map(t=>[t.id,JSON.parse(JSON.stringify(t))])),frNames=new Map(TOOLS.map(t=>[t.name,t.id]));
+  const pick0=TOOLS.map(t=>[PICK.bar(t),PICK.launch(t),PICK.notif(t),swMusl(t)].join());
+  // noms d'outils et jetons techniques (commandes, fichiers, options) du français à retrouver dans l'anglais
+  const TKN=/(^|\s|\()(-[\w-]+|[\w./-]*[\w](?:=|\(\)|\.[a-z]{2,}\b)|[a-z0-9]+-[a-z0-9-]+)(?=$|[\s,;:.)])/g;
+  const TSKIP=new Set(['multi-distributions','client-serveur','tout-en-un','sur-mesure','rétro-compatibles','pare-feu']);
+  const techs=s=>[...String(s).matchAll(TKN)].map(m=>m[2]).filter(x=>!TSKIP.has(x));
+  const toolNames=[...new Set(TOOLS.map(t=>t.name).filter(n=>/^[A-Za-z][\w.+-]{3,}$/.test(n)&&!/^(Archives|Terminal|Shell|Notifications|Jeux|Son|ranger|Fichiers|Stable|Rolling)$/i.test(n)))];
+  const has=(s,w)=>new RegExp('(^|[^\\w-])'+w.replace(/[.+()]/g,'\\$&')+'($|[^\\w-])').test(s);
+  Object.keys(EN_TOOLS).forEach(id=>{const f=frT[id],e=EN_TOOLS[id];
+   if(!f){bad.push('fiche inconnue: '+id);return}
+   Object.keys(e).forEach(k=>{if(!L10N_FIELDS.tools.includes(k))bad.push('champ interdit: '+id+'/'+k)});
+   if(!e.summary)bad.push('résumé manquant: '+id);
+   if(f.learn&&!e.learn)bad.push('learn manquant: '+id);
+   if('learn' in e&&!f.learn)bad.push('learn en trop: '+id);
+   AR.forEach(k=>{const a=f[k],b=e[k];
+    if(!b){if(a.some(PROSE))bad.push(k+' manquant: '+id);return}
+    if(a.length!==b.length){bad.push(k+' longueur différente: '+id);return}
+    a.forEach((x,i)=>{if(/Alpine/.test(x)!==/Alpine/.test(b[i]))bad.push('mot Alpine (filtre consFor/needsFor) différent: '+id+'/'+k+'['+i+']');
+     if(frNames.has(x)&&k==='needs'&&b[i]!==x)bad.push('nom d\'outil traduit dans needs: '+id+'/'+x)})});
+   if(e.name&&FRAG[f.name]!==undefined&&FRAG[f.name]!==e.name)bad.push('nom différent de FRAG: '+id+' : '+e.name+' ≠ '+FRAG[f.name]);
+   ['summary','learn',...AR].forEach(k=>{if(e[k]===undefined)return;
+    const a=[].concat(f[k]),b=[].concat(e[k]);
+    a.forEach((x,i)=>{const y=b[i];if(y===undefined)return;
+     if(FRV.test(y)&&!/^(Adélie)/.test(y))bad.push('français résiduel: '+id+'/'+k+' : '+y.slice(0,60));
+     if(PROSE(x)&&x===y)bad.push('identique au français: '+id+'/'+k+' : '+x.slice(0,60));
+     toolNames.forEach(n=>{if(has(x,n)&&!has(y,n))bad.push('nom perdu ('+n+'): '+id+'/'+k)});
+     techs(x).forEach(w=>{if(!y.includes(w))bad.push('jeton technique perdu ('+w+'): '+id+'/'+k)})})});
+   if(e.name){if(!/[A-Za-z]/.test(e.name)||e.name===f.name)bad.push('nom inutile: '+id);
+    const prod=(f.name.match(/\b[A-Z][\w-]*[A-Z0-9][\w-]*\b|\b(Linux|Wayland|Debian|Slackware|slackpkg|pkgtools)\b/g)||[]);
+    prod.forEach(w=>{if(!e.name.includes(w))bad.push('produit perdu dans le nom ('+w+'): '+id)})}
+  });
+  // catégories entièrement traduites : libellés et valeurs de critères couverts, comparateur sans français
+  const KEEP_VAL=new Set(['BIOS / UEFI','Secure Boot','Configuration','Documentation','Bluetooth','Wi-Fi','LTS','mainline','possible','MIT','LGPL','UEFI','C','Rust','musl','apk','OpenRC','glibc','apt','systemd','pacman','dnf','xbps','runit','Portage (emerge)','Nix','zypper','procd','BusyBox init','pkgtools (slackpkg)','.deb','.rpm','.xbps','.txz','.pkg.tar.zst','Alpine','Arch','Debian','rolling','stable','Wayland','X11','tiling','hyprland.conf','total','journald, timers, socket activation, cgroups','FAT, ext2/3/4, ISO9660','Dolphin, Konsole, Kate, Spectacle','Thunar, Terminal, Mousepad','Mo','1','aucune']);
+  const doneCats=CATS.filter(c=>{const l=TOOLS.filter(t=>t.category===c.id);return l.length&&l.every(t=>EN_TOOLS[t.id])});
+  doneCats.forEach(c=>{c.criteria.forEach(k=>{if(!VAL_EN[k.label]&&!KEEP_VAL.has(k.label))bad.push('libellé de critère sans anglais: '+c.id+'/'+k.label);if(k.unit&&!VAL_EN[k.unit])bad.push('unité sans anglais: '+k.unit)});
+   TOOLS.filter(t=>t.category===c.id).forEach(t=>{Object.values(t.criteria||{}).forEach(v=>{if(typeof v==='string'&&!VAL_EN[v]&&!KEEP_VAL.has(v))bad.push('valeur de critère sans anglais: '+t.id+' : '+v)});
+    t.used_by.forEach(u=>{if(FRV.test(u)&&!VAL_EN[u]&&!/^Adélie/.test(u))bad.push('Utilisé par sans anglais: '+u)});
+    t.implement.forEach(s=>{if(FRV.test(s.title)&&!VAL_EN[s.title])bad.push('titre d\'étape sans anglais: '+s.title)})})});
+  setLang('en',true);
+  const main=document.getElementById('main'),st0=JSON.stringify(state);
+  doneCats.forEach(c=>{const ids=TOOLS.filter(t=>t.category===c.id).map(t=>t.id);
+   for(let i=0;i<ids.length;i+=4){state.layer=c.layer;state.cat=c.id;state.sel=ids.slice(i,i+4);state.hideSame=false;render();
+    const cl=main.cloneNode(true);cl.querySelectorAll('pre').forEach(x=>x.remove());
+    const txt=cl.textContent.replace(/Adélie( Linux)?/g,'').replace(/Libre \((licences variées|livre et composants)\)/g,'').replace(/\s+/g,' ');
+    const m=txt.match(new RegExp('.{0,40}('+FRV.source+').{0,40}','i'));if(m)bad.push('français dans le comparateur ['+c.id+'] : …'+m[0]+'…')}});
+  Object.assign(state,JSON.parse(st0));
+  // la logique lit les valeurs françaises : identique dans les deux langues
+  const pick1=TOOLS.map(t=>[PICK.bar(t),PICK.launch(t),PICK.notif(t),swMusl(t)].join());
+  if(pick0.join('|')!==pick1.join('|'))bad.push('PICK/swMusl différents en anglais');
+  TOOLS.forEach(t=>{const f=frT[t.id];if(JSON.stringify(t.criteria)!==JSON.stringify(f.criteria)||JSON.stringify(t.implement)!==JSON.stringify(f.implement)||JSON.stringify(t.docs)!==JSON.stringify(f.docs)||t.license!==f.license)bad.push('critères/commandes/docs/licence modifiés en anglais: '+t.id)});
+  setLang('fr',true);
+  out.fiches=Object.keys(EN_TOOLS).length;out.total=TOOLS.length;out.reste=CATS.filter(c=>!doneCats.includes(c)).map(c=>c.id)}
  // 4c. mode anglais : les écrans du guide ne contiennent plus de français (hors données des fiches)
  {const FRW=/[éèàùçêâîôûœ]|\b(le|la|les|une|des|pour|ton|tes|avec|pas|est|sur|ou)\b|\bun\b/i;
   // noms de fiches (TOOLS) : données traduites au lot 6, pas ici
@@ -179,6 +235,7 @@ if(errs.length)r.bad.push('pageerror: '+errs[0]);
    await q2.goto(file);if(await q2.evaluate(()=>LANG)!=='en')r.bad.push('?lang a été enregistré par erreur')}
   await c.close()}}
 console.log('combinaisons comparées fr/en:',r.n);
+console.log('fiches traduites:',r.fiches+'/'+r.total);
 console.log(r.bad.length?'PROBLÈMES ('+r.bad.length+'):\n'+r.bad.slice(0,40).join('\n'):'0 problème');
 await b.close();process.exit(r.bad.length?1:0);
 })();
