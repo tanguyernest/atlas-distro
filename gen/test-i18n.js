@@ -66,7 +66,7 @@ const r=await p.evaluate(()=>{
   const pick0=TOOLS.map(t=>[PICK.bar(t),PICK.launch(t),PICK.notif(t),swMusl(t)].join());
   // noms d'outils et jetons techniques (commandes, fichiers, options) du français à retrouver dans l'anglais
   const TKN=/(^|\s|\()(-[\w-]+|[\w./-]*[\w](?:=|\(\)|\.[a-z]{2,}\b)|[a-z0-9]+-[a-z0-9-]+)(?=$|[\s,;:.)])/g;
-  const TSKIP=new Set(['multi-distributions','client-serveur','tout-en-un','sur-mesure','rétro-compatibles','pare-feu','sous-uid','sous-gid','presse-papiers']);
+  const TSKIP=new Set(['multi-distributions','client-serveur','tout-en-un','sur-mesure','rétro-compatibles','pare-feu','sous-uid','sous-gid','presse-papiers','multi-connexions','rendez-vous']);
   const techs=s=>[...String(s).matchAll(TKN)].map(m=>m[2]).filter(x=>!TSKIP.has(x));
   const toolNames=[...new Set(TOOLS.map(t=>t.name).filter(n=>/^[A-Za-z][\w.+-]{3,}$/.test(n)&&!/^(Archives|Terminal|Shell|Notifications|Jeux|Son|ranger|Fichiers|Stable|Rolling)$/i.test(n)))];
   const has=(s,w)=>new RegExp('(^|[^\\w-])'+w.replace(/[.+()]/g,'\\$&')+'($|[^\\w-])').test(s);
@@ -242,6 +242,6 @@ if(errs.length)r.bad.push('pageerror: '+errs[0]);
   await c.close()}}
 console.log('combinaisons comparées fr/en:',r.n);
 console.log('fiches traduites:',r.fiches+'/'+r.total);
-console.log(r.bad.length?'PROBLÈMES ('+r.bad.length+'):\n'+r.bad.slice(0,40).join('\n'):'0 problème');
+console.log(r.bad.length?'PROBLÈMES ('+r.bad.length+'):\n'+r.bad.slice(0,+(process.env.MAXBAD||40)).join('\n'):'0 problème');
 await b.close();process.exit(r.bad.length?1:0);
 })();
