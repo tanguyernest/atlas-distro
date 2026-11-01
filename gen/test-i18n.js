@@ -66,7 +66,7 @@ const r=await p.evaluate(()=>{
   const pick0=TOOLS.map(t=>[PICK.bar(t),PICK.launch(t),PICK.notif(t),swMusl(t)].join());
   // noms d'outils et jetons techniques (commandes, fichiers, options) du français à retrouver dans l'anglais
   const TKN=/(^|\s|\()(-[\w-]+|[\w./-]*[\w](?:=|\(\)|\.[a-z]{2,}\b)|[a-z0-9]+-[a-z0-9-]+)(?=$|[\s,;:.)])/g;
-  const TSKIP=new Set(['multi-distributions','client-serveur','tout-en-un','sur-mesure','rétro-compatibles','pare-feu']);
+  const TSKIP=new Set(['multi-distributions','client-serveur','tout-en-un','sur-mesure','rétro-compatibles','pare-feu','sous-uid','sous-gid','presse-papiers']);
   const techs=s=>[...String(s).matchAll(TKN)].map(m=>m[2]).filter(x=>!TSKIP.has(x));
   const toolNames=[...new Set(TOOLS.map(t=>t.name).filter(n=>/^[A-Za-z][\w.+-]{3,}$/.test(n)&&!/^(Archives|Terminal|Shell|Notifications|Jeux|Son|ranger|Fichiers|Stable|Rolling)$/i.test(n)))];
   const has=(s,w)=>new RegExp('(^|[^\\w-])'+w.replace(/[.+()]/g,'\\$&')+'($|[^\\w-])').test(s);
@@ -86,7 +86,7 @@ const r=await p.evaluate(()=>{
     const a=[].concat(f[k]),b=[].concat(e[k]);
     a.forEach((x,i)=>{const y=b[i];if(y===undefined)return;
      if(FRV.test(y)&&!/^(Adélie)/.test(y))bad.push('français résiduel: '+id+'/'+k+' : '+y.slice(0,60));
-     if(PROSE(x)&&x===y)bad.push('identique au français: '+id+'/'+k+' : '+x.slice(0,60));
+     if(PROSE(x)&&x===y&&!/^[\w.+-]+ \d+$/.test(x))bad.push('identique au français: '+id+'/'+k+' : '+x.slice(0,60));
      toolNames.forEach(n=>{if(has(x,n)&&!has(y,n))bad.push('nom perdu ('+n+'): '+id+'/'+k)});
      techs(x).forEach(w=>{if(!y.includes(w))bad.push('jeton technique perdu ('+w+'): '+id+'/'+k)})})});
    if(e.name){if(!/[A-Za-z]/.test(e.name)||e.name===f.name)bad.push('nom inutile: '+id);
@@ -94,18 +94,24 @@ const r=await p.evaluate(()=>{
     prod.forEach(w=>{if(!e.name.includes(w))bad.push('produit perdu dans le nom ('+w+'): '+id)})}
   });
   // catégories entièrement traduites : libellés et valeurs de critères couverts, comparateur sans français
-  const KEEP_VAL=new Set(['BIOS / UEFI','Secure Boot','Configuration','Documentation','Bluetooth','Wi-Fi','LTS','mainline','possible','MIT','LGPL','UEFI','C','Rust','musl','apk','OpenRC','glibc','apt','systemd','pacman','dnf','xbps','runit','Portage (emerge)','Nix','zypper','procd','BusyBox init','pkgtools (slackpkg)','.deb','.rpm','.xbps','.txz','.pkg.tar.zst','Alpine','Arch','Debian','rolling','stable','Wayland','X11','tiling','hyprland.conf','total','journald, timers, socket activation, cgroups','FAT, ext2/3/4, ISO9660','Dolphin, Konsole, Kate, Spectacle','Thunar, Terminal, Mousepad','Mo','1','aucune']);
+  const KEEP_VAL=new Set(['BIOS / UEFI','Secure Boot','Configuration','Documentation','Bluetooth','Wi-Fi','LTS','mainline','possible','MIT','LGPL','UEFI','C','Rust','musl','apk','OpenRC','glibc','apt','systemd','pacman','dnf','xbps','runit','Portage (emerge)','Nix','zypper','procd','BusyBox init','pkgtools (slackpkg)','.deb','.rpm','.xbps','.txz','.pkg.tar.zst','Alpine','Arch','Debian','rolling','stable','Wayland','X11','tiling','hyprland.conf','total','journald, timers, socket activation, cgroups','FAT, ext2/3/4, ISO9660','Dolphin, Konsole, Kate, Spectacle','Thunar, Terminal, Mousepad','Mo','1','aucune','CSS','Lua','Zig','Gecko','Blink','flatpak','terminal','Terminal','Terminal (iwctl)','Terminal (TUI)','Steam','Git','WireGuard','native','simple','Simple','Notifications','Interface','Extensions','Scripts','podman compose','docker compose','OpenVPN (TLS)','Epic, GOG, Amazon','Linux, Windows','Linux, Windows, macOS','Linux, Android, Windows','Linux, Windows, macOS, BSD','Linux, Windows, macOS, Android, BSD','Linux, Windows, macOS, Android, iOS']);
   const doneCats=CATS.filter(c=>{const l=TOOLS.filter(t=>t.category===c.id);return l.length&&l.every(t=>EN_TOOLS[t.id])});
   doneCats.forEach(c=>{c.criteria.forEach(k=>{if(!VAL_EN[k.label]&&!KEEP_VAL.has(k.label))bad.push('libellé de critère sans anglais: '+c.id+'/'+k.label);if(k.unit&&!VAL_EN[k.unit])bad.push('unité sans anglais: '+k.unit)});
    TOOLS.filter(t=>t.category===c.id).forEach(t=>{Object.values(t.criteria||{}).forEach(v=>{if(typeof v==='string'&&!VAL_EN[v]&&!KEEP_VAL.has(v))bad.push('valeur de critère sans anglais: '+t.id+' : '+v)});
     t.used_by.forEach(u=>{if(FRV.test(u)&&!VAL_EN[u]&&!/^Adélie/.test(u))bad.push('Utilisé par sans anglais: '+u)});
     t.implement.forEach(s=>{if(FRV.test(s.title)&&!VAL_EN[s.title])bad.push('titre d\'étape sans anglais: '+s.title)})})});
+  // licences : description traduite, identifiants conservés, valeur d'origine jamais modifiée
+  {const IDS=/[A-Z]+-[\d.]+\+?|\b(?:MIT|0?BSD|CDDL|ISC|GPL|Unlicense)\b/g;const L0=LANG;setLang('en',true);
+   [...new Set(TOOLS.map(t=>t.license).filter(Boolean))].forEach(l=>{const e=crx(l);
+    if(FRV.test(e)||/Libre|Licence|Propri[ée]taire|objet/.test(e))bad.push('licence non traduite: '+l);
+    if((l.match(IDS)||[]).join()!==(e.match(IDS)||[]).join())bad.push('identifiant de licence modifié: '+l)});
+   setLang(L0,true)}
   setLang('en',true);
   const main=document.getElementById('main'),st0=JSON.stringify(state);
   doneCats.forEach(c=>{const ids=TOOLS.filter(t=>t.category===c.id).map(t=>t.id);
    for(let i=0;i<ids.length;i+=4){state.layer=c.layer;state.cat=c.id;state.sel=ids.slice(i,i+4);state.hideSame=false;render();
     const cl=main.cloneNode(true);cl.querySelectorAll('pre').forEach(x=>x.remove());
-    const txt=cl.textContent.replace(/Adélie( Linux)?/g,'').replace(/Libre \((licences variées|livre et composants)\)/g,'').replace(/\s+/g,' ');
+    const txt=cl.textContent.replace(/Adélie( Linux)?/g,'').replace(/\s+/g,' ');
     const m=txt.match(new RegExp('.{0,40}('+FRV.source+').{0,40}','i'));if(m)bad.push('français dans le comparateur ['+c.id+'] : …'+m[0]+'…')}});
   Object.assign(state,JSON.parse(st0));
   // la logique lit les valeurs françaises : identique dans les deux langues
